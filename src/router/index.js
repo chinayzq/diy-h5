@@ -8,50 +8,22 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/model',
+      redirect: '/gallery',
       component: Layout,
       children: [
         {
-          path: '/model',
-          name: 'model',
-          component: () => import('@/views/model/index.vue'),
-          meta: { title: 'Model' },
+          path: '/gallery',
+          name: 'gallery',
+          component: () => import('@/views/gallery/index.vue'),
+          meta: { title: 'gallery' },
         },
         {
-          path: '/sticker',
-          name: 'sticker',
-          component: () => import('@/views/sticker/index.vue'),
-          meta: { title: 'sticker' },
-        },
-        {
-          path: '/template',
-          name: 'template',
-          component: () => import('@/views/template/index.vue'),
-          meta: { title: 'Template' },
-        },
-        {
-          path: '/template/detail',
-          name: 'templateDetail',
-          component: () => import('@/views/template/model/detail.vue'),
-          meta: {
-            title: 'Template Detail',
-            detail: true,
-            parrentPath: '/template',
-          },
-        },
-        {
-          path: '/dictionary',
-          name: 'dictionary',
-          component: () => import('@/views/dictionary/index.vue'),
-          meta: { title: 'Dictionary' },
+          path: '/workbench',
+          name: 'workbench',
+          component: () => import('@/views/workbench/index.vue'),
+          meta: { title: 'workbench' },
         },
       ],
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/views/login/index.vue'),
-      meta: { title: 'Login' },
     },
   ],
 });
