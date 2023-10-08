@@ -1,3 +1,6 @@
+export function dealImageUrl(url) {
+  return url.replace('?fileId=', '/');
+}
 export function getCookie(cname) {
   let name = cname + '=';
   let ca = document.cookie.split(';');

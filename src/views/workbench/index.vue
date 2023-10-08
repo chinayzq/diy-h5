@@ -17,7 +17,7 @@
       position="bottom"
       v-model:show="stickersShow"
     >
-      <StickersDialog />
+      <StickersDialog @close="stickersShow = false" />
     </var-popup>
     <!-- font弹出框 -->
     <var-popup

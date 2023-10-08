@@ -16,28 +16,33 @@
           :src="dealImageUrl(tab.stickerUrl)"
         />
       </var-tab>
+      <var-icon name="window-close" @click="emit('close')" />
     </var-tabs>
-    <div class="images-container" v-if="tabs[active]">
-      <div
-        class="single-image"
-        v-for="(single, singleIndex) in tabs[active].stickerChildlist"
-        :key="singleIndex"
-      >
-        <var-image
-          width="40px"
-          height="40px"
-          lazy
-          loading="/src/assets/images/img_loading.svg"
-          :src="dealImageUrl(single.url)"
-        />
+    <keep-alive>
+      <div class="images-container" v-if="tabs[active]">
+        <div
+          class="single-image"
+          v-for="(single, singleIndex) in tabs[active].stickerChildlist"
+          :key="singleIndex"
+        >
+          <var-image
+            width="40px"
+            height="40px"
+            lazy
+            loading="/src/assets/images/img_loading.svg"
+            :src="dealImageUrl(single.url)"
+          />
+        </div>
       </div>
-    </div>
+    </keep-alive>
   </div>
 </template>
 
 <script setup>
 import { onBeforeMount, ref } from "vue";
 import { getStickers } from "@/api/workbench.js";
+import { dealImageUrl } from "@/utils";
+const emit = defineEmits();
 onBeforeMount(() => {
   initDatas();
 });
@@ -51,9 +56,6 @@ const initDatas = () => {
     }
   });
 };
-const dealImageUrl = (url) => {
-  return url.replace("?fileId=", "/");
-};
 </script>
 
 <style lang="less" scoped>
@@ -66,9 +68,9 @@ const dealImageUrl = (url) => {
     overflow: hidden auto;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     align-items: center;
     gap: 8px 8px;
+    padding-left: 8px;
     padding-top: 10px;
     .single-image {
       background-color: #f7f7f7;
