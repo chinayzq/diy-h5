@@ -1,18 +1,18 @@
 export default {
   development: {
-    baseUrl: '/diyadmin',
-    uploadUrl: '/diyadmin/upload',
+    baseUrl: '/colgifts',
+    uploadUrl: '/colgifts/upload',
   },
   sit: {
-    baseUrl: '/diyadmin',
-    uploadUrl: '/diyadmin/upload',
+    baseUrl: '/colgifts',
+    uploadUrl: '/colgifts/upload',
   },
   uat: {
-    baseUrl: '/diyadmin',
-    uploadUrl: '/diyadmin/upload',
+    baseUrl: '/colgifts',
+    uploadUrl: '/colgifts/upload',
   },
   prod: {
-    baseUrl: '/diyadmin',
-    uploadUrl: '/diyadmin/upload',
+    baseUrl: '/colgifts',
+    uploadUrl: '/colgifts/upload',
   },
 };

@@ -1,7 +1,6 @@
 import axios from 'axios';
 import router from '@/router/index';
 import config from '~/config';
-import { ElMessage } from 'element-plus';
 // 这边由于后端没有区分测试和正式，姑且都写成一个接口。
 axios.defaults.baseURL = config[import.meta.env.MODE].baseUrl;
 // 携带 cookie，对目前的项目没有什么作用，因为我们是 token 鉴权
@@ -17,13 +16,13 @@ axios.interceptors.response.use(
   (res) => {
     if (!res) return;
     if (res?.data?.code === 401) {
-      ElMessage({
-        message: '登录失效，请重新登录！',
-        type: 'warning',
-      });
-      setTimeout(() => {
-        router.push({ path: '/login' });
-      }, 2000);
+      // ElMessage({
+      //   message: '登录失效，请重新登录！',
+      //   type: 'warning',
+      // });
+      // setTimeout(() => {
+      //   router.push({ path: '/login' });
+      // }, 2000);
     }
     if (res.data === 0) return res.data;
     if (res.data && res.config && res.headers && res.request) return res.data;

@@ -70,8 +70,8 @@ export default ({ mode }) =>
     server: {
       hmr: true,
       proxy: {
-        '/diyadmin': {
-          target: 'http://82.157.28.3:8083/',
+        '/colgifts': {
+          target: 'http://82.157.28.3:8084/',
           changeOrigin: true,
           // rewrite: (path) => path.replace(/^\/saascloud/, 'saascloud'),
         },

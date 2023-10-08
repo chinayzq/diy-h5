@@ -1,7 +1,7 @@
 <template>
   <div class="workbench-component">
     <div class="header-container">
-      <div class="model-case-container">
+      <div class="model-case-container" @click="brandAndModelShow = true">
         {{ `${currentModel} / ${currentCase}` }}
         <var-icon name="chevron-down" />
       </div>
@@ -27,6 +27,14 @@
     >
       <FontDialog />
     </var-popup>
+    <!-- 手机品牌、型号弹框 -->
+    <var-popup
+      overlay-class="popup-custom-border"
+      position="bottom"
+      v-model:show="brandAndModelShow"
+    >
+      <BrandAndModelsDialog />
+    </var-popup>
   </div>
 </template>
 
@@ -35,6 +43,7 @@ import { ref } from "vue";
 import NavigationBar from "./components/navigationBar.vue";
 import StickersDialog from "./components/stickersDialog.vue";
 import FontDialog from "./components/fontDialog.vue";
+import BrandAndModelsDialog from "./components/brandAndModelsDialog.vue";
 // PC、IOS、Android
 import { judgeClient } from "@/utils";
 const currentModel = "iPhone 15 pro";
@@ -61,8 +70,9 @@ const navigationEvent = (type, file) => {
 const stickersShow = ref(false);
 
 const fontShow = ref(false);
-</script>
 
+const brandAndModelShow = ref(false);
+</script>
 <style lang="less" scoped>
 .workbench-component {
   position: relative;
