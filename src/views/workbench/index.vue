@@ -8,31 +8,59 @@
       <div class="print-button">PRINT</div>
     </div>
     <div class="graph-container">
-      <img src="@/assets/images/model_temp.png" alt="" />
+      <!-- <img src="@/assets/images/model_temp.png" alt="" /> -->
     </div>
     <NavigationBar @naviClick="navigationEvent" />
+    <!-- sticker弹出框 -->
+    <var-popup
+      overlay-class="popup-custom-overlay"
+      position="bottom"
+      v-model:show="stickersShow"
+    >
+      <StickersDialog />
+    </var-popup>
+    <!-- font弹出框 -->
+    <var-popup
+      overlay-class="popup-custom-overlay"
+      position="bottom"
+      v-model:show="fontShow"
+    >
+      <FontDialog />
+    </var-popup>
   </div>
 </template>
 
 <script setup>
+import { ref } from "vue";
 import NavigationBar from "./components/navigationBar.vue";
+import StickersDialog from "./components/stickersDialog.vue";
+import FontDialog from "./components/fontDialog.vue";
 // PC、IOS、Android
 import { judgeClient } from "@/utils";
 const currentModel = "iPhone 15 pro";
 const currentCase = "Clear Impact Case - Black";
-const navigationEvent = (type) => {
+const navigationEvent = (type, file) => {
   console.log("type", type);
   switch (type) {
     case "stickers":
+      stickersShow.value = true;
       break;
     case "font":
+      fontShow.value = true;
       break;
     case "image":
+      if (file) {
+        console.log("file", file);
+      }
       break;
     case "templates":
       break;
   }
 };
+
+const stickersShow = ref(false);
+
+const fontShow = ref(false);
 </script>
 
 <style lang="less" scoped>

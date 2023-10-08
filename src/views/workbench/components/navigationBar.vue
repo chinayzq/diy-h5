@@ -6,10 +6,20 @@
       v-for="item in items"
       :key="item.key"
     >
-      <div :class="['icon-line', `icon-${item.key}`]"></div>
-      <div class="name-line">
-        {{ item.label }}
-      </div>
+      <template v-if="item.key === 'image'">
+        <var-uploader @after-read="uploadSuccess" hide-list v-model="files">
+          <div :class="['icon-line', `icon-${item.key}`]"></div>
+          <div class="name-line">
+            {{ item.label }}
+          </div>
+        </var-uploader>
+      </template>
+      <template v-else>
+        <div :class="['icon-line', `icon-${item.key}`]"></div>
+        <div class="name-line">
+          {{ item.label }}
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -17,6 +27,7 @@
 <script setup>
 import { judgeClient } from "@/utils";
 import { ref } from "vue";
+const files = ref([]);
 const items = ref([
   {
     label: "Stickers",
@@ -43,6 +54,10 @@ if (currentClient === "PC") {
 const emit = defineEmits();
 const itemClickHandler = (key) => {
   emit("naviClick", key);
+};
+
+const uploadSuccess = (file) => {
+  emit("naviClick", "image", file.cover);
 };
 </script>
 
