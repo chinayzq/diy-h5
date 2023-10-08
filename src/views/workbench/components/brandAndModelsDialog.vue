@@ -42,8 +42,7 @@
           ]"
           v-for="(caseItem, caseIndex) in caseList"
           :key="caseIndex"
-          width="40px"
-          height="66px"
+          height="77px"
           lazy
           loading="/src/assets/images/img_loading.svg"
           :src="dealImageUrl(caseItem.url)"
@@ -154,7 +153,7 @@ const getCaseByPhoneCode = (phoneCode) => {
       .single-image {
         padding: 5px 10px;
         border: 2.5px solid #f8f8f8;
-        min-width: 66px;
+        min-width: 60px;
       }
       .single-image-active {
         border: 2.5px solid rgb(143, 191, 255);

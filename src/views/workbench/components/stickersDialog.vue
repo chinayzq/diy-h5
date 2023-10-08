@@ -18,23 +18,21 @@
       </var-tab>
       <var-icon name="window-close" @click="emit('close')" />
     </var-tabs>
-    <keep-alive>
-      <div class="images-container" v-if="tabs[active]">
-        <div
-          class="single-image"
-          v-for="(single, singleIndex) in tabs[active].stickerChildlist"
-          :key="singleIndex"
-        >
-          <var-image
-            width="40px"
-            height="40px"
-            lazy
-            loading="/src/assets/images/img_loading.svg"
-            :src="dealImageUrl(single.url)"
-          />
-        </div>
+    <div class="images-container" v-if="tabs[active]">
+      <div
+        class="single-image"
+        v-for="(single, singleIndex) in tabs[active].stickerChildlist"
+        :key="singleIndex"
+      >
+        <var-image
+          width="40px"
+          height="40px"
+          lazy
+          loading="/src/assets/images/img_loading.svg"
+          :src="dealImageUrl(single.url)"
+        />
       </div>
-    </keep-alive>
+    </div>
   </div>
 </template>
 

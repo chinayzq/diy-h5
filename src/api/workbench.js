@@ -9,3 +9,6 @@ export function getPhoneColor(params) {
 export function getStickers(params) {
   return axios.get('/list/stickers', params);
 }
+export function getFontSize(params) {
+  return axios.get('/list/fontsize', params);
+}
