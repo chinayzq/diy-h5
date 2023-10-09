@@ -51,6 +51,19 @@
         @openModelDialog="openModelDialog"
       />
     </var-popup>
+
+    <!-- 模板弹窗 -->
+    <var-popup
+      @close="templateDialogClose"
+      :overlay-class="templateDialogClass"
+      position="bottom"
+      v-model:show="templateDialogShow"
+    >
+      <TemplateDialog
+        v-if="templateDialogShow"
+        @change="templateDialogChange"
+      />
+    </var-popup>
   </div>
 </template>
 
@@ -61,6 +74,7 @@ import StickersDialog from "./components/stickersDialog.vue";
 import FontDialog from "./components/fontDialog.vue";
 import BrandAndModelsDialog from "./components/brandAndModelsDialog.vue";
 import CaseDialog from "./components/caseDialog.vue";
+import TemplateDialog from "./components/templateDialog.vue";
 // PC、IOS、Android
 import { judgeClient } from "@/utils";
 const currentModel = "iPhone 15 pro";
@@ -80,8 +94,18 @@ const navigationEvent = (type, file) => {
       }
       break;
     case "templates":
+      templateDialogShow.value = true;
       break;
   }
+};
+
+const templateDialogShow = ref(false);
+const templateDialogClass = ref("popup-custom-overlay-offset");
+const templateDialogChange = () => {
+  templateDialogClass.value = "popup-custom-border";
+};
+const templateDialogClose = () => {
+  templateDialogClass.value = "popup-custom-overlay-offset";
 };
 
 const stickersShow = ref(false);

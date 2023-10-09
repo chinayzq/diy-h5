@@ -31,7 +31,7 @@
             height="40px"
             lazy
             loading="/src/assets/images/img_loading.svg"
-            :src="imageUrlDeal(single.extend2)"
+            :src="single.extend2"
           />
         </div>
       </div>
@@ -137,10 +137,6 @@ const fontIconList = ref([
     key: "line-through",
   },
 ]);
-
-const imageUrlDeal = (url) => {
-  return `/colgifts/image/${url}`;
-};
 
 const fontSizeList = ref([]);
 const loadingFlag = ref(false);

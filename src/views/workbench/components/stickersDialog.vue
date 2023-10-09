@@ -14,7 +14,7 @@
           height="30px"
           lazy
           loading="/src/assets/images/img_loading.svg"
-          :src="dealImageUrl(tab.stickerUrl)"
+          :src="tab.stickerUrl"
         />
       </var-tab>
       <var-icon name="window-close" @click="emit('close')" />
@@ -30,7 +30,7 @@
           height="40px"
           lazy
           loading="/src/assets/images/img_loading.svg"
-          :src="dealImageUrl(single.url)"
+          :src="single.url"
         />
       </div>
     </div>
@@ -40,7 +40,6 @@
 <script setup>
 import { onBeforeMount, ref } from "vue";
 import { getStickers } from "@/api/workbench.js";
-import { dealImageUrl } from "@/utils";
 const emit = defineEmits();
 onBeforeMount(() => {
   initDatas();
