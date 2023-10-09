@@ -1,5 +1,6 @@
 <template>
   <div class="font-dialog">
+    <Loading v-show="loadingFlag" />
     <div class="input-line">
       <var-input
         class="type-input"
@@ -132,8 +133,8 @@ const fontIconList = ref([
     key: "italic",
   },
   {
-    icon: "text-edit-through.svg",
-    key: "through",
+    icon: "text-edit-line-through.svg",
+    key: "line-through",
   },
 ]);
 
@@ -142,12 +143,18 @@ const imageUrlDeal = (url) => {
 };
 
 const fontSizeList = ref([]);
+const loadingFlag = ref(false);
 const initDatas = () => {
-  getFontSize().then((res) => {
-    if (res.code === 200) {
-      fontSizeList.value = res.data;
-    }
-  });
+  loadingFlag.value = true;
+  getFontSize()
+    .then((res) => {
+      if (res.code === 200) {
+        fontSizeList.value = res.data;
+      }
+    })
+    .finally(() => {
+      loadingFlag.value = false;
+    });
 };
 
 const typeContent = ref(null);

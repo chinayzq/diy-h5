@@ -1,5 +1,6 @@
 <template>
   <div class="stickers-dialog">
+    <Loading v-show="loadingFlag" />
     <var-tabs v-model:active="active" style="width: 100vw">
       <var-tab
         v-for="tab in tabs"
@@ -46,13 +47,19 @@ onBeforeMount(() => {
 });
 const active = ref(0);
 const tabs = ref([]);
+const loadingFlag = ref(false);
 const initDatas = () => {
-  getStickers().then((res) => {
-    console.log(res);
-    if (res.code === 200) {
-      tabs.value = res.data;
-    }
-  });
+  loadingFlag.value = true;
+  getStickers()
+    .then((res) => {
+      console.log(res);
+      if (res.code === 200) {
+        tabs.value = res.data;
+      }
+    })
+    .finally(() => {
+      loadingFlag.value = false;
+    });
 };
 </script>
 

@@ -11,6 +11,7 @@
       <!-- <img src="@/assets/images/model_temp.png" alt="" /> -->
     </div>
     <NavigationBar @naviClick="navigationEvent" />
+
     <!-- sticker弹出框 -->
     <var-popup
       overlay-class="popup-custom-overlay"
@@ -19,6 +20,7 @@
     >
       <StickersDialog @close="stickersShow = false" />
     </var-popup>
+
     <!-- font弹出框 -->
     <var-popup
       overlay-class="popup-custom-overlay"
@@ -27,13 +29,27 @@
     >
       <FontDialog />
     </var-popup>
+
     <!-- 手机品牌、型号弹框 -->
     <var-popup
       overlay-class="popup-custom-border"
       position="bottom"
       v-model:show="brandAndModelShow"
     >
-      <BrandAndModelsDialog />
+      <BrandAndModelsDialog @nextStep="nextStepHandler" />
+    </var-popup>
+
+    <!-- 手机壳选择弹窗 -->
+    <var-popup
+      overlay-class="popup-custom-border"
+      position="bottom"
+      v-model:show="caseDialogShow"
+    >
+      <CaseDialog
+        :dataset="selectCaseList"
+        :selectPhoneName="selectPhoneName"
+        @openModelDialog="openModelDialog"
+      />
     </var-popup>
   </div>
 </template>
@@ -44,6 +60,7 @@ import NavigationBar from "./components/navigationBar.vue";
 import StickersDialog from "./components/stickersDialog.vue";
 import FontDialog from "./components/fontDialog.vue";
 import BrandAndModelsDialog from "./components/brandAndModelsDialog.vue";
+import CaseDialog from "./components/caseDialog.vue";
 // PC、IOS、Android
 import { judgeClient } from "@/utils";
 const currentModel = "iPhone 15 pro";
@@ -72,6 +89,22 @@ const stickersShow = ref(false);
 const fontShow = ref(false);
 
 const brandAndModelShow = ref(false);
+
+const caseDialogShow = ref(false);
+const selectCaseList = ref([]);
+const selectPhoneName = ref(null);
+const nextStepHandler = (datas) => {
+  selectCaseList.value = datas.caseList;
+  selectPhoneName.value = datas.phoneName;
+  console.log("selectCaseList.value", selectCaseList.value);
+  brandAndModelShow.value = false;
+  caseDialogShow.value = true;
+};
+
+const openModelDialog = () => {
+  caseDialogShow.value = false;
+  brandAndModelShow.value = true;
+};
 </script>
 <style lang="less" scoped>
 .workbench-component {

@@ -1,5 +1,6 @@
 <template>
   <div class="brand-and-models">
+    <Loading v-show="loadingFlag" />
     <div class="brand-container">
       <div class="title-line">Brand</div>
       <div class="brand-list">
@@ -38,18 +39,19 @@
         <var-image
           :class="[
             'single-image',
-            activeCaseIndex === caseIndex && 'single-image-active',
+            activeCaseIndex === phoneIndex && 'single-image-active',
           ]"
-          v-for="(caseItem, caseIndex) in caseList"
-          :key="caseIndex"
+          @click="activeCaseIndex = phoneIndex"
+          v-for="(phoneItem, phoneIndex) in phoneColorList"
+          :key="phoneIndex"
           height="77px"
           lazy
           loading="/src/assets/images/img_loading.svg"
-          :src="dealImageUrl(caseItem.url)"
+          :src="dealImageUrl(phoneItem.url)"
         />
       </div>
     </div>
-    <div class="next-step">Next Step</div>
+    <div class="next-step" @click="nextStepHandler">Next Step</div>
   </div>
 </template>
 
@@ -62,31 +64,49 @@ onBeforeMount(() => {
 });
 
 const dataList = ref([]);
+const loadingFlag = ref(false);
 const initDatas = () => {
-  getBrandAndModels().then((res) => {
-    console.log(res);
-    if (res.code === 200) {
-      dataList.value = res.data;
-    }
-  });
+  loadingFlag.value = true;
+  getBrandAndModels()
+    .then((res) => {
+      console.log(res);
+      if (res.code === 200) {
+        dataList.value = res.data;
+      }
+    })
+    .finally(() => {
+      loadingFlag.value = false;
+    });
 };
 
 const activeBrandIndex = ref(0);
 const activeModelIndex = ref(0);
 const activeCaseIndex = ref(0);
+const activePhoneName = ref(null);
 const modelClickHandler = (model, index) => {
   activeModelIndex.value = index;
+  activePhoneName.value = model.phoneName;
   getCaseByPhoneCode(model.phoneCode);
 };
 
+const phoneColorList = ref([]);
 const caseList = ref([]);
 const getCaseByPhoneCode = (phoneCode) => {
   getPhoneColor({
     phoneCode,
   }).then((res) => {
     if (res.code === 200) {
-      caseList.value = res.data.phoneColorList;
+      phoneColorList.value = res.data.phoneColorList;
+      caseList.value = res.data.modelColorList;
     }
+  });
+};
+
+const emit = defineEmits();
+const nextStepHandler = () => {
+  emit("nextStep", {
+    caseList: caseList.value,
+    phoneName: activePhoneName.value,
   });
 };
 </script>

@@ -6,7 +6,9 @@ import '@varlet/ui/es/style';
 import { initGlableFilters } from './utils';
 // import 'amfe-flexible/index.js';
 import { setDomFontSize } from './utils/dom';
+import Loading from '@/components/Loading/index.vue';
 const app = createApp(App).use(Varlet);
+app.component('Loading', Loading);
 // 全局过滤器
 initGlableFilters(app);
 
