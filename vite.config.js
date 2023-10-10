@@ -71,7 +71,7 @@ export default ({ mode }) =>
       hmr: true,
       proxy: {
         '/colgifts': {
-          target: 'http://82.157.28.3:8084/',
+          target: 'http://43.159.137.119:8084/',
           changeOrigin: true,
           // rewrite: (path) => path.replace(/^\/saascloud/, 'saascloud'),
         },

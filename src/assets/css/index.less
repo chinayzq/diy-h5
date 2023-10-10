@@ -9,6 +9,7 @@
   background: #ffffff00 !important;
   & + .var-popup__content {
     bottom: 80px;
+    box-shadow: none;
   }
 }
 .popup-custom-border {
@@ -23,6 +24,8 @@
 .var-tabs__indicator-inner {
   background: #00000090 !important;
 }
+
+// 滚动条样式
 *::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -43,4 +46,29 @@
   border-radius: 4px;
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.2);
   background-color: rgba(85, 85, 85, 0.4);
+}
+
+// PC端布局
+.layout-PC {
+  .workbench-component {
+    width: 375px;
+  }
+  .layout-container {
+    display: flex;
+    justify-content: center;
+  }
+  .navigation-bar-component {
+    width: 375px !important;
+    left: calc(50% - 187.5px) !important;
+  }
+  .var-popup {
+    width: 375px;
+    left: calc(50% - 187.5px) !important;
+  }
+  .var-popup__content {
+    width: 375px;
+  }
+  .var-tabs {
+    width: 375px !important;
+  }
 }

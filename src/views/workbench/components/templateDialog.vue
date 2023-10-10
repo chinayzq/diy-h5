@@ -1,5 +1,6 @@
 <template>
   <div :class="['template-dialog', `template-dialog-${displayModel}`]">
+    <Loading v-show="loadingFlag" />
     <div class="left-part" v-show="displayModel === 'default'">
       <img class="clear-icon" src="@/assets/images/template_clear.svg" alt="" />
       <span class="more-span" @click="changeHandler">
@@ -27,6 +28,7 @@
         </var-tab>
       </var-tabs>
       <div class="template-list">
+        <Loading v-show="listLoading" />
         <div
           class="single-image"
           v-for="(single, singleIndex) in tabs[active]?.children"
@@ -37,6 +39,7 @@
             loading="/src/assets/images/img_loading.svg"
             :src="single.templateUrl"
           />
+          <span class="diy-span" v-show="!listLoading">diy it</span>
         </div>
       </div>
     </div>
@@ -72,6 +75,7 @@ const initDatas = () => {
       }
     })
     .finally(() => {
+      tabChange(0);
       loadingFlag.value = false;
     });
 };
@@ -103,6 +107,7 @@ const tabChange = (index) => {
 .template-dialog {
   width: 100vw;
   display: flex;
+  position: relative;
   .left-part {
     min-width: 45px;
     height: 100%;
@@ -133,23 +138,66 @@ const tabChange = (index) => {
     .tab-label-active {
       color: rgb(51, 51, 51);
     }
-    .template-list {
-      width: 100%;
-      height: calc(100% - 48px);
-      display: flex;
-      gap: 0 10px;
-      .single-image {
-        width: 80px;
-        height: 106px;
-        display: inline-block;
-      }
-    }
   }
   .right-part-default {
     width: calc(100% - 45px);
+    .template-list {
+      width: 100%;
+      height: calc(100% - 48px);
+      overflow: auto;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 0 10px;
+      position: relative;
+      .single-image {
+        min-width: 70px;
+        min-height: 106px;
+        display: inline-block;
+        .diy-span {
+          display: none;
+        }
+      }
+    }
   }
   .right-part-more {
     width: 100%;
+    .template-list {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-evenly;
+      gap: 10px;
+      padding: 20px 0;
+      .single-image {
+        background-color: #f7f7f7;
+        width: 170px;
+        display: inline-block;
+        padding: 15px 0;
+        position: relative;
+        .diy-span {
+          position: absolute;
+          bottom: 20px;
+          right: 20px;
+          background-color: #fff;
+          text-align: center;
+          color: #e73295;
+          border-radius: 15px;
+          font-family: JostMedium;
+          font-size: 16px;
+          display: inline-block;
+          padding: 0 15px;
+        }
+        :deep(.var-image) {
+          display: flex;
+          justify-content: center;
+        }
+        :deep(.var-image__image) {
+          width: 70%;
+        }
+      }
+    }
   }
 }
 .template-dialog-default {

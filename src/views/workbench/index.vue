@@ -8,7 +8,7 @@
       <div class="print-button">PRINT</div>
     </div>
     <div class="graph-container">
-      <!-- <img src="@/assets/images/model_temp.png" alt="" /> -->
+      <img src="@/assets/images/model_temp.png" alt="" />
     </div>
     <NavigationBar @naviClick="navigationEvent" />
 
@@ -64,6 +64,11 @@
         @change="templateDialogChange"
       />
     </var-popup>
+
+    <!-- PC - tempaltes -->
+    <TemplateSideComponent />
+    <!-- PC - layers -->
+    <GraphLayers />
   </div>
 </template>
 
@@ -75,8 +80,9 @@ import FontDialog from "./components/fontDialog.vue";
 import BrandAndModelsDialog from "./components/brandAndModelsDialog.vue";
 import CaseDialog from "./components/caseDialog.vue";
 import TemplateDialog from "./components/templateDialog.vue";
-// PC、IOS、Android
-import { judgeClient } from "@/utils";
+import TemplateSideComponent from "./components/templateSideComponent.vue";
+import GraphLayers from "./components/graphLayers.vue";
+
 const currentModel = "iPhone 15 pro";
 const currentCase = "Clear Impact Case - Black";
 const navigationEvent = (type, file) => {
@@ -134,6 +140,7 @@ const openModelDialog = () => {
 .workbench-component {
   position: relative;
   height: 100%;
+  background-color: #f9f5eb;
   .header-container {
     position: absolute;
     top: 5px;

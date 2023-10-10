@@ -1,3 +1,11 @@
+import { useStore } from '@/stores';
+
+export function setLayout() {
+  const store = useStore();
+  if (store.client === 'PC') {
+    document.body.classList.add('layout-PC');
+  }
+}
 export function dealImageUrl(url) {
   return url.replace('?fileId=', '/');
 }
