@@ -16,7 +16,7 @@
           width="80px"
           lazy
           loading="/src/assets/images/img_loading.svg"
-          :src="dealImageUrl(item.url)"
+          :src="dealImageUrl(item.exampleUrl)"
         />
         <div class="right-part">
           <span class="top-line">

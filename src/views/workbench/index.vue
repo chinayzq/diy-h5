@@ -8,7 +8,7 @@
       <div class="print-button">PRINT</div>
     </div>
     <div class="graph-container">
-      <img src="@/assets/images/model_temp.png" alt="" />
+      <!-- <img src="@/assets/images/model_temp.png" alt="" /> -->
     </div>
     <NavigationBar @naviClick="navigationEvent" />
 
