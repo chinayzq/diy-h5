@@ -72,6 +72,7 @@ const initDatas = () => {
       console.log(res);
       if (res.code === 200) {
         dataList.value = res.data;
+        modelClickHandler(res.data[0].modelList[0], 0);
       }
     })
     .finally(() => {

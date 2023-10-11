@@ -151,9 +151,14 @@ const tabChange = (index) => {
       padding: 0 10px;
       position: relative;
       .single-image {
+        width: 70px;
         min-width: 70px;
-        min-height: 106px;
+        height: 116px;
         display: inline-block;
+        :deep(.var-image) {
+          height: 100%;
+          width: 100%;
+        }
         .diy-span {
           display: none;
         }
@@ -167,12 +172,15 @@ const tabChange = (index) => {
       flex-direction: row;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: space-evenly;
-      gap: 10px;
-      padding: 20px 0;
+      // justify-content: space-evenly;
+      gap: 15px;
+      padding: 20px 10px;
+      height: calc(100% - 50px);
+      overflow: auto;
       .single-image {
         background-color: #f7f7f7;
-        width: 170px;
+        width: 165px;
+        min-height: 256px;
         display: inline-block;
         padding: 15px 0;
         position: relative;

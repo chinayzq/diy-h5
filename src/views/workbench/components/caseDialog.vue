@@ -11,13 +11,13 @@
     </div>
     <div class="scroll-container">
       <div class="single-card" v-for="(item, index) in dataset" :key="index">
-        <var-image
-          class="case-image"
-          width="80px"
-          lazy
-          loading="/src/assets/images/img_loading.svg"
-          :src="dealImageUrl(item.exampleUrl)"
-        />
+        <div class="left-part">
+          <var-image
+            lazy
+            loading="/src/assets/images/img_loading.svg"
+            :src="dealImageUrl(item.exampleUrl)"
+          />
+        </div>
         <div class="right-part">
           <span class="top-line">
             <div class="case-name-line">
@@ -104,7 +104,7 @@ const changeHandler = () => {
     overflow: hidden auto;
     padding-right: 5px;
     .single-card {
-      padding: 15px;
+      padding: 15px 15px 15px 0;
       width: 100%;
       height: 162px;
       margin-top: 10px;
@@ -113,11 +113,12 @@ const changeHandler = () => {
       border: 1px solid #ddd;
       display: flex;
       justify-content: space-between;
-      .case-image {
-        min-width: 80px;
+      .left-part {
+        width: 120px;
+        display: flex;
+        align-items: flex-end;
       }
       .right-part {
-        margin-left: 10px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
