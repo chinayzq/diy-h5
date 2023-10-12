@@ -6,6 +6,7 @@
         class="type-input"
         placeholder="Type here"
         v-model="typeContent"
+        @input="inputChange"
       />
       <var-icon class="check-icon" :size="26" name="check" />
     </div>
@@ -25,6 +26,7 @@
           class="single-image"
           v-for="(single, singleIndex) in fontSizeList"
           :key="singleIndex"
+          @click="fontFamilyClick(single)"
         >
           <var-image
             width="40px"
@@ -45,6 +47,7 @@
           }"
           v-for="single in colorList"
           :key="single"
+          @click="colorChange(single)"
         >
         </span>
       </div>
@@ -57,6 +60,7 @@
           lazy
           loading="/src/assets/images/img_loading.svg"
           :src="`/src/assets/images/${item.icon}`"
+          @click="styleChange(item)"
         />
       </div>
     </div>
@@ -64,12 +68,29 @@
 </template>
 
 <script setup>
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref, watch } from "vue";
 import { getFontSize } from "@/api/workbench";
 
 onBeforeMount(() => {
   initDatas();
 });
+
+const props = defineProps({
+  editItem: {
+    type: Object,
+    default() {
+      return {};
+    },
+  },
+});
+
+watch(
+  () => props.editItem,
+  (item) => {
+    console.log("xxx1", item);
+    typeContent.value = item.content;
+  }
+);
 
 const colorList = [
   "rgb(255, 255, 255)",
@@ -166,6 +187,68 @@ const tabs = ref([
 const activeTab = ref("Font");
 const setTabActive = (item) => {
   activeTab.value = item.label;
+};
+
+const emit = defineEmits();
+const inputChange = (value) => {
+  emit("fontChange", {
+    type: "content",
+    content: value,
+  });
+};
+const fontFamilyClick = (item) => {
+  const { fontSizeName, extend1 } = item;
+  emit("fontChange", {
+    type: "fontFamily",
+    content: fontSizeName,
+    fontFile: extend1,
+  });
+};
+const colorChange = (color) => {
+  emit("fontChange", {
+    type: "color",
+    content: color,
+  });
+};
+const styleChange = (item) => {
+  switch (item.key) {
+    case "align-left":
+      emit("fontChange", {
+        type: "textAlign",
+        content: "left",
+      });
+      break;
+    case "align-center":
+      emit("fontChange", {
+        type: "textAlign",
+        content: "center",
+      });
+      break;
+    case "align-right":
+      emit("fontChange", {
+        type: "textAlign",
+        content: "right",
+      });
+      break;
+    case "bold":
+      emit("fontChange", {
+        type: "fontWeight",
+        content: "bold",
+      });
+      break;
+    case "italic":
+      emit("fontChange", {
+        type: "fontStyle",
+        content: "italic",
+      });
+      break;
+    case "line-through":
+      emit("fontChange", {
+        type: "textDecoration",
+        content: "line-through",
+      });
+      break;
+  }
 };
 </script>
 

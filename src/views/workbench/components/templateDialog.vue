@@ -2,7 +2,12 @@
   <div :class="['template-dialog', `template-dialog-${displayModel}`]">
     <Loading v-show="loadingFlag" />
     <div class="left-part" v-show="displayModel === 'default'">
-      <img class="clear-icon" src="@/assets/images/template_clear.svg" alt="" />
+      <img
+        class="clear-icon"
+        @click="emit('clear')"
+        src="@/assets/images/template_clear.svg"
+        alt=""
+      />
       <span class="more-span" @click="changeHandler">
         M
         <br />
@@ -33,6 +38,7 @@
           class="single-image"
           v-for="(single, singleIndex) in tabs[active]?.children"
           :key="singleIndex"
+          @click="templateClickHandler(single)"
         >
           <var-image
             lazy
@@ -100,6 +106,11 @@ const tabChange = (index) => {
       listLoading.value = false;
       tabs.value[index].hasLoad = true;
     });
+};
+
+const templateClickHandler = (template) => {
+  emit("clear");
+  emit("templateChange", template.templateId);
 };
 </script>
 

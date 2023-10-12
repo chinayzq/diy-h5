@@ -18,6 +18,7 @@
             class="single-image"
             v-for="(single, singleIndex) in tabs[active]?.children"
             :key="singleIndex"
+            @click="templateClickHandler(single)"
           >
             <var-image
               lazy
@@ -79,6 +80,11 @@ const tabChange = (index) => {
       listLoading.value = false;
       tabs.value[index].hasLoad = true;
     });
+};
+
+const emit = defineEmits();
+const templateClickHandler = (template) => {
+  emit("templateChange", template.templateId);
 };
 </script>
 

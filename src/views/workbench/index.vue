@@ -8,6 +8,7 @@
       <div class="print-button" @click="printHandler">PRINT</div>
     </div>
     <div class="graph-container">
+      <Loading v-show="graphLoading" :size="30" />
       <img
         style="z-index: 1"
         class="single-graph-image"
@@ -70,9 +71,25 @@
             transform: `rotate(${item.rotate}deg)`,
             zIndex: item.active ? 9999 : `${item.zIndex}`,
           }"
-          :class="['drag-image', item.active && 'drag-image-active']"
+          :class="['drag-item', item.active && 'drag-item-active']"
         >
+          <span
+            class="drag-text"
+            v-if="item.type === 'text'"
+            :style="{
+              color: item.color,
+              fontFamily: item.fontFamily,
+              fontWeight: item.fontWeight,
+              fontStyle: item.fontStyle,
+              textAlign: item.textAlign,
+              textDecoration: item.textDecoration,
+              fontSize: `${item.fontSize}px`,
+            }"
+          >
+            {{ item.content }}
+          </span>
           <img
+            v-else
             draggable="false"
             style="height: 100%; width: 100%"
             :src="item.url"
@@ -86,7 +103,16 @@
               class="operation-icon delete-icon"
               alt=""
             />
-            <!-- <span class="replace-icon"> Replace </span> -->
+            <span
+              v-if="item.type !== 'text'"
+              class="replace-icon"
+              @click="replaceHandler(item)"
+            >
+              Replace
+            </span>
+            <span v-else class="edit-icon" @click="editHandler(item)">
+              Edit
+            </span>
             <img
               draggable="false"
               @click.stop="iconCopyHandler(item)"
@@ -106,6 +132,9 @@
                 }
               "
               class="operation-icon resize-icon"
+              :style="{
+                transform: item.type === 'text' && 'rotate(137deg)',
+              }"
             >
               <img draggable="false" :src="ResizeIcon" alt="" />
             </div>
@@ -137,7 +166,10 @@
       position="bottom"
       v-model:show="stickersShow"
     >
-      <StickersDialog @close="stickersShow = false" />
+      <StickersDialog
+        @close="stickersShow = false"
+        @stickerSelect="stickerSelectHandler"
+      />
     </var-popup>
 
     <!-- font弹出框 -->
@@ -146,7 +178,11 @@
       position="bottom"
       v-model:show="fontShow"
     >
-      <FontDialog />
+      <FontDialog
+        :currentTextId="currentTextId"
+        :editItem="editItem"
+        @fontChange="fontChangeHandler"
+      />
     </var-popup>
 
     <!-- 手机品牌、型号弹框 -->
@@ -181,6 +217,8 @@
       <TemplateDialog
         v-if="templateDialogShow"
         @change="templateDialogChange"
+        @templateChange="templateChangeHandler"
+        @clear="graphClearHandler"
       />
     </var-popup>
 
@@ -194,7 +232,7 @@
     </var-popup>
 
     <!-- PC - tempaltes -->
-    <TemplateSideComponent />
+    <TemplateSideComponent @templateChange="templateChangeHandler" />
     <!-- PC - layers -->
     <GraphLayers />
   </div>
@@ -212,6 +250,7 @@ import TemplateSideComponent from "./components/templateSideComponent.vue";
 import GraphLayers from "./components/graphLayers.vue";
 import PrintDialog from "./components/printDialog.vue";
 import { uuid } from "@/utils";
+import { getTemplateDetail } from "@/api/workbench";
 
 // 拖拽ICons
 import DeleteIcon from "@/assets/images/drag_delete_icon.png";
@@ -226,18 +265,38 @@ const selectCaseImage = ref("/src/assets/images/case_temp.png");
 
 // 所有贴纸图片
 const dragStickerList = ref([
-  {
-    id: "xxx1",
-    url: "/src/assets/images/drag_temp.webp",
-    height: 100,
-    width: 100,
-    top: 200,
-    left: 50,
-    rotate: 0,
-    zIndex: 1001,
-    active: false,
-  },
+  // {
+  //   id: "xxx1",
+  //   url: "/src/assets/images/drag_temp.webp",
+  //   height: 100,
+  //   width: 100,
+  //   top: 200,
+  //   left: 50,
+  //   rotate: 0,
+  //   zIndex: 1001,
+  //   active: false,
+  // },
+  // {
+  //   type: "text",
+  //   height: "auto",
+  //   width: "auto",
+  //   top: 200,
+  //   left: 50,
+  //   rotate: 0,
+  //   zIndex: 1001,
+  //   fontSize: 26,
+  //   content: "test",
+  //   color: "#1a4cec",
+  //   fontFamily: "JostMedium",
+  //   fontWeight: "normal", // normal | bold
+  //   fontStyle: "normal", // normal | italic
+  //   textAlign: "center", // left | center | right
+  //   textDecoration: "none", //none | line-through
+  //   active: true,
+  // },
 ]);
+
+const graphLoading = ref(false);
 
 const currentModel = "iPhone 15 pro";
 const currentCase = "Clear Impact Case - Black";
@@ -249,10 +308,11 @@ const navigationEvent = (type, file) => {
       break;
     case "font":
       fontShow.value = true;
+      currentTextId.value = addTextToGraph();
       break;
     case "image":
       if (file) {
-        console.log("file", file);
+        addStickerToGraph(file, true);
       }
       break;
     case "templates":
@@ -269,10 +329,81 @@ const templateDialogChange = () => {
 const templateDialogClose = () => {
   templateDialogClass.value = "popup-custom-overlay-offset";
 };
+const templateChangeHandler = (templateId) => {
+  graphLoading.value = true;
+  getTemplateDetail({ templateId })
+    .then((res) => {
+      if (res.code === 200) {
+        dragStickerList.value = dragStickerList.value.concat(
+          res.data.templateData.basedata
+        );
+      }
+    })
+    .finally(() => {
+      setTimeout(() => {
+        graphLoading.value = false;
+      }, Math.min(200 * dragStickerList.value.length, 2000));
+    });
+};
 
 const stickersShow = ref(false);
+const stickerSelectHandler = (url) => {
+  if (replaceItem.value.id) {
+    dragStickerList.value.forEach((item) => {
+      if (item.id === replaceItem.value.id) {
+        item.url = replaceItem.value.url;
+      }
+    });
+    stickersShow.value = false;
+    replaceItem.value = {};
+  } else {
+    addStickerToGraph(url, true);
+  }
+};
 
 const fontShow = ref(false);
+const currentTextId = ref(null);
+const fontChangeHandler = (params) => {
+  const { type, content, fontFile } = params;
+  dragStickerList.value.forEach((item) => {
+    if (item.id === currentTextId.value) {
+      item[type] = content;
+    }
+  });
+  if (fontFile) {
+    loadFonts(content, fontFile);
+  }
+};
+const loadFonts = (cssValue, fontFile) => {
+  if (document.fonts && !checkFont(cssValue)) {
+    graphLoading.value = true;
+    let fontFace = new FontFace(
+      cssValue,
+      `local('${cssValue}'),url('${fontFile}') format('ttf'),url('${fontFile}')`
+    );
+    fontFace
+      .load()
+      .then((loadedFontFace) => {
+        document.fonts.add(loadedFontFace);
+      })
+      .finally(() => {
+        graphLoading.value = false;
+      });
+  }
+};
+const checkFont = (name) => {
+  let values = document.fonts.values();
+  let isHave = false;
+  let item = values.next();
+  while (!item.done && !isHave) {
+    let fontFace = item.value;
+    if (fontFace.family == name) {
+      isHave = true;
+    }
+    item = values.next();
+  }
+  return isHave;
+};
 
 const brandAndModelShow = ref(false);
 
@@ -300,7 +431,7 @@ const printDialogClose = () => {
   printDialogShow.value = false;
 };
 
-const addStickerToGraph = (url) => {
+const addStickerToGraph = (url, activeFlag = false) => {
   dragStickerList.value.push({
     id: uuid(),
     url,
@@ -309,8 +440,48 @@ const addStickerToGraph = (url) => {
     top: 280,
     left: 100,
     zIndex: getMaxIndex(),
-    active: false,
+    active: activeFlag,
   });
+};
+const addTextToGraph = () => {
+  const id = uuid();
+  dragStickerList.value.push({
+    id,
+    type: "text",
+    height: "auto",
+    width: "auto",
+    top: 200,
+    left: 50,
+    rotate: 0,
+    zIndex: 1001,
+    fontSize: 26,
+    content: "",
+    color: "#1a4cec",
+    fontFamily: "JostMedium",
+    fontWeight: "normal", // normal | bold
+    fontStyle: "normal", // normal | italic
+    textAlign: "center", // left | center | right
+    textDecoration: "none", //none | lineThrough
+    active: true,
+  });
+  return id;
+};
+
+const replaceItem = ref({});
+const replaceHandler = (item) => {
+  replaceItem.value.id = item.id;
+  replaceItem.value.url = item.url;
+  stickersShow.value = true;
+};
+
+const editItem = ref({});
+const editHandler = (item) => {
+  editItem.value = item;
+  fontShow.value = true;
+};
+
+const graphClearHandler = () => {
+  dragStickerList.value = [];
 };
 const activeItem = (dragItem) => {
   clearActiveState();
@@ -430,8 +601,13 @@ const resizeMove = (event, item) => {
   const yDiff = clientY - resizeObj.y;
   resizeObj.x = clientX;
   resizeObj.y = clientY;
-  item.height = item.height + yDiff;
-  item.width = item.width + xDiff;
+  // 如果是text类型，根据横向移动距离改变font-size
+  if (currentItem.type === "text") {
+    item.fontSize += xDiff;
+  } else {
+    item.height = item.height + yDiff;
+    item.width = item.width + xDiff;
+  }
 };
 const resizeEnd = () => {
   resizeObj.start = false;
@@ -526,6 +702,7 @@ const eventEndHandler = () => {
   height: 100%;
   background-color: #f9f5eb;
   .header-container {
+    z-index: 1;
     position: absolute;
     top: 5px;
     left: 0;
@@ -562,6 +739,7 @@ const eventEndHandler = () => {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     .single-graph-image {
       position: absolute;
       width: 70%;
@@ -574,7 +752,7 @@ const eventEndHandler = () => {
         width: 100%;
         height: 100%;
       }
-      .drag-image {
+      .drag-item {
         user-select: none;
         position: absolute;
         cursor: pointer;
@@ -582,6 +760,12 @@ const eventEndHandler = () => {
         // background-size: 100% 100%;
         box-sizing: border-box;
         border: 1px solid #00000000;
+        .drag-text {
+          display: inline-block;
+          min-width: 100px;
+          width: 100%;
+          height: 100%;
+        }
         .operation-icon {
           cursor: pointer;
           height: 35px;
@@ -601,6 +785,18 @@ const eventEndHandler = () => {
           cursor: pointer;
           position: absolute;
           right: -33px;
+          top: -18px;
+          font-size: 14px;
+        }
+        .edit-icon {
+          display: inline-block;
+          background: #ffffff;
+          border-radius: 20px;
+          padding: 5px 10px;
+          color: #000;
+          cursor: pointer;
+          position: absolute;
+          right: -25px;
           top: -18px;
           font-size: 14px;
         }
@@ -627,7 +823,7 @@ const eventEndHandler = () => {
           left: calc(50% - 17.5px);
         }
       }
-      .drag-image-active {
+      .drag-item-active {
         border: 1px solid #409eff;
       }
     }

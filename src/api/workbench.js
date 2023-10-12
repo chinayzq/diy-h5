@@ -18,3 +18,6 @@ export function getTemplateTypeList(params) {
 export function getTemplateListByCode(params) {
   return axios.get('/listtemplate', { params });
 }
+export function getTemplateDetail(params) {
+  return axios.get('/template', { params });
+}

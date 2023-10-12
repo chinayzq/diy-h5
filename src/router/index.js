@@ -23,6 +23,12 @@ const router = createRouter({
           component: () => import('@/views/workbench/index.vue'),
           meta: { title: 'workbench' },
         },
+        {
+          path: '/settlement',
+          name: 'settlement',
+          component: () => import('@/views/settlement/index.vue'),
+          meta: { title: 'settlement' },
+        },
       ],
     },
   ],

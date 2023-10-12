@@ -24,6 +24,7 @@
         class="single-image"
         v-for="(single, singleIndex) in tabs[active].stickerChildlist"
         :key="singleIndex"
+        @click="stickerClickHandler(single)"
       >
         <var-image
           width="40px"
@@ -59,6 +60,10 @@ const initDatas = () => {
     .finally(() => {
       loadingFlag.value = false;
     });
+};
+
+const stickerClickHandler = (item) => {
+  emit("stickerSelect", item.url);
 };
 </script>
 
