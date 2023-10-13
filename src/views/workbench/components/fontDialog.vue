@@ -8,7 +8,12 @@
         v-model="typeContent"
         @input="inputChange"
       />
-      <var-icon class="check-icon" :size="26" name="check" />
+      <var-icon
+        class="check-icon"
+        @click="emit('close')"
+        :size="26"
+        name="check"
+      />
     </div>
     <div class="tabs-line">
       <span

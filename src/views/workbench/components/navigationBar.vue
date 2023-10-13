@@ -63,7 +63,9 @@ const resourceItems = ref([
 ]);
 const currentClient = judgeClient();
 if (currentClient === "PC") {
-  items.value = items.value.filter((item) => item.key !== "templates");
+  resourceItems.value = resourceItems.value.filter(
+    (item) => item.key !== "templates"
+  );
 }
 
 const emit = defineEmits();

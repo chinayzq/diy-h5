@@ -81,7 +81,7 @@ const changeHandler = () => {
 };
 
 const phoneCaseSelect = (item) => {
-  emit("phoneCaseSelect", item.url);
+  emit("phoneCaseSelect", item.url, item.colorName);
 };
 </script>
 

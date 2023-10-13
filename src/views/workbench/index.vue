@@ -2,7 +2,7 @@
   <div class="workbench-component" @click="clearActiveState">
     <div class="header-container">
       <div class="model-case-container" @click="brandAndModelShow = true">
-        {{ `${currentModel} / ${currentCase}` }}
+        {{ `${selectPhoneName} / ${selectCaseName}` }}
         <var-icon name="chevron-down" />
       </div>
       <div class="print-button" @click="printHandler">PRINT</div>
@@ -226,6 +226,7 @@
       <FontDialog
         :currentTextId="currentTextId"
         :editItem="editItem"
+        @close="fontShow = false"
         @fontChange="fontChangeHandler"
       />
     </var-popup>
@@ -386,8 +387,6 @@ const dragStickerList = ref([
 
 const graphLoading = ref(false);
 
-const currentModel = "iPhone 15 pro";
-const currentCase = "Clear Impact Case - Black";
 const navigationEvent = (type, file) => {
   console.log("type", type);
   switch (type) {
@@ -559,7 +558,8 @@ const brandAndModelShow = ref(false);
 
 const caseDialogShow = ref(false);
 const selectCaseList = ref([]);
-const selectPhoneName = ref(null);
+const selectPhoneName = ref("iPhone 14");
+const selectCaseName = ref("Clear Impact Case - Black");
 const nextStepHandler = (datas) => {
   selectModeImage.value = datas.modelUrl;
   selectMaskImage.value = datas.maskUrl;
@@ -568,9 +568,10 @@ const nextStepHandler = (datas) => {
   brandAndModelShow.value = false;
   caseDialogShow.value = true;
 };
-const phoneCaseSelectHandler = (url) => {
+const phoneCaseSelectHandler = (url, caseName) => {
   graphLoading.value = true;
   selectCaseImage.value = url;
+  selectCaseName.value = caseName;
   caseDialogShow.value = false;
   setTimeout(() => {
     graphLoading.value = false;
@@ -647,7 +648,7 @@ const addTextToGraph = () => {
     fontStyle: "normal", // normal | italic
     textAlign: "center", // left | center | right
     textDecoration: "none", //none | lineThrough
-    active: true,
+    active: false,
   });
   return id;
 };
@@ -949,7 +950,7 @@ const eventEndHandler = () => {
       width: 70%;
     }
     .single-graph-image-full {
-      width: 100%;
+      transform: scale(1.3);
     }
     .mask-container {
       width: 70%;
@@ -1045,7 +1046,7 @@ const eventEndHandler = () => {
       }
     }
     .mask-container-full {
-      width: 100%;
+      transform: scale(1.3);
     }
   }
 }
