@@ -7,7 +7,10 @@ export function getPhoneColor(params) {
   return axios.get('/list/phonecolor', { params });
 }
 export function getStickers(params) {
-  return axios.get('/list/stickers', params);
+  return axios.get('/list/stickers', { params });
+}
+export function getStickerList(params) {
+  return axios.get('/sticker', { params });
 }
 export function getFontSize(params) {
   return axios.get('/list/fontsize', params);

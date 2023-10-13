@@ -1,11 +1,11 @@
 <template>
-  <div class="workbench-component" @click="clearActiveState">
+  <div class="workbench-component" @click.stop="clearActiveState">
     <div class="header-container">
-      <div class="model-case-container" @click="brandAndModelShow = true">
+      <div class="model-case-container" @click.stop="brandAndModelShow = true">
         {{ `${selectPhoneName} / ${selectCaseName}` }}
         <var-icon name="chevron-down" />
       </div>
-      <div class="print-button" @click="printHandler">PRINT</div>
+      <div class="print-button" @click.stop="printHandler">PRINT</div>
     </div>
     <div class="graph-container">
       <Loading v-show="graphLoading" :size="30" />
@@ -113,11 +113,11 @@
             <span
               v-if="item.type !== 'text'"
               class="replace-icon"
-              @click="replaceHandler(item)"
+              @click.stop="replaceHandler(item)"
             >
               Replace
             </span>
-            <span v-else class="edit-icon" @click="editHandler(item)">
+            <span v-else class="edit-icon" @click.stop="editHandler(item)">
               Edit
             </span>
             <img
@@ -188,6 +188,7 @@
       v-model:show="stickersShow"
     >
       <StickersDialog
+        :stickersShow="stickersShow"
         @close="stickersShow = false"
         @stickerSelect="stickerSelectHandler"
       />
