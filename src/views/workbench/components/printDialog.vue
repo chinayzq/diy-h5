@@ -43,7 +43,7 @@ const closeHandler = () => {
     text-align: center;
     position: relative;
     .title-span {
-      font-family: JostMedium;
+      font-family: "JostMedium";
       font-size: 20px;
       font-style: normal;
       color: rgba(0, 0, 0, 0.9);
@@ -66,7 +66,7 @@ const closeHandler = () => {
   }
   .model-line {
     text-align: center;
-    font-family: JostMedium;
+    font-family: "JostMedium";
     font-size: 16px;
     font-style: normal;
     color: rgba(0, 0, 0, 0.9);
@@ -77,7 +77,7 @@ const closeHandler = () => {
     line-height: 46px;
     text-align: center;
     border-radius: 5px;
-    font-family: JostMedium;
+    font-family: "JostMedium";
     font-size: 18px;
     color: rgb(255, 255, 255);
     background-color: rgb(0, 0, 0);

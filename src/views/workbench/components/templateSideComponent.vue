@@ -22,7 +22,7 @@
           >
             <var-image
               lazy
-              loading="/src/assets/images/img_loading.svg"
+              loading="/src/assets/images/load.gif"
               :src="`${single.templateUrl}?type=webp`"
             />
           </div>
@@ -103,7 +103,7 @@ const templateClickHandler = (template) => {
     line-height: 36px;
     font-size: 18px;
     color: rgba(0, 0, 0, 0.9);
-    font-family: JostMedium;
+    font-family: "JostMedium";
     box-shadow: 0 0.8rem 0.26667rem -0.53333rem var(--shadow-key-umbra-opacity),
       0 0.53333rem 0.53333rem 0 var(--shadow-key-penumbra-opacity),
       0 0.26667rem 1.33333rem 0 var(--shadow-key-ambient-opacity);

@@ -32,7 +32,7 @@
             width="40px"
             height="40px"
             lazy
-            loading="/src/assets/images/img_loading.svg"
+            loading="/src/assets/images/load.gif"
             :src="single.extend2"
           />
         </div>
@@ -58,7 +58,7 @@
           width="30px"
           height="30px"
           lazy
-          loading="/src/assets/images/img_loading.svg"
+          loading="/src/assets/images/load.gif"
           :src="`/src/assets/images/${item.icon}`"
           @click="styleChange(item)"
         />
@@ -278,7 +278,7 @@ const styleChange = (item) => {
     gap: 0 10px;
     .single-tab {
       color: #d3d3d3;
-      font-family: JostMedium;
+      font-family: "JostMedium";
       font-size: 20px;
     }
     .single-tab-active {

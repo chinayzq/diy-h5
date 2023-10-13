@@ -1,0 +1,151 @@
+<template>
+  <div class="graph-sider-bar">
+    <div
+      class="single-item"
+      v-for="(item, index) in toolList"
+      :key="index"
+      @click.stop="toolClick(item)"
+    >
+      <div
+        class="image-line"
+        :style="{
+          backgroundImage:
+            item.label === 'Enlarge' && item.clicked
+              ? `url(${item.clickedIcon})`
+              : `url(${item.icon})`,
+        }"
+      ></div>
+      <div class="label-line">
+        {{
+          item.label === "Enlarge" && item.clicked
+            ? item.clickedLabel
+            : item.label
+        }}
+      </div>
+    </div>
+    <div class="layers-container" v-show="layersShow">
+      <div
+        :class="['single-layer', item.active && 'single-layer-active']"
+        v-for="(item, index) in layers"
+        :key="index"
+        @click.stop="setActive(item)"
+      >
+        <span class="text-one" v-if="item.type === 'text'">
+          {{ item.content }}
+        </span>
+        <img v-else class="image-one" :src="item.url" alt="" />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from "vue";
+const toolList = ref([
+  {
+    label: "Draft",
+    icon: "/src/assets/images/graph_draft_icon.png",
+  },
+  {
+    label: "Layers",
+    icon: "/src/assets/images/graph_layer_icon.png",
+    clicked: false,
+  },
+  {
+    label: "Enlarge",
+    clickedLabel: "Shrink",
+    icon: "/src/assets/images/graph_enlarge_icon.png",
+    clickedIcon: "/src/assets/images/graph_dislarge_icon.png",
+    clicked: false,
+  },
+]);
+const emit = defineEmits();
+const toolClick = (item) => {
+  switch (item.label) {
+    case "Enlarge":
+      item.clicked = !item.clicked;
+      emit("fullScreen", item.clicked);
+      break;
+    case "Draft":
+      // 打开draftDialog
+      emit("openDraftDialog");
+      break;
+    case "Layers":
+      // 打开图层popup
+      item.clicked = !item.clicked;
+      layersShow.value = item.clicked;
+      break;
+  }
+};
+
+const props = defineProps({
+  layers: {
+    type: Array,
+    default() {
+      return [];
+    },
+  },
+});
+const layersShow = ref(false);
+const setActive = ({ id }) => {
+  emit("setActive", id);
+};
+</script>
+
+<style lang="less" scoped>
+.graph-sider-bar {
+  z-index: 10;
+  position: absolute;
+  right: 0;
+  bottom: 80px;
+  width: 62px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .single-item {
+    height: 42px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    .image-line {
+      height: 22px;
+      width: 22px;
+      background-size: 100% 100%;
+    }
+    .label-line {
+      color: #5c5c66;
+      font-size: 8px;
+      font-weight: 600;
+      font-style: normal;
+      font-family: "JostMedium";
+    }
+  }
+  .layers-container {
+    background-color: rgba(0, 0, 0, 0.2);
+    width: 96px;
+    height: 260px;
+    overflow: auto;
+    position: absolute;
+    left: -96px;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 10px 0;
+    .single-layer {
+      width: 76px;
+      height: 76px;
+      margin-bottom: 10px;
+      .image-one {
+        height: 100%;
+        width: 100%;
+      }
+    }
+    .single-layer-active {
+      border: aqua solid 1px;
+    }
+  }
+}
+</style>

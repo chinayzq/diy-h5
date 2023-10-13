@@ -2,11 +2,11 @@
   <div class="navigation-bar-component">
     <div
       class="single-item"
-      @click="itemClickHandler(item.key)"
-      v-for="item in items"
+      @click.stop="itemClickHandler(item.key)"
+      v-for="item in activeItems"
       :key="item.key"
     >
-      <template v-if="item.key === 'image'">
+      <template v-if="item.key === 'image' && activeType !== 'text'">
         <var-uploader @after-read="uploadSuccess" hide-list v-model="files">
           <div :class="['icon-line', `icon-${item.key}`]"></div>
           <div class="name-line">
@@ -26,16 +26,20 @@
 
 <script setup>
 import { judgeClient } from "@/utils";
-import { ref } from "vue";
+import { ref, watch } from "vue";
+
 const files = ref([]);
-const items = ref([
+const activeItems = ref([]);
+const resourceItems = ref([
   {
     label: "Stickers",
     key: "stickers",
+    activeTab: false,
   },
   {
     label: "Font",
     key: "font",
+    activeTab: false,
   },
   {
     label: "Image",
@@ -44,6 +48,17 @@ const items = ref([
   {
     label: "Templates",
     key: "templates",
+    activeTab: false,
+  },
+  {
+    label: "Layers",
+    key: "layers",
+    activeTab: true,
+  },
+  {
+    label: "Flip",
+    key: "flip",
+    activeTab: true,
   },
 ]);
 const currentClient = judgeClient();
@@ -57,8 +72,46 @@ const itemClickHandler = (key) => {
 };
 
 const uploadSuccess = (file) => {
-  emit("naviClick", "image", file.cover);
+  if (activeCountRef.value === 0) {
+    emit("naviClick", "image", file.cover);
+  } else {
+    emit("naviClick", "imageReplace", file.cover);
+  }
 };
+
+const props = defineProps({
+  dragStickerList: {
+    type: Array,
+    default() {
+      return [];
+    },
+  },
+});
+const activeCountRef = ref(0);
+const activeType = ref(null);
+watch(
+  () => props.dragStickerList,
+  (list) => {
+    const activeList = list.filter((item) => item.active);
+    const activeCount = activeList.length;
+    activeType.value = activeList[0]?.type || null;
+    activeCountRef.value = activeCount;
+    activeItems.value = resourceItems.value.filter((item) => {
+      if (activeCount === 1) {
+        return (
+          item.activeTab ||
+          (activeType.value !== "text" && item.key === "image")
+        );
+      } else {
+        return !item.activeTab;
+      }
+    });
+  },
+  {
+    deep: true,
+    immediate: true,
+  }
+);
 </script>
 
 <style lang="less" scoped>
@@ -100,6 +153,14 @@ const uploadSuccess = (file) => {
   }
   .icon-templates {
     background: url("../../../assets/images/home_bar_templates.png");
+    background-size: 100% 100%;
+  }
+  .icon-layers {
+    background: url("../../../assets/images/layer-icon.png");
+    background-size: 100% 100%;
+  }
+  .icon-flip {
+    background: url("../../../assets/images/home_bar_flip.png");
     background-size: 100% 100%;
   }
 }

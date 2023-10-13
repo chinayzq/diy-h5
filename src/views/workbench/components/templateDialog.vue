@@ -42,7 +42,7 @@
         >
           <var-image
             lazy
-            loading="/src/assets/images/img_loading.svg"
+            loading="/src/assets/images/load.gif"
             :src="`${single.templateUrl}?type=webp`"
           />
           <span class="diy-span" v-show="!listLoading">diy it</span>
@@ -132,7 +132,7 @@ const templateClickHandler = (template) => {
     }
     .more-span {
       font-size: 16px;
-      font-family: JostMedium;
+      font-family: "JostMedium";
       background-color: #f7f7f7;
       flex: 1;
       text-align: center;
@@ -143,7 +143,7 @@ const templateClickHandler = (template) => {
     height: 100%;
     .tab-label {
       font-size: 16px;
-      font-family: JostMedium;
+      font-family: "JostMedium";
       color: rgb(137, 137, 137);
     }
     .tab-label-active {
@@ -203,7 +203,7 @@ const templateClickHandler = (template) => {
           text-align: center;
           color: #e73295;
           border-radius: 15px;
-          font-family: JostMedium;
+          font-family: "JostMedium";
           font-size: 16px;
           display: inline-block;
           padding: 0 15px;

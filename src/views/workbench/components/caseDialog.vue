@@ -10,11 +10,16 @@
       />
     </div>
     <div class="scroll-container">
-      <div class="single-card" v-for="(item, index) in dataset" :key="index">
+      <div
+        class="single-card"
+        v-for="(item, index) in dataset"
+        :key="index"
+        @click="phoneCaseSelect(item)"
+      >
         <div class="left-part">
           <var-image
             lazy
-            loading="/src/assets/images/img_loading.svg"
+            loading="/src/assets/images/load.gif"
             :src="dealImageUrl(item.exampleUrl)"
           />
         </div>
@@ -74,6 +79,10 @@ const emit = defineEmits();
 const changeHandler = () => {
   emit("openModelDialog");
 };
+
+const phoneCaseSelect = (item) => {
+  emit("phoneCaseSelect", item.url);
+};
 </script>
 
 <style lang="less" scoped>
@@ -86,7 +95,7 @@ const changeHandler = () => {
     font-size: 14px;
     font-weight: 700;
     color: #000;
-    font-family: JostMedium;
+    font-family: "JostMedium";
     width: 100%;
     text-align: center;
     display: flex;
@@ -127,14 +136,14 @@ const changeHandler = () => {
           flex-direction: column;
           .case-name-line {
             font-style: italic;
-            font-family: JostMedium;
+            font-family: "JostMedium";
             font-size: 15px;
             color: #000;
             font-weight: 700;
           }
           .size-camera-line {
             font-style: normal;
-            font-family: JostMedium;
+            font-family: "JostMedium";
             font-size: 12px;
             color: #000;
             margin-top: 10px;

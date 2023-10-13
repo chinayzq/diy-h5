@@ -9,24 +9,27 @@
     </div>
     <div class="graph-container">
       <Loading v-show="graphLoading" :size="30" />
-      <img
+      <var-image
         style="z-index: 1"
-        class="single-graph-image"
+        :class="['single-graph-image', fullScreen && 'single-graph-image-full']"
         :src="selectModeImage"
+        loading="/src/assets/images/load.gif"
+        lazy
         alt=""
       />
-      <img
+      <var-image
         style="z-index: 2"
-        class="single-graph-image"
+        :class="['single-graph-image', fullScreen && 'single-graph-image-full']"
         :src="selectCaseImage"
-        alt=""
+        loading="/src/assets/images/load.gif"
+        lazy
       />
       <div
         :style="{
           zIndex: 3,
           maskImage: `url(${selectMaskImage})`,
         }"
-        class="mask-container"
+        :class="['mask-container', fullScreen && 'mask-container-full']"
         @mousemove="
           (event) => {
             moveHandler(event, item);
@@ -84,14 +87,18 @@
               textAlign: item.textAlign,
               textDecoration: item.textDecoration,
               fontSize: `${item.fontSize}px`,
+              transform: rotateRender(item),
             }"
           >
             {{ item.content }}
           </span>
           <img
             v-else
+            class="drag-image"
             draggable="false"
-            style="height: 100%; width: 100%"
+            :style="{
+              transform: rotateRender(item),
+            }"
             :src="item.url"
             alt=""
           />
@@ -158,7 +165,21 @@
         </div>
       </div>
     </div>
-    <NavigationBar @naviClick="navigationEvent" />
+    <NavigationBar
+      @naviClick="navigationEvent"
+      :dragStickerList="dragStickerList"
+    />
+
+    <!-- 右侧操作栏 -->
+    <GraphSiderBar
+      @fullScreen="graphFullScreen"
+      @openDraftDialog="openDraftDialog"
+      @setActive="setActiveById"
+      :layers="dragStickerList"
+    />
+
+    <!-- 撤销操作 -->
+    <UndoComponent />
 
     <!-- sticker弹出框 -->
     <var-popup
@@ -169,6 +190,30 @@
       <StickersDialog
         @close="stickersShow = false"
         @stickerSelect="stickerSelectHandler"
+      />
+    </var-popup>
+
+    <!-- layers弹出框 -->
+    <var-popup
+      overlay-class="popup-custom-overlay"
+      position="bottom"
+      v-model:show="layersDialogShow"
+    >
+      <LayersDialog
+        @close="layersDialogShow = false"
+        @layerEvent="layerChangeHandler"
+      />
+    </var-popup>
+
+    <!-- flip弹出框 -->
+    <var-popup
+      overlay-class="popup-custom-overlay"
+      position="bottom"
+      v-model:show="flipDialogShow"
+    >
+      <FlipDialog
+        @close="flipDialogShow = false"
+        @flipEvent="flipChangeHandler"
       />
     </var-popup>
 
@@ -203,6 +248,7 @@
       <CaseDialog
         :dataset="selectCaseList"
         :selectPhoneName="selectPhoneName"
+        @phoneCaseSelect="phoneCaseSelectHandler"
         @openModelDialog="openModelDialog"
       />
     </var-popup>
@@ -231,6 +277,15 @@
       <PrintDialog @close="printDialogClose" />
     </var-popup>
 
+    <!-- draft弹窗 -->
+    <var-popup
+      overlay-class="popup-custom-border"
+      position="bottom"
+      v-model:show="draftDialogShow"
+    >
+      <DraftDialog @close="draftDialogShow = false" />
+    </var-popup>
+
     <!-- PC - tempaltes -->
     <TemplateSideComponent @templateChange="templateChangeHandler" />
     <!-- PC - layers -->
@@ -249,6 +304,12 @@ import TemplateDialog from "./components/templateDialog.vue";
 import TemplateSideComponent from "./components/templateSideComponent.vue";
 import GraphLayers from "./components/graphLayers.vue";
 import PrintDialog from "./components/printDialog.vue";
+import GraphSiderBar from "./components/graphSiderBar.vue";
+import DraftDialog from "./components/draftDialog.vue";
+import UndoComponent from "./components/undoComponent.vue";
+import LayersDialog from "./components/layersDialog.vue";
+import FlipDialog from "./components/flipDialog.vue";
+
 import { uuid } from "@/utils";
 import { getTemplateDetail } from "@/api/workbench";
 
@@ -259,9 +320,21 @@ import ResizeIcon from "@/assets/images/drag_resize_icon.png";
 import RotateIcon from "@/assets/images/drag_rotate_icon.svg";
 
 // 选择的背景图 - temp
-import selectMaskImage from "@/assets/images/mask_temp.webp";
+const selectMaskImage = ref("/src/assets/images/mask_temp.webp");
 const selectModeImage = ref("/src/assets/images/model_temp.png");
 const selectCaseImage = ref("/src/assets/images/case_temp.png");
+
+const rotateRender = (item) => {
+  const { rotateY, rotateZ } = item;
+  let styleStr = ``;
+  if (rotateY) {
+    styleStr += `rotateY(180deg)`;
+  }
+  if (rotateZ) {
+    styleStr += `rotateY(180deg) rotateZ(180deg)`;
+  }
+  return styleStr;
+};
 
 // 所有贴纸图片
 const dragStickerList = ref([
@@ -274,6 +347,21 @@ const dragStickerList = ref([
   //   left: 50,
   //   rotate: 0,
   //   zIndex: 1001,
+  //   rotateY: false, // 0 | 180
+  //   rotateZ: false, // 0 | 180
+  //   active: false,
+  // },
+  // {
+  //   id: "xxx2",
+  //   url: "/src/assets/images/drag_delete_icon.png",
+  //   height: 100,
+  //   width: 100,
+  //   top: 250,
+  //   left: 100,
+  //   rotate: 0,
+  //   rotateY: 0, // 0 | 180
+  //   rotateZ: 0, // 0 | 180
+  //   zIndex: 1002,
   //   active: false,
   // },
   // {
@@ -315,10 +403,72 @@ const navigationEvent = (type, file) => {
         addStickerToGraph(file, true);
       }
       break;
+    case "imageReplace":
+      if (file) {
+        replaceImageUrl(file);
+      }
+      break;
     case "templates":
       templateDialogShow.value = true;
       break;
+    case "layers":
+      layersDialogShow.value = true;
+      break;
+    case "flip":
+      flipDialogShow.value = true;
+      break;
   }
+};
+
+const flipDialogShow = ref(false);
+const flipChangeHandler = (key, flag) => {
+  dragStickerList.value.forEach((item) => {
+    if (item.active) {
+      switch (key) {
+        case "horizontal":
+          item.rotateY = flag;
+          break;
+        case "vertical":
+          item.rotateZ = flag;
+          break;
+      }
+    }
+  });
+  // horizontal - transform: rotateY(180deg);
+  // vertical - transform: rotateY(180deg) rotateZ(180deg);
+};
+
+const layersDialogShow = ref(false);
+const layerChangeHandler = (key) => {
+  dragStickerList.value.forEach((item) => {
+    if (item.active) {
+      switch (key) {
+        case "top":
+          item.zIndex = getMaxIndex();
+          break;
+        case "bottom":
+          item.zIndex = getMinIndex();
+          break;
+        case "forward":
+          item.zIndex++;
+          break;
+        case "backward":
+          item.zIndex--;
+          break;
+      }
+    }
+  });
+};
+
+// fullscreen | layers Dialog
+const fullScreen = ref(false);
+const graphFullScreen = (flag) => {
+  fullScreen.value = flag;
+};
+
+const draftDialogShow = ref(false);
+const openDraftDialog = () => {
+  draftDialogShow.value = true;
 };
 
 const templateDialogShow = ref(false);
@@ -411,11 +561,20 @@ const caseDialogShow = ref(false);
 const selectCaseList = ref([]);
 const selectPhoneName = ref(null);
 const nextStepHandler = (datas) => {
+  selectModeImage.value = datas.modelUrl;
+  selectMaskImage.value = datas.maskUrl;
   selectCaseList.value = datas.caseList;
   selectPhoneName.value = datas.phoneName;
-  console.log("selectCaseList.value", selectCaseList.value);
   brandAndModelShow.value = false;
   caseDialogShow.value = true;
+};
+const phoneCaseSelectHandler = (url) => {
+  graphLoading.value = true;
+  selectCaseImage.value = url;
+  caseDialogShow.value = false;
+  setTimeout(() => {
+    graphLoading.value = false;
+  }, 1000);
 };
 
 const openModelDialog = () => {
@@ -431,7 +590,19 @@ const printDialogClose = () => {
   printDialogShow.value = false;
 };
 
+const setActiveById = (id) => {
+  dragStickerList.value.forEach((item) => {
+    item.active = item.id === id;
+  });
+  console.log("dragStickerList.value", dragStickerList.value);
+};
+const clearAllActive = () => {
+  dragStickerList.value.forEach((item) => {
+    item.active = false;
+  });
+};
 const addStickerToGraph = (url, activeFlag = false) => {
+  clearAllActive();
   dragStickerList.value.push({
     id: uuid(),
     url,
@@ -439,8 +610,20 @@ const addStickerToGraph = (url, activeFlag = false) => {
     width: 100,
     top: 280,
     left: 100,
+    rotate: 0,
+    rotateY: false,
+    rotateZ: false,
     zIndex: getMaxIndex(),
     active: activeFlag,
+  });
+};
+const replaceImageUrl = (url) => {
+  dragStickerList.value.forEach((item) => {
+    if (item.active) {
+      item.url = url;
+      item.rotateY = false;
+      item.rotateZ = false;
+    }
   });
 };
 const addTextToGraph = () => {
@@ -453,6 +636,8 @@ const addTextToGraph = () => {
     top: 200,
     left: 50,
     rotate: 0,
+    rotateY: false,
+    rotateZ: false,
     zIndex: 1001,
     fontSize: 26,
     content: "",
@@ -481,6 +666,7 @@ const editHandler = (item) => {
 };
 
 const graphClearHandler = () => {
+  console.log("graphClearHandler");
   dragStickerList.value = [];
 };
 const activeItem = (dragItem) => {
@@ -489,6 +675,7 @@ const activeItem = (dragItem) => {
 };
 // 清除所有拖拽图形active状态
 const clearActiveState = () => {
+  console.log("clearActiveState");
   dragStickerList.value.forEach((item) => {
     item.active = false;
   });
@@ -507,6 +694,21 @@ const getMaxIndex = () => {
     return 1000;
   }
 };
+// 获取addStickerToGraph最小Index
+const getMinIndex = () => {
+  if (dragStickerList.value.length) {
+    let count = 10000;
+    dragStickerList.value.forEach((item) => {
+      if (item.zIndex < count) {
+        count = item.zIndex;
+      }
+    });
+    return count - 1;
+  } else {
+    return 999;
+  }
+};
+
 const eventTransfor = (event) => {
   if (event.touches) {
     return event.touches[0];
@@ -517,7 +719,6 @@ const eventTransfor = (event) => {
 let currentItem = {};
 // move事件处理
 const moveHandler = (event) => {
-  console.log(1111, draggingItem.start);
   if (draggingItem.start) {
     dragHandler(event, currentItem);
   }
@@ -567,12 +768,15 @@ const iconDeleteHandler = ({ id }) => {
 
 // icon - 复制
 const iconCopyHandler = (item) => {
-  const { url, height, width, top, left } = item;
+  const { url, height, width, top, left, rotate, rotateY, rotateZ } = item;
   dragStickerList.value.push({
     id: uuid(),
     url,
     height,
     width,
+    rotate,
+    rotateY,
+    rotateZ,
     top: top + 40,
     left: left + 40,
     zIndex: getMaxIndex(),
@@ -730,7 +934,7 @@ const eventEndHandler = () => {
       text-align: center;
       line-height: 30px;
       border-radius: 15px;
-      font-family: JostMedium;
+      font-family: "JostMedium";
     }
   }
   .graph-container {
@@ -743,6 +947,9 @@ const eventEndHandler = () => {
     .single-graph-image {
       position: absolute;
       width: 70%;
+    }
+    .single-graph-image-full {
+      width: 100%;
     }
     .mask-container {
       width: 70%;
@@ -763,6 +970,10 @@ const eventEndHandler = () => {
         .drag-text {
           display: inline-block;
           min-width: 100px;
+          width: 100%;
+          height: 100%;
+        }
+        .drag-image {
           width: 100%;
           height: 100%;
         }
@@ -826,6 +1037,15 @@ const eventEndHandler = () => {
       .drag-item-active {
         border: 1px solid #409eff;
       }
+      .drag-item-horizontal {
+        transform: rotateY(180deg);
+      }
+      .drag-item-vertical {
+        transform: rotateY(180deg) rotateZ(180deg);
+      }
+    }
+    .mask-container-full {
+      width: 100%;
     }
   }
 }

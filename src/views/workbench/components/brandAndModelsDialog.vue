@@ -44,9 +44,9 @@
           @click="activeCaseIndex = phoneIndex"
           v-for="(phoneItem, phoneIndex) in phoneColorList"
           :key="phoneIndex"
-          height="77px"
+          height="100px"
           lazy
-          loading="/src/assets/images/img_loading.svg"
+          loading="/src/assets/images/load.gif"
           :src="dealImageUrl(phoneItem.url)"
         />
       </div>
@@ -84,14 +84,17 @@ const activeBrandIndex = ref(0);
 const activeModelIndex = ref(0);
 const activeCaseIndex = ref(0);
 const activePhoneName = ref(null);
+const activePhoneCode = ref(null);
 const modelClickHandler = (model, index) => {
   activeModelIndex.value = index;
   activePhoneName.value = model.phoneName;
+  activePhoneCode.value = model.phoneCode;
   getCaseByPhoneCode(model.phoneCode);
 };
 
 const phoneColorList = ref([]);
 const caseList = ref([]);
+const maskList = ref([]);
 const getCaseByPhoneCode = (phoneCode) => {
   getPhoneColor({
     phoneCode,
@@ -99,15 +102,23 @@ const getCaseByPhoneCode = (phoneCode) => {
     if (res.code === 200) {
       phoneColorList.value = res.data.phoneColorList;
       caseList.value = res.data.modelColorList;
+      maskList.value = res.data.maskImage;
     }
   });
 };
 
 const emit = defineEmits();
 const nextStepHandler = () => {
+  const brandName = dataList.value[activeBrandIndex.value].brandName;
+  const modelUrl = phoneColorList.value[activeCaseIndex.value].url;
+  const maskUrl = maskList.value[0].url;
   emit("nextStep", {
-    caseList: caseList.value,
-    phoneName: activePhoneName.value,
+    caseList: caseList.value, //手机壳列表&example列表
+    phoneName: activePhoneName.value, // 机型名称
+    phoneCode: activePhoneCode.value, // 机型Code
+    modelUrl, // 机型背景图
+    brandName, // 品牌名称
+    maskUrl, // 蒙版背景图
   });
 };
 </script>
@@ -115,13 +126,13 @@ const nextStepHandler = () => {
 <style lang="less" scoped>
 .brand-and-models {
   height: 90vh;
-  width: 100vw;
+  width: 100%;
   overflow: hidden auto;
   padding: 20px 10px;
   .title-line {
     height: 25px;
     line-height: 25px;
-    font-family: JostMedium;
+    font-family: "JostMedium";
     font-size: 13px;
     color: #000000e6;
   }
@@ -163,7 +174,7 @@ const nextStepHandler = () => {
     }
   }
   .case-container {
-    width: 100vw;
+    width: 100%;
     .image-list {
       margin-top: 15px;
       display: flex;
@@ -174,7 +185,7 @@ const nextStepHandler = () => {
       .single-image {
         padding: 5px 10px;
         border: 2.5px solid #f8f8f8;
-        min-width: 60px;
+        min-width: 75px;
       }
       .single-image-active {
         border: 2.5px solid rgb(143, 191, 255);
@@ -185,7 +196,7 @@ const nextStepHandler = () => {
     font-size: 16px;
     height: 46px;
     line-height: 46px;
-    font-family: JostMedium;
+    font-family: "JostMedium";
     cursor: pointer;
     color: white;
     background-color: rgb(230, 50, 149);

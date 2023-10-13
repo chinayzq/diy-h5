@@ -13,7 +13,7 @@
           width="30px"
           height="30px"
           lazy
-          loading="/src/assets/images/img_loading.svg"
+          loading="/src/assets/images/load.gif"
           :src="tab.stickerUrl"
         />
       </var-tab>
@@ -30,7 +30,7 @@
           width="40px"
           height="40px"
           lazy
-          loading="/src/assets/images/img_loading.svg"
+          loading="/src/assets/images/load.gif"
           :src="single.url"
         />
       </div>
@@ -54,7 +54,7 @@ const initDatas = () => {
     .then((res) => {
       console.log(res);
       if (res.code === 200) {
-        tabs.value = res.data;
+        tabs.value = res.data.slice(0, 10);
       }
     })
     .finally(() => {

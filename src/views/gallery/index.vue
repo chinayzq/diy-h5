@@ -187,7 +187,7 @@ const jumpToWorkBench = () => {
     justify-content: space-evenly;
     padding-top: 40px;
     box-sizing: border-box;
-    font-family: JostMedium;
+    font-family: "JostMedium";
     margin: 0 20px;
     border-bottom: 1px solid #000;
     .header-icon {
@@ -251,7 +251,7 @@ const jumpToWorkBench = () => {
           border-radius: 24px;
           font-size: 14px;
           color: #d8201c;
-          font-family: JostMedium;
+          font-family: "JostMedium";
         }
         .icon-image {
           height: 20px;
