@@ -9,6 +9,12 @@
         alt=""
       />
     </div>
+    <var-icon
+      class="close-icon"
+      name="window-close"
+      :size="30"
+      @click="closeHandler"
+    />
     <div class="scroll-container">
       <div
         class="single-card"
@@ -83,12 +89,22 @@ const changeHandler = () => {
 const phoneCaseSelect = (item) => {
   emit("phoneCaseSelect", item.url, item.colorName);
 };
+
+const closeHandler = () => {
+  emit("close");
+};
 </script>
 
 <style lang="less" scoped>
 .phone-case-dialog {
   height: 85vh;
   padding: 15px;
+  position: relative;
+  .close-icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+  }
   .title-line {
     padding-top: 10px;
     height: 35px;

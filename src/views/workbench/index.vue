@@ -237,7 +237,10 @@
       position="bottom"
       v-model:show="brandAndModelShow"
     >
-      <BrandAndModelsDialog @nextStep="nextStepHandler" />
+      <BrandAndModelsDialog
+        @close="brandAndModelShow = false"
+        @nextStep="nextStepHandler"
+      />
     </var-popup>
 
     <!-- 手机壳选择弹窗 -->
@@ -249,6 +252,7 @@
       <CaseDialog
         :dataset="selectCaseList"
         :selectPhoneName="selectPhoneName"
+        @close="caseDialogShow = false"
         @phoneCaseSelect="phoneCaseSelectHandler"
         @openModelDialog="openModelDialog"
       />
@@ -634,8 +638,8 @@ const addTextToGraph = () => {
     type: "text",
     height: "auto",
     width: "auto",
-    top: 200,
-    left: 50,
+    top: 280,
+    left: 100,
     rotate: 0,
     rotateY: false,
     rotateZ: false,
@@ -907,6 +911,7 @@ const eventEndHandler = () => {
   top: 0;
   left: 0;
   height: 100%;
+  width: 100%;
   background-color: #f9f5eb;
   .header-container {
     z-index: 1;
@@ -949,11 +954,12 @@ const eventEndHandler = () => {
     position: relative;
     .single-graph-image {
       position: absolute;
-      width: 50%;
+      width: 300px;
+      transform: scale(0.65);
     }
-
     .mask-container {
-      width: 50%;
+      width: 300px;
+      transform: scale(0.65);
       position: relative;
       -webkit-mask-size: cover;
       .container-image {
@@ -1046,10 +1052,10 @@ const eventEndHandler = () => {
       }
     }
     .mask-container-full {
-      transform: scale(1.5);
+      transform: scale(0.9);
     }
     .single-graph-image-full {
-      transform: scale(1.5);
+      transform: scale(0.9);
     }
   }
 }

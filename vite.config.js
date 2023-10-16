@@ -22,7 +22,7 @@ const baseUrl = {
   development: './',
   sit: './',
   beta: './',
-  prod: './',
+  prod: '/diy',
 };
 const getBaseByMode = (mode) => {
   console.log(

@@ -124,19 +124,17 @@ const setActive = ({ id }) => {
   }
   .layers-container {
     background-color: rgba(0, 0, 0, 0.2);
-    width: 96px;
+    width: 72px;
     height: 260px;
     overflow: auto;
     position: absolute;
-    left: -96px;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
+    right: 0;
+    top: -300px;
     padding: 10px 0;
     .single-layer {
-      width: 76px;
-      height: 76px;
+      display: inline-block;
+      width: 66px;
+      height: 66px;
       margin-bottom: 10px;
       .image-one {
         height: 100%;

@@ -125,8 +125,8 @@ const templateClickHandler = (template) => {
     display: flex;
     flex-direction: column;
     .clear-icon {
-      height: 28px;
-      width: 28px;
+      height: 24px;
+      width: 24px;
       cursor: pointer;
       margin: 10px;
     }
@@ -154,18 +154,23 @@ const templateClickHandler = (template) => {
     width: calc(100% - 45px);
     .template-list {
       width: 100%;
-      height: calc(100% - 48px);
-      overflow: auto;
+      height: calc(100% - 44px);
+      overflow: auto hidden;
       display: flex;
       align-items: center;
       gap: 20px;
       padding: 0 10px;
       position: relative;
       .single-image {
-        width: 70px;
-        min-width: 70px;
-        height: 116px;
+        padding: 5px;
+        width: 80px;
+        min-width: 80px;
+        height: 100%;
         display: inline-block;
+        background-color: #f7f7f7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         :deep(.var-image) {
           height: 100%;
           width: 100%;

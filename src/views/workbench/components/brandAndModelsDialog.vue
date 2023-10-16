@@ -1,6 +1,12 @@
 <template>
   <div class="brand-and-models">
     <Loading v-show="loadingFlag" />
+    <var-icon
+      class="close-icon"
+      name="window-close"
+      :size="30"
+      @click="closeHandler"
+    />
     <div v-show="!loadingFlag">
       <div class="brand-container">
         <div class="title-line">Brand</div>
@@ -130,14 +136,24 @@ const nextStepHandler = () => {
     maskUrl, // 蒙版背景图
   });
 };
+
+const closeHandler = () => {
+  emit("close");
+};
 </script>
 
 <style lang="less" scoped>
 .brand-and-models {
-  height: 90vh;
+  height: 80vh;
   width: 100%;
   overflow: hidden auto;
   padding: 20px 10px;
+  position: relative;
+  .close-icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+  }
   .title-line {
     height: 25px;
     line-height: 25px;
