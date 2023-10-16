@@ -18,7 +18,7 @@
         <div class="bottom-line">
           <img class="icon-image" src="@/assets/images/icon_small.png" alt="" />
           <span class="price-span">{{ item.price }}</span>
-          <span class="diy-button">diy it</span>
+          <span class="diy-button">Diy it</span>
         </div>
       </div>
     </div>

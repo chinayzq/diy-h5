@@ -164,22 +164,21 @@
           </template>
         </div>
       </div>
+      <!-- 右侧操作栏 -->
+      <GraphSiderBar
+        @fullScreen="graphFullScreen"
+        @openDraftDialog="openDraftDialog"
+        @setActive="setActiveById"
+        :layers="dragStickerList"
+      />
+
+      <!-- 撤销操作 -->
+      <UndoComponent />
     </div>
     <NavigationBar
       @naviClick="navigationEvent"
       :dragStickerList="dragStickerList"
     />
-
-    <!-- 右侧操作栏 -->
-    <GraphSiderBar
-      @fullScreen="graphFullScreen"
-      @openDraftDialog="openDraftDialog"
-      @setActive="setActiveById"
-      :layers="dragStickerList"
-    />
-
-    <!-- 撤销操作 -->
-    <UndoComponent />
 
     <!-- sticker弹出框 -->
     <var-popup
@@ -904,7 +903,9 @@ const eventEndHandler = () => {
 </script>
 <style lang="less" scoped>
 .workbench-component {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
   background-color: #f9f5eb;
   .header-container {
@@ -948,13 +949,11 @@ const eventEndHandler = () => {
     position: relative;
     .single-graph-image {
       position: absolute;
-      width: 70%;
+      width: 50%;
     }
-    .single-graph-image-full {
-      transform: scale(1.3);
-    }
+
     .mask-container {
-      width: 70%;
+      width: 50%;
       position: relative;
       -webkit-mask-size: cover;
       .container-image {
@@ -1047,7 +1046,10 @@ const eventEndHandler = () => {
       }
     }
     .mask-container-full {
-      transform: scale(1.3);
+      transform: scale(1.5);
+    }
+    .single-graph-image-full {
+      transform: scale(1.5);
     }
   }
 }

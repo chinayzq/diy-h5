@@ -48,7 +48,7 @@
                 {{ item.curPrice + priceUnit }}
               </span>
             </span>
-            <span class="diy-span"> diy it > </span>
+            <span class="diy-span"> Diy it > </span>
           </div>
         </div>
       </div>

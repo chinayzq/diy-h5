@@ -97,7 +97,7 @@ const setActive = ({ id }) => {
   z-index: 10;
   position: absolute;
   right: 0;
-  bottom: 80px;
+  bottom: 0;
   width: 62px;
   display: flex;
   flex-direction: column;

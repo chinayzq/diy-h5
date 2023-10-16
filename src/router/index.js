@@ -29,6 +29,12 @@ const router = createRouter({
           component: () => import('@/views/settlement/index.vue'),
           meta: { title: 'settlement' },
         },
+        {
+          path: '/test',
+          name: 'test',
+          component: () => import('@/views/test/index.vue'),
+          meta: { title: 'test' },
+        },
       ],
     },
   ],

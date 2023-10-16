@@ -45,7 +45,7 @@
             loading="/src/assets/images/load.gif"
             :src="`${single.templateUrl}?type=webp`"
           />
-          <span class="diy-span" v-show="!listLoading">diy it</span>
+          <span class="diy-span" v-show="!listLoading">Diy it</span>
         </div>
       </div>
     </div>

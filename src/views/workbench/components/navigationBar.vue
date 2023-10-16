@@ -6,14 +6,19 @@
       v-for="item in activeItems"
       :key="item.key"
     >
-      <template v-if="item.key === 'image' && activeType !== 'text'">
-        <var-uploader @after-read="uploadSuccess" hide-list v-model="files">
-          <div :class="['icon-line', `icon-${item.key}`]"></div>
-          <div class="name-line">
-            {{ item.label }}
-          </div>
-        </var-uploader>
-      </template>
+      <var-uploader
+        v-if="item.key === 'image' && activeType !== 'text'"
+        @after-read="uploadSuccess"
+        hide-list
+        v-model="files"
+        style="width: 35px"
+      >
+        <!-- ↑↑↑  需要设置一个具体数值,否则在IOS中，宽度巨大 -->
+        <div :class="['icon-line', `icon-${item.key}`]"></div>
+        <div class="name-line">
+          {{ item.label }}
+        </div>
+      </var-uploader>
       <template v-else>
         <div :class="['icon-line', `icon-${item.key}`]"></div>
         <div class="name-line">

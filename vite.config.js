@@ -65,7 +65,7 @@ export default ({ mode }) =>
       },
     },
     build: {
-      outDir: 'diyadmin',
+      outDir: 'diy-h5',
     },
     server: {
       hmr: true,
