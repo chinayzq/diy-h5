@@ -22,7 +22,7 @@
           >
             <var-image
               lazy
-              loading="/src/assets/images/load.gif"
+              :loading="$LoadingImage"
               :src="`${single.templateUrl}?type=webp`"
             />
           </div>

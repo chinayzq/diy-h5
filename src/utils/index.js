@@ -1,5 +1,10 @@
 import { useStore } from '@/stores';
 
+// 获取assets静态资源
+export const getAssetsFile = (url) => {
+  return new URL(`../assets/${url}`, import.meta.url).href;
+};
+
 export function setLayout() {
   const store = useStore();
   if (store.client === 'PC') {

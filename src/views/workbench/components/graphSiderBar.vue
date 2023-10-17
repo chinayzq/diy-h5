@@ -44,18 +44,30 @@ import { ref } from "vue";
 const toolList = ref([
   {
     label: "Draft",
-    icon: "/src/assets/images/graph_draft_icon.png",
+    icon: new URL(
+      "../../../assets/images/graph_draft_icon.png",
+      import.meta.url
+    ).href,
   },
   {
     label: "Layers",
-    icon: "/src/assets/images/graph_layer_icon.png",
+    icon: new URL(
+      "../../../assets/images/graph_layer_icon.png",
+      import.meta.url
+    ).href,
     clicked: false,
   },
   {
     label: "Enlarge",
     clickedLabel: "Shrink",
-    icon: "/src/assets/images/graph_enlarge_icon.png",
-    clickedIcon: "/src/assets/images/graph_dislarge_icon.png",
+    icon: new URL(
+      "../../../assets/images/graph_enlarge_icon.png",
+      import.meta.url
+    ).href,
+    clickedIcon: new URL(
+      "../../../assets/images/graph_dislarge_icon.png",
+      import.meta.url
+    ).href,
     clicked: false,
   },
 ]);

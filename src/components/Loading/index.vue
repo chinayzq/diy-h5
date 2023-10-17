@@ -4,7 +4,7 @@
       :style="{
         width: `${props.size}%`,
       }"
-      src="@/assets/images/load.gif"
+      :src="$LoadingImage"
       alt=""
     />
   </div>

@@ -54,7 +54,7 @@
             :key="phoneIndex"
             height="100px"
             lazy
-            loading="/src/assets/images/load.gif"
+            :loading="$LoadingImage"
             :src="dealImageUrl(phoneItem.url)"
           />
         </div>
@@ -68,6 +68,7 @@
 import { getBrandAndModels, getPhoneColor } from "@/api/workbench";
 import { onBeforeMount, ref } from "vue";
 import { dealImageUrl } from "@/utils";
+
 onBeforeMount(() => {
   initDatas();
 });

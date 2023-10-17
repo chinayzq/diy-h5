@@ -13,7 +13,6 @@
         style="z-index: 1"
         :class="['single-graph-image', fullScreen && 'single-graph-image-full']"
         :src="selectModeImage"
-        loading="/src/assets/images/load.gif"
         lazy
         alt=""
       />
@@ -21,7 +20,6 @@
         style="z-index: 2"
         :class="['single-graph-image', fullScreen && 'single-graph-image-full']"
         :src="selectCaseImage"
-        loading="/src/assets/images/load.gif"
         lazy
       />
       <div
@@ -325,9 +323,15 @@ import ResizeIcon from "@/assets/images/drag_resize_icon.png";
 import RotateIcon from "@/assets/images/drag_rotate_icon.svg";
 
 // 选择的背景图 - temp
-const selectMaskImage = ref("/src/assets/images/mask_temp.webp");
-const selectModeImage = ref("/src/assets/images/model_temp.png");
-const selectCaseImage = ref("/src/assets/images/case_temp.png");
+const selectMaskImage = ref(
+  new URL("../../assets/images/mask_temp.webp", import.meta.url).href
+);
+const selectModeImage = ref(
+  new URL("../../assets/images/model_temp.png", import.meta.url).href
+);
+const selectCaseImage = ref(
+  new URL("../../assets/images/case_temp.png", import.meta.url).href
+);
 
 const rotateRender = (item) => {
   const { rotateY, rotateZ } = item;

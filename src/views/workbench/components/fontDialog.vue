@@ -37,7 +37,7 @@
             width="40px"
             height="40px"
             lazy
-            loading="/src/assets/images/load.gif"
+            :loading="$LoadingImage"
             :src="single.extend2"
           />
         </div>
@@ -63,7 +63,7 @@
           width="30px"
           height="30px"
           lazy
-          loading="/src/assets/images/load.gif"
+          :loading="$LoadingImage"
           :src="`/src/assets/images/${item.icon}`"
           @click="styleChange(item)"
         />

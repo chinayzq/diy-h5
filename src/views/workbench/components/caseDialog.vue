@@ -25,7 +25,7 @@
         <div class="left-part">
           <var-image
             lazy
-            loading="/src/assets/images/load.gif"
+            :loading="$LoadingImage"
             :src="dealImageUrl(item.exampleUrl)"
           />
         </div>
