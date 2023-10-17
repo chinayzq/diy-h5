@@ -52,7 +52,6 @@
             @click="activeCaseIndex = phoneIndex"
             v-for="(phoneItem, phoneIndex) in phoneColorList"
             :key="phoneIndex"
-            height="100px"
             lazy
             :loading="$LoadingImage"
             :src="dealImageUrl(phoneItem.url)"
@@ -208,7 +207,7 @@ const closeHandler = () => {
       padding-bottom: 10px;
       width: 100%;
       overflow: auto;
-      min-height: 90px;
+      min-height: 130px;
       position: relative;
       .single-image {
         padding: 5px 10px;

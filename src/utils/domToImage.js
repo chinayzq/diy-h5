@@ -21,7 +21,6 @@ function dataURItoBlob(base64Data) {
 }
 
 function drawSingle(myCanvas, image, type) {
-  console.log('xxxx2');
   const operationMap = {
     mask: 'destination-in',
     model: 'destination-over',
@@ -54,11 +53,11 @@ function uploadAndGetTemplateUrl() {
     //ajax上传，ajax的形式随意，JQ的写法也没有问题
     //需要注意的是服务端需要设定，允许跨域请求。数据接收的方式和<input type="file"/> 上传的文件没有区别
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open('POST', '/diyadmin/upload');
-    const currentToken = localStorage.getItem('diy-admin-token');
-    if (currentToken) {
-      xmlHttp.setRequestHeader('token', currentToken); //设置请求header,按需设定，非必须
-    }
+    xmlHttp.open('POST', '/colgifts/upload');
+    // const currentToken = localStorage.getItem('diy-admin-token');
+    // if (currentToken) {
+    //   xmlHttp.setRequestHeader('token', currentToken); //设置请求header,按需设定，非必须
+    // }
     // xmlHttp.setRequestHeader(
     //   'Content-Type',
     //   'multipart/form-data; boundary=----WebKitFormBoundaryr3jgTATix0AdBbiG'
@@ -80,25 +79,16 @@ export function exportAsImage(domId, images) {
   let myCanvas = document.getElementById('myCanvas').getContext('2d');
   const { mask, model, caseImage } = images;
   return new Promise((resolve) => {
-    // html2Canvas(document.querySelector(`#${domId}`), {
-    //   width: 150,
-    // }).then((canvas) => {
-    //   console.log('canvas', canvas);
-    //   let imageURL = canvas.toDataURL('image/png'); //canvas转base64图片
-    //   console.log('imageURL', imageURL);
-    //   document.getElementById('aBase64Url').href = imageURL;
-    //   document.getElementById('aBase64Url').style = 'display: block';
-    //   document.getElementById('base64Url').src = imageURL;
-    //   document.getElementById('aBase64Url').click();
-    //   document.getElementById('aBase64Url').style = 'display: none';
-    //   resolve();
-    // });
-    domtoimage.toPng(document.querySelector(`#${domId}`)).then((imgbase64) => {
+    html2Canvas(document.querySelector(`#${domId}`), {
+      width: 300,
+      height: 588,
+    }).then((canvas) => {
+      let imageURL = canvas.toDataURL('image/png'); //canvas转base64图片
       let img = new Image();
-      img.src = imgbase64;
+      img.src = imageURL;
       img.onload = async () => {
         myCanvas.globalCompositeOperation = 'source-over';
-        myCanvas.drawImage(img, 0, 0);
+        myCanvas.drawImage(img, 0, 0, 300, 588);
         if (mask) {
           await drawSingle(myCanvas, mask, 'mask');
         }
@@ -112,5 +102,24 @@ export function exportAsImage(domId, images) {
         resolve(url);
       };
     });
+    // domtoimage.toPng(document.querySelector(`#${domId}`)).then((imgbase64) => {
+    //   let img = new Image();
+    //   img.src = imgbase64;
+    //   img.onload = async () => {
+    //     myCanvas.globalCompositeOperation = 'source-over';
+    //     myCanvas.drawImage(img, 0, 0);
+    //     if (mask) {
+    //       await drawSingle(myCanvas, mask, 'mask');
+    //     }
+    //     if (caseImage) {
+    //       await drawSingle(myCanvas, caseImage, 'caseImage');
+    //     }
+    //     if (model) {
+    //       await drawSingle(myCanvas, model, 'model');
+    //     }
+    //     const url = await uploadAndGetTemplateUrl();
+    //     resolve(url);
+    //   };
+    // });
   });
 }

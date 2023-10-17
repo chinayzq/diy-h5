@@ -12,7 +12,7 @@
       <var-image
         style="z-index: 1"
         :class="['single-graph-image', fullScreen && 'single-graph-image-full']"
-        :src="selectModeImage"
+        :src="selectModelImage"
         lazy
         alt=""
       />
@@ -44,7 +44,7 @@
         <img
           class="container-image"
           style="position: relative; z-index: -1"
-          :src="selectModeImage"
+          :src="selectModelImage"
           alt=""
         />
         <div
@@ -277,7 +277,7 @@
       position="bottom"
       v-model:show="printDialogShow"
     >
-      <PrintDialog @close="printDialogClose" />
+      <PrintDialog @close="printDialogClose" :previewImage="previewImage" />
     </var-popup>
 
     <!-- draft弹窗 -->
@@ -293,11 +293,26 @@
     <TemplateSideComponent @templateChange="templateChangeHandler" />
     <!-- PC - layers -->
     <GraphLayers />
+    <!-- continue dialog -->
+    <var-overlay v-model:show="continueDialogShow">
+      <!-- <div class="overlay-content" @click.stop>
+        素胚勾勒出青花笔锋浓转淡, 瓶身描绘的牡丹一如你初妆,
+        冉冉檀香透过窗心事我了然, 宣纸上走笔至此搁一半。
+      </div> -->
+      <ContinueDialog @clickEvent="countinueEvent" />
+    </var-overlay>
+    <!-- 该canvas节点用来导出模板图片渲染用 -->
+    <canvas
+      id="myCanvas"
+      width="300"
+      height="588"
+      style="display: none"
+    ></canvas>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 import NavigationBar from "./components/navigationBar.vue";
 import StickersDialog from "./components/stickersDialog.vue";
 import FontDialog from "./components/fontDialog.vue";
@@ -312,21 +327,58 @@ import DraftDialog from "./components/draftDialog.vue";
 import UndoComponent from "./components/undoComponent.vue";
 import LayersDialog from "./components/layersDialog.vue";
 import FlipDialog from "./components/flipDialog.vue";
+import ContinueDialog from "./components/continueDialog.vue";
 
 import { uuid } from "@/utils";
 import { getTemplateDetail } from "@/api/workbench";
-
+import { exportAsImage } from "@/utils/domToImage";
+import {
+  setItem,
+  removeItem,
+  clearStorage,
+  getStorage,
+} from "@/utils/localStorage";
 // 拖拽ICons
 import DeleteIcon from "@/assets/images/drag_delete_icon.png";
 import PlusIcon from "@/assets/images/drag_plus_icon.svg";
 import ResizeIcon from "@/assets/images/drag_resize_icon.png";
 import RotateIcon from "@/assets/images/drag_rotate_icon.svg";
 
+onBeforeMount(() => {
+  initLocalDatas();
+});
+const continueDialogShow = ref(false);
+const initLocalDatas = () => {
+  const currentLocal = getStorage();
+  if (currentLocal) {
+    continueDialogShow.value = true;
+  }
+};
+const countinueEvent = (event) => {
+  if (event === "continue") {
+    graphLoading.value = true;
+    const currentLocal = getStorage();
+    const { phoneName, modelUrl, maskUrl, caseUrl, caseName } =
+      currentLocal || {};
+    selectPhoneName.value = phoneName;
+    selectCaseName.value = caseName;
+    selectMaskImage.value = maskUrl;
+    selectModelImage.value = modelUrl;
+    selectCaseImage.value = caseUrl;
+    setTimeout(() => {
+      graphLoading.value = false;
+    }, 2000);
+  } else {
+    brandAndModelShow.value = true;
+  }
+  continueDialogShow.value = false;
+};
+
 // 选择的背景图 - temp
 const selectMaskImage = ref(
   new URL("../../assets/images/mask_temp.webp", import.meta.url).href
 );
-const selectModeImage = ref(
+const selectModelImage = ref(
   new URL("../../assets/images/model_temp.png", import.meta.url).href
 );
 const selectCaseImage = ref(
@@ -569,17 +621,23 @@ const selectCaseList = ref([]);
 const selectPhoneName = ref("iPhone 14");
 const selectCaseName = ref("Clear Impact Case - Black");
 const nextStepHandler = (datas) => {
-  selectModeImage.value = datas.modelUrl;
+  selectModelImage.value = datas.modelUrl;
+  setItem("modelUrl", datas.modelUrl);
   selectMaskImage.value = datas.maskUrl;
+  setItem("maskUrl", datas.maskUrl);
   selectCaseList.value = datas.caseList;
   selectPhoneName.value = datas.phoneName;
+  setItem("phoneName", datas.phoneName);
+  setItem("brandName", datas.brandName);
   brandAndModelShow.value = false;
   caseDialogShow.value = true;
 };
 const phoneCaseSelectHandler = (url, caseName) => {
   graphLoading.value = true;
   selectCaseImage.value = url;
+  setItem("caseUrl", url);
   selectCaseName.value = caseName;
+  setItem("caseName", caseName);
   caseDialogShow.value = false;
   setTimeout(() => {
     graphLoading.value = false;
@@ -592,11 +650,38 @@ const openModelDialog = () => {
 };
 
 const printDialogShow = ref(false);
-const printHandler = () => {
+const previewImage = ref(null);
+const printHandler = async () => {
+  previewImage.value = null;
   printDialogShow.value = true;
+  setGraphDomsScale(1, true);
+  const templateUrl = await exportAsImage("mask-container", {
+    mask: selectMaskImage.value,
+    model: selectModelImage.value,
+    caseImage: selectCaseImage.value,
+  });
+  previewImage.value = templateUrl;
+  setGraphDomsScale(0.65, false);
 };
 const printDialogClose = () => {
   printDialogShow.value = false;
+};
+const setGraphDomsScale = (scale, hideFlag) => {
+  if (hideFlag) {
+    document.getElementsByClassName("graph-container")[0].style.top = "50%";
+  }
+  document.getElementsByClassName(
+    "single-graph-image"
+  )[0].style.transform = `scale(${scale})`;
+  document.getElementsByClassName(
+    "single-graph-image"
+  )[1].style.transform = `scale(${scale})`;
+  document.getElementsByClassName(
+    "mask-container"
+  )[0].style.transform = `scale(${scale})`;
+  if (!hideFlag) {
+    document.getElementsByClassName("graph-container")[0].style.top = "0";
+  }
 };
 
 const setActiveById = (id) => {

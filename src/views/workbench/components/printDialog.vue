@@ -11,8 +11,16 @@
     </div>
     <div class="graph-container">
       <img
+        v-if="!previewImage"
         class="loading-icon"
         src="@/assets/images/preview-loading.gif"
+        alt=""
+      />
+      <var-image
+        v-else
+        class="preview-image"
+        :src="`/colgifts/image/${previewImage}`"
+        :loading="$LoadingImage"
         alt=""
       />
     </div>
@@ -24,8 +32,16 @@
 </template>
 
 <script setup>
-const currentModel = "IPhone 14";
-
+import { ref } from "vue";
+const currentModel = ref("IPhone 14");
+const props = defineProps({
+  previewImage: {
+    type: String,
+    default() {
+      return "";
+    },
+  },
+});
 const emit = defineEmits();
 const closeHandler = () => {
   emit("close");
@@ -62,6 +78,9 @@ const closeHandler = () => {
     .loading-icon {
       height: 120px;
       width: 330px;
+    }
+    .preview-image {
+      height: 80%;
     }
   }
   .model-line {
