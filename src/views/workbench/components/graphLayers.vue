@@ -8,8 +8,18 @@
         </div>
       </div>
       <div class="right-part">
-        <div class="single-image" v-for="single in layerList" :key="single">
-          <img src="@/assets/images/layer-example.webp" alt="" />
+        <div class="single-image" v-for="single in layers" :key="single">
+          <div
+            :class="['single-layer', item.active && 'single-layer-active']"
+            v-for="(item, index) in layers"
+            :key="index"
+            @click.stop="setActive(item)"
+          >
+            <span class="text-one" v-if="item.type === 'text'">
+              {{ item.content }}
+            </span>
+            <img v-else class="image-one" :src="item.url" alt="" />
+          </div>
         </div>
       </div>
     </div>
@@ -21,7 +31,19 @@ import { useStore } from "@/stores";
 import { ref } from "vue";
 const store = useStore();
 
-const layerList = ref([{}, {}, {}, {}, {}, {}, {}, {}, {}]);
+const props = defineProps({
+  layers: {
+    type: Array,
+    default() {
+      return [];
+    },
+  },
+});
+
+const emit = defineEmits();
+const setActive = ({ id }) => {
+  emit("setActive", id);
+};
 </script>
 
 <style lang="less" scoped>
@@ -70,9 +92,20 @@ const layerList = ref([{}, {}, {}, {}, {}, {}, {}, {}, {}]);
       .single-image {
         width: 80px;
         height: 80px;
-        img {
-          height: 100%;
-          width: 100%;
+        text-align: center;
+        .single-layer {
+          display: inline-block;
+          width: 70px;
+          height: 70px;
+          margin-bottom: 10px;
+          border: #ffffff solid 2px;
+          .image-one {
+            height: 100%;
+            width: 100%;
+          }
+        }
+        .single-layer-active {
+          border: aqua solid 2px;
         }
       }
     }

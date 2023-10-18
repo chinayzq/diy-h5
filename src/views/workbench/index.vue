@@ -286,21 +286,22 @@
       position="bottom"
       v-model:show="draftDialogShow"
     >
-      <DraftDialog @close="draftDialogShow = false" />
+      <DraftDialog
+        v-if="draftDialogShow"
+        @close="draftDialogShow = false"
+        @draftSelect="draftSelectHandler"
+      />
     </var-popup>
 
     <!-- PC - tempaltes -->
     <TemplateSideComponent @templateChange="templateChangeHandler" />
     <!-- PC - layers -->
-    <GraphLayers />
+    <GraphLayers :layers="dragStickerList" @setActive="setActiveById" />
     <!-- continue dialog -->
     <var-overlay v-model:show="continueDialogShow">
-      <!-- <div class="overlay-content" @click.stop>
-        素胚勾勒出青花笔锋浓转淡, 瓶身描绘的牡丹一如你初妆,
-        冉冉檀香透过窗心事我了然, 宣纸上走笔至此搁一半。
-      </div> -->
       <ContinueDialog @clickEvent="countinueEvent" />
     </var-overlay>
+
     <!-- 该canvas节点用来导出模板图片渲染用 -->
     <canvas
       id="myCanvas"
@@ -330,7 +331,7 @@ import FlipDialog from "./components/flipDialog.vue";
 import ContinueDialog from "./components/continueDialog.vue";
 
 import { uuid } from "@/utils";
-import { getTemplateDetail } from "@/api/workbench";
+import { getTemplateDetail, saveDraft } from "@/api/workbench";
 import { exportAsImage } from "@/utils/domToImage";
 import {
   setItem,
@@ -358,7 +359,7 @@ const countinueEvent = (event) => {
   if (event === "continue") {
     graphLoading.value = true;
     const currentLocal = getStorage();
-    const { phoneName, modelUrl, maskUrl, caseUrl, caseName } =
+    const { phoneName, modelUrl, maskUrl, caseUrl, caseName, stickers } =
       currentLocal || {};
     selectPhoneName.value = phoneName;
     selectCaseName.value = caseName;
@@ -368,6 +369,7 @@ const countinueEvent = (event) => {
     setTimeout(() => {
       graphLoading.value = false;
     }, 2000);
+    dragStickerList.value = JSON.parse(stickers);
   } else {
     brandAndModelShow.value = true;
   }
@@ -529,6 +531,20 @@ const draftDialogShow = ref(false);
 const openDraftDialog = () => {
   draftDialogShow.value = true;
 };
+const draftSelectHandler = (item) => {
+  graphLoading.value = true;
+  const { templateData } = item || {};
+  selectPhoneName.value = templateData.phoneName;
+  selectCaseName.value = templateData.caseName;
+  selectMaskImage.value = templateData.maskImage;
+  selectModelImage.value = templateData.modelImage;
+  selectCaseImage.value = templateData.caseImage;
+  dragStickerList.value = templateData.basedata || [];
+  setTimeout(() => {
+    graphLoading.value = false;
+  }, 2000);
+  draftDialogShow.value = false;
+};
 
 const templateDialogShow = ref(false);
 const templateDialogClass = ref("popup-custom-overlay-offset");
@@ -619,6 +635,7 @@ const brandAndModelShow = ref(false);
 const caseDialogShow = ref(false);
 const selectCaseList = ref([]);
 const selectPhoneName = ref("iPhone 14");
+const selectPhoneCode = ref("IPHONE14");
 const selectCaseName = ref("Clear Impact Case - Black");
 const nextStepHandler = (datas) => {
   selectModelImage.value = datas.modelUrl;
@@ -627,6 +644,7 @@ const nextStepHandler = (datas) => {
   setItem("maskUrl", datas.maskUrl);
   selectCaseList.value = datas.caseList;
   selectPhoneName.value = datas.phoneName;
+  selectPhoneCode.value = datas.phoneCode;
   setItem("phoneName", datas.phoneName);
   setItem("brandName", datas.brandName);
   brandAndModelShow.value = false;
@@ -655,6 +673,7 @@ const printHandler = async () => {
   previewImage.value = null;
   printDialogShow.value = true;
   setGraphDomsScale(1, true);
+  setItem("stickers", JSON.stringify(dragStickerList.value));
   const templateUrl = await exportAsImage("mask-container", {
     mask: selectMaskImage.value,
     model: selectModelImage.value,
@@ -662,10 +681,12 @@ const printHandler = async () => {
   });
   previewImage.value = templateUrl;
   setGraphDomsScale(0.65, false);
+  saveAsDraft(templateUrl);
 };
 const printDialogClose = () => {
   printDialogShow.value = false;
 };
+// 渲染的时候隐藏画布大图、调整scale
 const setGraphDomsScale = (scale, hideFlag) => {
   if (hideFlag) {
     document.getElementsByClassName("graph-container")[0].style.top = "50%";
@@ -682,6 +703,22 @@ const setGraphDomsScale = (scale, hideFlag) => {
   if (!hideFlag) {
     document.getElementsByClassName("graph-container")[0].style.top = "0";
   }
+};
+const saveAsDraft = (templateUrl) => {
+  const params = {
+    description: "", //暂时没有描述
+    phoneCode: selectPhoneCode.value,
+    templateData: {
+      basedata: dragStickerList.value,
+      modelImage: selectModelImage.value,
+      caseImage: selectCaseImage.value,
+      maskImage: selectMaskImage.value,
+      phoneName: selectPhoneName.value,
+      caseName: selectCaseName.value,
+    },
+    templateUrl,
+  };
+  saveDraft(params);
 };
 
 const setActiveById = (id) => {

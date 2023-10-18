@@ -24,3 +24,9 @@ export function getTemplateListByCode(params) {
 export function getTemplateDetail(params) {
   return axios.get('/template', { params });
 }
+export function saveDraft(params) {
+  return axios.post('/template/savedraft', params);
+}
+export function getDraftList(params) {
+  return axios.get('/template/listdraft', { params });
+}
