@@ -27,12 +27,14 @@
     <div class="model-line">
       {{ currentModel }}
     </div>
-    <div class="confirm-button">CONFIRM</div>
+    <div class="confirm-button" @click="confirmHanlder">CONFIRM</div>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import { useRouter } from "vue-router";
+
 const currentModel = ref("IPhone 14");
 const props = defineProps({
   previewImage: {
@@ -45,6 +47,13 @@ const props = defineProps({
 const emit = defineEmits();
 const closeHandler = () => {
   emit("close");
+};
+
+const router = useRouter();
+const confirmHanlder = () => {
+  router.push({
+    path: "/settlement",
+  });
 };
 </script>
 
