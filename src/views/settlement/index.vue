@@ -9,6 +9,7 @@
       </div>
     </div>
     <div class="list-container">
+      <Loading v-show="listLoading" />
       <div class="single-item" v-for="(item, index) in itemList" :key="index">
         <div class="left-part">
           <var-checkbox v-model="item.checked"></var-checkbox>
@@ -18,7 +19,7 @@
             height="135"
             style="display: flex; justify-content: center; align-items: center"
             :loading="$LoadingImage"
-            src="/colgifts/image/c5e772ba2c3c428fab7a6d89a6775861"
+            :src="`/colgifts/image/${item.templateUrl}`"
             lazy
             alt=""
           />
@@ -27,13 +28,19 @@
           <div>
             <div class="item-title">
               <span class="product-name">Phone Case</span>
-              <span class="product-price">30 USD</span>
+              <span class="product-price"
+                >{{ item.extendJson.curPrice }} USD</span
+              >
             </div>
-            <div class="item-second-title">iPhone14 - Black</div>
+            <div class="item-second-title">
+              {{ item.extendJson.phoneName }} - {{ item.extendJson.caseColor }}
+            </div>
           </div>
           <div class="link-line">
-            <span class="save"> save image </span>
-            <span class="remove"> remove </span>
+            <span class="save" @click="saveImageToLocal(item)">
+              save image
+            </span>
+            <span class="remove" @click="removeHandler(item)"> remove </span>
           </div>
           <div class="number-control">
             <var-icon name="minus" @click="item.count > 0 && item.count--" />
@@ -48,20 +55,25 @@
     <div class="bottom-container">
       <div class="single-line">
         <span> Subtotal </span>
-        <span class="font-italic"> 30.00 USD </span>
+        <span class="font-italic"> {{ Subtotal }} USD </span>
       </div>
       <div class="single-line">
         <span> Shipping </span>
-        <span class="font-italic"> 6.00 USD </span>
+        <span class="font-italic">
+          {{ free ? "FREE" : `${shipping} USD` }}
+        </span>
         <span class="font-italic"> Buy 2 get free shipping </span>
       </div>
       <div class="border-line"></div>
       <div class="single-line">
         <span> Estimated Total </span>
-        <span class="font-italic"> 36.00 USD </span>
+        <span class="font-italic"> {{ Subtotal }} USD </span>
       </div>
       <div class="button-line">
-        <span :class="['add-button', !policyChecked && 'add-button-disabled']">
+        <span
+          :class="['add-button', !policyChecked && 'add-button-disabled']"
+          @click="addCardHandler"
+        >
           Add to card
         </span>
         <span class="shipping-cart">
@@ -74,28 +86,116 @@
         <span class="link-span"> contact us </span>
       </div>
     </div>
+    <var-popup
+      overlay-class="card-list-pop"
+      position="right"
+      v-model:show="cartShow"
+    >
+      <CartList v-if="cartShow" @close="cartShow = false" />
+    </var-popup>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import {
+  getProductList,
+  deleteProduct,
+  saveCart,
+  getShipping,
+} from "@/api/workbench";
+import { onBeforeMount, ref, watch } from "vue";
+import { getStorage } from "@/utils/localStorage";
+import CartList from "./components/cartList.vue";
+const currentLocal = getStorage();
+const currentProductId = ref(currentLocal.selectProductId);
 
 const policyChecked = ref(true);
+const shipping = ref(0);
+const itemList = ref([]);
+onBeforeMount(() => {
+  getShipping().then((res) => {
+    shipping.value = Number(res.data).toFixed(2);
+  });
+  getProductList().then((res) => {
+    itemList.value = res.data.map((item) => {
+      item.checked = item.productId === currentProductId.value;
+      item.count = 1;
+      return item;
+    });
+  });
+});
+watch(
+  () => itemList.value,
+  () => {
+    countCalc();
+  },
+  { deep: true }
+);
+const Subtotal = ref(0);
+const free = ref(false);
+const countCalc = () => {
+  let subTotalTemp = 0;
+  let checkedCount = 0;
+  itemList.value.forEach((item) => {
+    if (item.checked) {
+      checkedCount += item.count;
+      subTotalTemp += item.count * item.extendJson.curPrice;
+    }
+  });
+  free.value = checkedCount > 1;
+  Subtotal.value = subTotalTemp.toFixed(2);
+};
 
-const itemList = ref([
-  {
-    checked: true,
-    count: 1,
-  },
-  {
-    checked: false,
-    count: 1,
-  },
-  {
-    checked: false,
-    count: 1,
-  },
-]);
+const removeHandler = (item) => {
+  for (let i = 0; i < itemList.value.length; i++) {
+    if (itemList.value[i].productId === item.productId) {
+      itemList.value.splice(i, 1);
+      break;
+    }
+  }
+  deleteProduct(item.productId);
+};
+
+const saveImageToLocal = (item) => {
+  let image = new Image();
+  image.setAttribute("crossOrigin", "anonymous");
+  image.src = `/colgifts/image/${item.templateUrl}`;
+  image.onload = function () {
+    let canvas = document.createElement("canvas");
+    canvas.width = image.width;
+    canvas.height = image.height;
+    let context = canvas.getContext("2d");
+    context.drawImage(image, 0, 0, image.width, image.height);
+    let url = canvas.toDataURL("image/png");
+    let a = document.createElement("a");
+    a.download = `product_preview`;
+    a.href = url;
+    a.click();
+  };
+};
+
+const cartShow = ref(false);
+const listLoading = ref(false);
+const addCardHandler = () => {
+  if (!policyChecked) return;
+  let checkedItemList = itemList.value.filter((item) => item.checked);
+  const params = checkedItemList.map((item) => {
+    // item.extendJson.subTotal = item.count * item.extendJson.curPrice;
+    return {
+      description: "",
+      extendJson: item.extendJson,
+      phoneCode: item.phoneCode,
+      productCount: item.count,
+      productId: item.productId,
+      templateUrl: item.templateUrl,
+    };
+  });
+  listLoading.value = true;
+  saveCart(params).finally(() => {
+    listLoading.value = false;
+    cartShow.value = true;
+  });
+};
 </script>
 
 <style lang="less" scoped>
@@ -133,6 +233,7 @@ const itemList = ref([
         font-family: "JostMedium";
         border-radius: 12px;
         padding: 0 10px;
+        cursor: pointer;
       }
       .create-link {
         background-color: #c54f91;
@@ -193,10 +294,13 @@ const itemList = ref([
           align-items: center;
           font-size: 16px;
           text-decoration: underline;
-          cursor: pointer;
           .save {
+            cursor: pointer;
             color: #8a8984;
             font-size: 16px;
+          }
+          .remove {
+            cursor: pointer;
           }
         }
         .number-control {

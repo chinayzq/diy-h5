@@ -39,6 +39,31 @@ function drawSingle(myCanvas, image, type) {
   });
   // };
 }
+function uploadPrintAndGetUrl() {
+  return new Promise((resolve) => {
+    console.log(2);
+    const finalData = document
+      .getElementById('myCanvas')
+      .toDataURL('image/png');
+    const blob = dataURItoBlob(finalData);
+    //组装formdata
+    var fd = new FormData();
+    fd.append('file', blob); //fileData为自定义
+    fd.append('fileName', 'print'); //fileName为自定义，名字随机生成或者写死，看需求
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open('POST', '/colgifts/upload');
+    xmlHttp.send(fd);
+    //ajax回调
+    xmlHttp.onreadystatechange = (res) => {
+      //todo  your code...
+      if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+        try {
+          resolve(JSON.parse(xmlHttp.responseText).data);
+        } catch (error) {}
+      }
+    };
+  });
+}
 
 function uploadAndGetTemplateUrl() {
   return new Promise((resolve) => {
@@ -92,14 +117,16 @@ export function exportAsImage(domId, images) {
         if (mask) {
           await drawSingle(myCanvas, mask, 'mask');
         }
+        const printUrl = await uploadPrintAndGetUrl();
         if (caseImage) {
           await drawSingle(myCanvas, caseImage, 'caseImage');
         }
         if (model) {
           await drawSingle(myCanvas, model, 'model');
         }
-        const url = await uploadAndGetTemplateUrl();
-        resolve(url);
+        const templateUrl = await uploadAndGetTemplateUrl();
+
+        resolve({ templateUrl, printUrl });
       };
     });
     // domtoimage.toPng(document.querySelector(`#${domId}`)).then((imgbase64) => {

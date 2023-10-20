@@ -8,7 +8,7 @@
         </div>
       </div>
       <div class="right-part">
-        <div class="single-image" v-for="single in layers" :key="single">
+        <div class="single-image">
           <div
             :class="['single-layer', item.active && 'single-layer-active']"
             v-for="(item, index) in layers"

@@ -11,14 +11,20 @@
       <Loading v-show="graphLoading" :size="30" />
       <var-image
         style="z-index: 1"
-        :class="['single-graph-image', fullScreen && 'single-graph-image-full']"
+        class="single-graph-image"
+        :style="{
+          transform: `scale(${scale})`,
+        }"
         :src="selectModelImage"
         lazy
         alt=""
       />
       <var-image
         style="z-index: 2"
-        :class="['single-graph-image', fullScreen && 'single-graph-image-full']"
+        class="single-graph-image"
+        :style="{
+          transform: `scale(${scale})`,
+        }"
         :src="selectCaseImage"
         lazy
       />
@@ -26,8 +32,9 @@
         :style="{
           zIndex: 3,
           maskImage: `url(${selectMaskImage})`,
+          transform: `scale(${scale})`,
         }"
-        :class="['mask-container', fullScreen && 'mask-container-full']"
+        class="mask-container"
         @mousemove="
           (event) => {
             moveHandler(event, item);
@@ -277,7 +284,11 @@
       position="bottom"
       v-model:show="printDialogShow"
     >
-      <PrintDialog @close="printDialogClose" :previewImage="previewImage" />
+      <PrintDialog
+        @close="printDialogClose"
+        @confirm="confirmHandler"
+        :previewImage="previewImage"
+      />
     </var-popup>
 
     <!-- draft弹窗 -->
@@ -313,7 +324,7 @@
 </template>
 
 <script setup>
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref, watch } from "vue";
 import NavigationBar from "./components/navigationBar.vue";
 import StickersDialog from "./components/stickersDialog.vue";
 import FontDialog from "./components/fontDialog.vue";
@@ -331,8 +342,9 @@ import FlipDialog from "./components/flipDialog.vue";
 import ContinueDialog from "./components/continueDialog.vue";
 
 import { uuid } from "@/utils";
-import { getTemplateDetail, saveDraft } from "@/api/workbench";
+import { getTemplateDetail, saveDraft, saveProduct } from "@/api/workbench";
 import { exportAsImage } from "@/utils/domToImage";
+import { useRouter } from "vue-router";
 import {
   setItem,
   removeItem,
@@ -344,6 +356,8 @@ import DeleteIcon from "@/assets/images/drag_delete_icon.png";
 import PlusIcon from "@/assets/images/drag_plus_icon.svg";
 import ResizeIcon from "@/assets/images/drag_resize_icon.png";
 import RotateIcon from "@/assets/images/drag_rotate_icon.svg";
+
+const scale = ref(0.65);
 
 onBeforeMount(() => {
   initLocalDatas();
@@ -522,9 +536,8 @@ const layerChangeHandler = (key) => {
 };
 
 // fullscreen | layers Dialog
-const fullScreen = ref(false);
 const graphFullScreen = (flag) => {
-  fullScreen.value = flag;
+  scale.value = flag ? 0.9 : 0.65;
 };
 
 const draftDialogShow = ref(false);
@@ -650,12 +663,24 @@ const nextStepHandler = (datas) => {
   brandAndModelShow.value = false;
   caseDialogShow.value = true;
 };
-const phoneCaseSelectHandler = (url, caseName) => {
+const selectCaseItem = ref({
+  // curPrice,
+  // oriPrice,
+  // description, - 颜色
+  // extend1, - 尺寸描述
+  // extend2, - 摄像头描述
+  // extend3, - SKU
+  // url,
+  // colorName
+});
+const phoneCaseSelectHandler = (item) => {
+  selectCaseItem.value = item;
+  const { url, colorName } = item;
   graphLoading.value = true;
   selectCaseImage.value = url;
   setItem("caseUrl", url);
-  selectCaseName.value = caseName;
-  setItem("caseName", caseName);
+  selectCaseName.value = colorName;
+  setItem("caseName", colorName);
   caseDialogShow.value = false;
   setTimeout(() => {
     graphLoading.value = false;
@@ -669,25 +694,69 @@ const openModelDialog = () => {
 
 const printDialogShow = ref(false);
 const previewImage = ref(null);
+const printImage = ref(null);
 const printHandler = async () => {
   previewImage.value = null;
   printDialogShow.value = true;
   setGraphDomsScale(1, true);
   setItem("stickers", JSON.stringify(dragStickerList.value));
-  const templateUrl = await exportAsImage("mask-container", {
+  const { templateUrl, printUrl } = await exportAsImage("mask-container", {
     mask: selectMaskImage.value,
     model: selectModelImage.value,
     caseImage: selectCaseImage.value,
   });
   previewImage.value = templateUrl;
+  printImage.value = printUrl;
   setGraphDomsScale(0.65, false);
   saveAsDraft(templateUrl);
 };
 const printDialogClose = () => {
   printDialogShow.value = false;
 };
+watch(
+  () => printDialogShow.value,
+  (dialogShow) => {
+    if (!dialogShow) {
+      setGraphDomsScale(0.65, false);
+    }
+  }
+);
+
+const router = useRouter();
+const confirmHandler = () => {
+  const { curPrice, oriPrice, description, extend1, extend2, extend3 } =
+    selectCaseItem.value;
+  // 保存产品后跳转
+  const params = {
+    description: "",
+    extendJson: {
+      oriPrice,
+      curPrice,
+      caseColor: description,
+      extend1,
+      extend2,
+      extend3,
+      phoneName: selectPhoneName.value,
+      printUrl: printImage.value,
+    },
+    phoneCode: selectPhoneCode.value,
+    templateUrl: previewImage.value,
+  };
+  saveProduct(params)
+    .then((res) => {
+      // 保存产品后，返回productId，进入settlement页面后，勾选到这个产品
+      setItem("selectProductId", res.data);
+    })
+    .finally(() => {
+      router.push({
+        path: "/settlement",
+      });
+    });
+};
+
 // 渲染的时候隐藏画布大图、调整scale
 const setGraphDomsScale = (scale, hideFlag) => {
+  clearAllActive();
   if (hideFlag) {
     document.getElementsByClassName("graph-container")[0].style.top = "50%";
   }
@@ -874,8 +943,8 @@ const dragHandler = (event, item) => {
   const yDiff = clientY - draggingItem.y;
   draggingItem.x = clientX;
   draggingItem.y = clientY;
-  item.top = item.top + yDiff;
-  item.left = item.left + xDiff;
+  item.top = item.top + yDiff / scale.value;
+  item.left = item.left + xDiff / scale.value;
 };
 const dragStartHandler = (event, item) => {
   currentItem = item;
@@ -938,10 +1007,10 @@ const resizeMove = (event, item) => {
   resizeObj.y = clientY;
   // 如果是text类型，根据横向移动距离改变font-size
   if (currentItem.type === "text") {
-    item.fontSize += xDiff;
+    item.fontSize += xDiff / scale.value;
   } else {
-    item.height = item.height + yDiff;
-    item.width = item.width + xDiff;
+    item.height = item.height + yDiff / scale.value;
+    item.width = item.width + xDiff / scale.value;
   }
 };
 const resizeEnd = () => {
@@ -966,11 +1035,11 @@ const rotateStart = (event, item) => {
   const { height, width, id } = item;
   const currentDom = document.getElementById(`drag_dom_${id}`);
   const { left, top } = currentDom.getBoundingClientRect();
-  pointA.X = width / 2 + left;
-  pointA.Y = height / 2 + top;
+  pointA.X = (width / 2 + left) / scale.value;
+  pointA.Y = (height / 2 + top) / scale.value;
   // 记录起始坐标
-  pointB.X = eventTransfor(event).pageX;
-  pointB.Y = eventTransfor(event).pageY;
+  pointB.X = eventTransfor(event).pageX / scale.value;
+  pointB.Y = eventTransfor(event).pageY / scale.value;
   // 计算元素中心点
   // pointA.X = event.pageX - width / 2;
   // pointA.Y = event.pageY - height / 2;
@@ -979,8 +1048,8 @@ const rotateStart = (event, item) => {
 };
 const rotating = (event, item) => {
   if (!rotateObj.start) return;
-  pointC.X = eventTransfor(event).pageX;
-  pointC.Y = eventTransfor(event).pageY; // 获取结束点坐标
+  pointC.X = eventTransfor(event).pageX / scale.value;
+  pointC.Y = eventTransfor(event).pageY / scale.value; // 获取结束点坐标
   // 计算出旋转角度
   const AB = {};
   const AC = {};
@@ -1081,11 +1150,9 @@ const eventEndHandler = () => {
     .single-graph-image {
       position: absolute;
       width: 300px;
-      transform: scale(0.65);
     }
     .mask-container {
       width: 300px;
-      transform: scale(0.65);
       position: relative;
       -webkit-mask-size: cover;
       .container-image {
@@ -1176,12 +1243,6 @@ const eventEndHandler = () => {
       .drag-item-vertical {
         transform: rotateY(180deg) rotateZ(180deg);
       }
-    }
-    .mask-container-full {
-      transform: scale(0.9);
-    }
-    .single-graph-image-full {
-      transform: scale(0.9);
     }
   }
 }

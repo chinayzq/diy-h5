@@ -30,3 +30,27 @@ export function saveDraft(params) {
 export function getDraftList(params) {
   return axios.get('/template/listdraft', { params });
 }
+export function saveProduct(params) {
+  return axios.post('/saveproducct', params);
+}
+export function saveCart(params) {
+  return axios.post('/savecard', params);
+}
+export function getProductList(params) {
+  return axios.get('/listproduct', { params });
+}
+export function getCartList(params) {
+  return axios.get('/listcard', { params });
+}
+export function getShipping(params) {
+  return axios.get('/shipping', { params });
+}
+export function deleteProduct(productId) {
+  return axios.delete(`/deleteproduct/${productId}`);
+}
+export function deleteCart(cartId) {
+  return axios.delete(`/deletecard/${cartId}`);
+}
+export function couponAmount(params) {
+  return axios.get('/couponamount', { params });
+}

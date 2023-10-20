@@ -29,7 +29,7 @@
         class="single-image"
         v-for="(single, singleIndex) in tabs[active].children"
         :key="singleIndex"
-        @click="stickerClickHandler(single)"
+        @click.stop="stickerClickHandler(single)"
       >
         <var-image
           v-if="props.stickersShow"

@@ -57,6 +57,11 @@
 .var-popup__content {
   width: 100vw;
 }
+.card-list-pop {
+  & + .var-popup__content {
+    width: calc(100% - 30px);
+  }
+}
 // PC端布局
 .layout-PC {
   .header-container {

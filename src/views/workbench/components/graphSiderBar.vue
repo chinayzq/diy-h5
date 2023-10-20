@@ -137,17 +137,22 @@ const setActive = ({ id }) => {
   .layers-container {
     background-color: rgba(0, 0, 0, 0.2);
     width: 72px;
-    height: 260px;
     overflow: auto;
-    position: absolute;
-    right: 0;
-    top: -300px;
+    position: fixed;
+    top: 50px;
+    left: 0;
+    height: calc(100% - 200px);
+    // height: 260px;
+    // position: absolute;
+    // right: 0;
+    // top: -300px;
     padding: 10px 0;
     .single-layer {
       display: inline-block;
       width: 66px;
       height: 66px;
       margin-bottom: 10px;
+      border: #00000000 solid 1px;
       .image-one {
         height: 100%;
         width: 100%;

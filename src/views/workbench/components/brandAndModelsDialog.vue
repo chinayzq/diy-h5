@@ -7,55 +7,58 @@
       :size="30"
       @click="closeHandler"
     />
-    <div v-show="!loadingFlag">
-      <div class="brand-container">
-        <div class="title-line">Brand</div>
-        <div class="brand-list">
-          <span
-            :class="[
-              'single-brand',
-              index === activeBrandIndex && 'single-brand-active',
-            ]"
-            v-for="(item, index) in dataList"
-            :key="index"
-            @click="activeBrandIndex = index"
-          >
-            {{ item.brandName }}
-          </span>
+    <div v-show="!loadingFlag" class="main-container">
+      <div class="sroll-container">
+        <div class="brand-container">
+          <div class="title-line">Brand</div>
+          <div class="brand-list">
+            <span
+              :class="[
+                'single-brand',
+                index === activeBrandIndex && 'single-brand-active',
+              ]"
+              v-for="(item, index) in dataList"
+              :key="index"
+              @click="activeBrandIndex = index"
+            >
+              {{ item.brandName }}
+            </span>
+          </div>
         </div>
-      </div>
-      <div class="model-container">
-        <div class="title-line">Model</div>
-        <div class="model-list" v-if="dataList[activeBrandIndex]">
-          <span
-            :class="[
-              'single-model',
-              modelIndex === activeModelIndex && 'single-model-active',
-            ]"
-            v-for="(model, modelIndex) in dataList[activeBrandIndex].modelList"
-            :key="modelIndex"
-            @click="modelClickHandler(model, modelIndex)"
-          >
-            {{ model.phoneName }}
-          </span>
+        <div class="model-container">
+          <div class="title-line">Model</div>
+          <div class="model-list" v-if="dataList[activeBrandIndex]">
+            <span
+              :class="[
+                'single-model',
+                modelIndex === activeModelIndex && 'single-model-active',
+              ]"
+              v-for="(model, modelIndex) in dataList[activeBrandIndex]
+                .modelList"
+              :key="modelIndex"
+              @click="modelClickHandler(model, modelIndex)"
+            >
+              {{ model.phoneName }}
+            </span>
+          </div>
         </div>
-      </div>
-      <div class="case-container">
-        <div class="title-line">Color</div>
-        <div class="image-list">
-          <Loading v-show="listLoading" />
-          <var-image
-            :class="[
-              'single-image',
-              activeCaseIndex === phoneIndex && 'single-image-active',
-            ]"
-            @click="activeCaseIndex = phoneIndex"
-            v-for="(phoneItem, phoneIndex) in phoneColorList"
-            :key="phoneIndex"
-            lazy
-            :loading="$LoadingImage"
-            :src="dealImageUrl(phoneItem.url)"
-          />
+        <div class="case-container">
+          <div class="title-line">Color</div>
+          <div class="image-list">
+            <Loading v-show="listLoading" />
+            <var-image
+              :class="[
+                'single-image',
+                activeCaseIndex === phoneIndex && 'single-image-active',
+              ]"
+              @click="activeCaseIndex = phoneIndex"
+              v-for="(phoneItem, phoneIndex) in phoneColorList"
+              :key="phoneIndex"
+              lazy
+              :loading="$LoadingImage"
+              :src="dealImageUrl(phoneItem.url)"
+            />
+          </div>
         </div>
       </div>
       <div class="next-step" @click="nextStepHandler">Next Step</div>
@@ -146,7 +149,7 @@ const closeHandler = () => {
 .brand-and-models {
   height: 80vh;
   width: 100%;
-  overflow: hidden auto;
+  overflow: hidden;
   padding: 20px 10px;
   position: relative;
   .close-icon {
@@ -160,6 +163,17 @@ const closeHandler = () => {
     font-family: "JostMedium";
     font-size: 13px;
     color: #000000e6;
+  }
+  .main-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    overflow: auto;
+    .sroll-container {
+      flex: 1;
+      overflow: auto;
+    }
   }
   .brand-container {
     .brand-list {

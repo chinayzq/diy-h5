@@ -87,7 +87,7 @@ const changeHandler = () => {
 };
 
 const phoneCaseSelect = (item) => {
-  emit("phoneCaseSelect", item.url, item.colorName);
+  emit("phoneCaseSelect", item);
 };
 
 const closeHandler = () => {
