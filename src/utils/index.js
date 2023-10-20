@@ -105,8 +105,31 @@ export function judgeClient() {
   } else {
     return 'PC';
   }
-  // xr 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1'
-  // 12 pro 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1'
+
+  // 方法1
+  // var system = {};
+  // system.pingtai =
+  //   /(Win32|Win16|WinCE|Mac68K|MacIntel|MacIntel|MacPPC|Linux mips64)/i.test(
+  //     navigator.platform
+  //   );
+  // if (system.pingtai) {
+  //   //电脑
+  //   return 'PC';
+  // } else {
+  //   //手机
+  //   return 'MOBILE';
+  // }
+
+  // 方法2
+  // var system = {};
+  // var p = navigator.platform;
+  // system.win = p.indexOf("Win") == 0;
+  // system.mac = p.indexOf("Mac") == 0;
+  // if (system.win || system.mac) {//如果是电脑
+  //   return 'PC'
+  // } else { //如果是手机,
+  //   return 'MOBILE'
+  // }
 }
 
 /** 是否是刘海屏 */

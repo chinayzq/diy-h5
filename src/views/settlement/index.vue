@@ -203,6 +203,8 @@ const addCardHandler = () => {
   position: absolute;
   height: 100%;
   width: 100%;
+  left: 0;
+  top: 0;
   .main-title {
     width: 100%;
     height: 35px;

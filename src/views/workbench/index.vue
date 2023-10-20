@@ -65,9 +65,8 @@
               dragStartHandler(event, item);
             }
           "
-          @click.stop="activeItem(item)"
-          @mouseup="eventEndHandler"
-          @touchend="eventEndHandler"
+          @mouseup.prevent="eventEndHandler"
+          @touchend.prevent="eventEndHandler"
           v-for="item in dragStickerList"
           :id="`drag_dom_${item.id}`"
           :key="item.id"
@@ -178,7 +177,11 @@
       />
 
       <!-- 撤销操作 -->
-      <UndoComponent />
+      <UndoComponent
+        :canUndo="canUndo"
+        :canDo="canDo"
+        @clickEvent="undoOrDoHandler"
+      />
     </div>
     <NavigationBar
       @naviClick="navigationEvent"
@@ -351,11 +354,27 @@ import {
   clearStorage,
   getStorage,
 } from "@/utils/localStorage";
+import useUndoAndDo from "@/hooks/useUndoAndDo";
 // 拖拽ICons
 import DeleteIcon from "@/assets/images/drag_delete_icon.png";
 import PlusIcon from "@/assets/images/drag_plus_icon.svg";
 import ResizeIcon from "@/assets/images/drag_resize_icon.png";
 import RotateIcon from "@/assets/images/drag_rotate_icon.svg";
+
+const { updateHandler, undoHandler, doHandler, canUndo, canDo } =
+  useUndoAndDo();
+const undoOrDoHandler = (type) => {
+  if (type === "undo") {
+    const current = undoHandler();
+    dragStickerList.value = current;
+  } else {
+    const current = doHandler();
+    dragStickerList.value = current;
+  }
+};
+const freshUndoList = () => {
+  updateHandler(dragStickerList.value);
+};
 
 const scale = ref(0.65);
 
@@ -578,6 +597,7 @@ const templateChangeHandler = (templateId) => {
       }
     })
     .finally(() => {
+      freshUndoList();
       setTimeout(() => {
         graphLoading.value = false;
       }, Math.min(200 * dragStickerList.value.length, 2000));
@@ -594,6 +614,7 @@ const stickerSelectHandler = (url) => {
     });
     stickersShow.value = false;
     replaceItem.value = {};
+    freshUndoList();
   } else {
     addStickerToGraph(url, true);
   }
@@ -611,6 +632,7 @@ const fontChangeHandler = (params) => {
   if (fontFile) {
     loadFonts(content, fontFile);
   }
+  freshUndoList();
 };
 const loadFonts = (cssValue, fontFile) => {
   if (document.fonts && !checkFont(cssValue)) {
@@ -794,7 +816,6 @@ const setActiveById = (id) => {
   dragStickerList.value.forEach((item) => {
     item.active = item.id === id;
   });
-  console.log("dragStickerList.value", dragStickerList.value);
 };
 const clearAllActive = () => {
   dragStickerList.value.forEach((item) => {
@@ -816,6 +837,7 @@ const addStickerToGraph = (url, activeFlag = false) => {
     zIndex: getMaxIndex(),
     active: activeFlag,
   });
+  freshUndoList();
 };
 const replaceImageUrl = (url) => {
   dragStickerList.value.forEach((item) => {
@@ -825,6 +847,7 @@ const replaceImageUrl = (url) => {
       item.rotateZ = false;
     }
   });
+  freshUndoList();
 };
 const addTextToGraph = () => {
   const id = uuid();
@@ -849,6 +872,7 @@ const addTextToGraph = () => {
     textDecoration: "none", //none | lineThrough
     active: false,
   });
+  freshUndoList();
   return id;
 };
 
@@ -880,7 +904,7 @@ const clearActiveState = () => {
     item.active = false;
   });
 };
-// 获取addStickerToGraph最大Index
+// 获取最大Index
 const getMaxIndex = () => {
   if (dragStickerList.value.length) {
     let count = 0;
@@ -894,7 +918,7 @@ const getMaxIndex = () => {
     return 1000;
   }
 };
-// 获取addStickerToGraph最小Index
+// 获取最小Index
 const getMinIndex = () => {
   if (dragStickerList.value.length) {
     let count = 10000;
@@ -946,9 +970,11 @@ const dragHandler = (event, item) => {
   item.top = item.top + yDiff / scale.value;
   item.left = item.left + xDiff / scale.value;
 };
+let startTimestamp = 0;
 const dragStartHandler = (event, item) => {
+  startTimestamp = new Date().getTime();
+  activeItem(item);
   currentItem = item;
-  console.log("currentItem", currentItem);
   draggingItem.start = true;
   const { clientX, clientY } = eventTransfor(event);
   draggingItem.x = clientX;
@@ -964,6 +990,7 @@ const iconDeleteHandler = ({ id }) => {
   dragStickerList.value = dragStickerList.value.filter(
     (item) => item.id !== id
   );
+  freshUndoList();
 };
 
 // icon - 复制
@@ -982,6 +1009,7 @@ const iconCopyHandler = (item) => {
     zIndex: getMaxIndex(),
     active: false,
   });
+  freshUndoList();
 };
 
 // icon - 改变大小
@@ -1098,6 +1126,9 @@ const eventEndHandler = () => {
   rotateEnd();
   resizeEnd();
   dragEndHandler();
+  if (new Date().getTime() - startTimestamp > 100) {
+    freshUndoList();
+  }
 };
 </script>
 <style lang="less" scoped>
@@ -1138,6 +1169,7 @@ const eventEndHandler = () => {
       line-height: 30px;
       border-radius: 15px;
       font-family: "JostMedium";
+      cursor: pointer;
     }
   }
   .graph-container {

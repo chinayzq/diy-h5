@@ -85,6 +85,8 @@ const confirmHandler = () => {
     }
     .preview-image {
       height: 80%;
+      max-width: 180px;
+      // height: 353px;
     }
   }
   .model-line {
