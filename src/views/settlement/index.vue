@@ -116,13 +116,18 @@ onBeforeMount(() => {
   getShipping().then((res) => {
     shipping.value = Number(res.data).toFixed(2);
   });
-  getProductList().then((res) => {
-    itemList.value = res.data.map((item) => {
-      item.checked = item.productId === currentProductId.value;
-      item.count = 1;
-      return item;
+  listLoading.value = true;
+  getProductList()
+    .then((res) => {
+      itemList.value = res.data.map((item) => {
+        item.checked = item.productId === currentProductId.value;
+        item.count = 1;
+        return item;
+      });
+    })
+    .finally(() => {
+      listLoading.value = false;
     });
-  });
 });
 watch(
   () => itemList.value,

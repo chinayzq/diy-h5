@@ -5,11 +5,11 @@
         <span class="title-label"> Your cart </span>
         <var-icon name="window-close" :size="30" @click="emit('close')" />
       </div>
-      <div class="tips-container">
+      <!-- <div class="tips-container">
         <div class="tips-line">
           35%OFF for orders over 40USD / 50%OFF for orders over 70USD
         </div>
-      </div>
+      </div> -->
       <div class="list-title">
         <span>PRODUCT</span>
         <span>TOTAL</span>
@@ -85,7 +85,10 @@
         <div class="subtotal-line">
           <span class="saving-label"> Subtotal </span>
           <span class="saving-value">
-            <span class="through-span" v-if="originTotal > 0">
+            <span
+              class="through-span"
+              v-if="originTotal > 0 && originTotal !== payTotal"
+            >
               ${{ originTotal }}
             </span>
             ${{ payTotal }} USD
@@ -140,7 +143,12 @@ const couponValid = () => {
   couponAmount({
     couponCode: coupon.value,
     originalPrice: originTotal.value,
-  }).then((res) => {});
+  }).then((res) => {
+    if (res.code === 200) {
+      savingTotal.value = res.data;
+      payTotal.value = originTotal.value - savingTotal.value;
+    }
+  });
 };
 
 const deleteHandler = ({ cardId }) => {
@@ -158,7 +166,7 @@ watch(
 );
 const countCalc = () => {
   let originTotalTemp = 0;
-  let savingTotalTemp = 20;
+  let savingTotalTemp = 0;
   cartList.value.forEach((item) => {
     originTotalTemp += item.extendJson.curPrice * item.productCount;
   });

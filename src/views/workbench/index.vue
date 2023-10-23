@@ -47,12 +47,13 @@
         "
         id="mask-container"
       >
-        <!-- 该图只为撑起来mask容器 -->
+        <!-- 该图只为撑起来mask容器 touchstart.prevent为了解决ios上长按能获取图片的问题-->
         <img
           class="container-image"
           style="position: relative; z-index: -1"
           :src="selectModelImage"
           alt=""
+          @touchstart.prevent="clearActiveState"
         />
         <div
           @mousedown="
@@ -290,6 +291,7 @@
       <PrintDialog
         @close="printDialogClose"
         @confirm="confirmHandler"
+        :confirmLoading="confirmLoading"
         :previewImage="previewImage"
       />
     </var-popup>
@@ -745,7 +747,9 @@ watch(
 );
 
 const router = useRouter();
+const confirmLoading = ref(false);
 const confirmHandler = () => {
+  confirmLoading.value = true;
   const { curPrice, oriPrice, description, extend1, extend2, extend3 } =
     selectCaseItem.value;
   // 保存产品后跳转
@@ -770,6 +774,7 @@ const confirmHandler = () => {
       setItem("selectProductId", res.data);
     })
     .finally(() => {
+      confirmLoading.value = false;
       router.push({
         path: "/settlement",
       });
@@ -1138,6 +1143,7 @@ const eventEndHandler = () => {
   left: 0;
   height: 100%;
   width: 100%;
+  overflow: hidden;
   background-color: #f9f5eb;
   .header-container {
     z-index: 1;
@@ -1179,6 +1185,7 @@ const eventEndHandler = () => {
     align-items: center;
     justify-content: center;
     position: relative;
+    overflow: hidden;
     .single-graph-image {
       position: absolute;
       width: 300px;

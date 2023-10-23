@@ -5,7 +5,8 @@
   src: url('@/assets/fonts/JostMedium.ttf') format('truetype');
 }
 #app {
-  height: 100vh;
+  // height: 100vh;
+  overflow: hidden;
 }
 // popup弹框遮罩层自定义
 .popup-custom-overlay {
@@ -64,6 +65,10 @@
 }
 // PC端布局
 .layout-PC {
+  .graph-layers-icon,
+  .graph-enlarge-icon {
+    display: none !important;
+  }
   .settlement-page-component {
     width: 375px !important;
     left: calc(50% - 187.5px) !important;

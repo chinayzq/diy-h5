@@ -8,7 +8,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/gallery',
+      redirect: '/workbench',
       component: Layout,
       children: [
         {

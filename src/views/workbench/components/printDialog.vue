@@ -42,12 +42,19 @@ const props = defineProps({
       return "";
     },
   },
+  confirmLoading: {
+    type: Boolean,
+    default() {
+      return false;
+    },
+  },
 });
 const emit = defineEmits();
 const closeHandler = () => {
   emit("close");
 };
 const confirmHandler = () => {
+  if (props.confirmLoading.value) return;
   emit("confirm");
 };
 </script>
@@ -84,9 +91,10 @@ const confirmHandler = () => {
       width: 330px;
     }
     .preview-image {
-      height: 80%;
-      max-width: 180px;
+      // height: 80%;
+      // width: 180px;
       // height: 353px;
+      width: 50%;
     }
   }
   .model-line {

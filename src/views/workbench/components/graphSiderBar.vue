@@ -1,7 +1,7 @@
 <template>
   <div class="graph-sider-bar">
     <div
-      class="single-item"
+      :class="['single-item', `${item.customerClass}`]"
       v-for="(item, index) in toolList"
       :key="index"
       @click.stop="toolClick(item)"
@@ -48,6 +48,7 @@ const toolList = ref([
       "../../../assets/images/graph_draft_icon.png",
       import.meta.url
     ).href,
+    customerClass: "graph-draft-icon",
   },
   {
     label: "Layers",
@@ -56,6 +57,7 @@ const toolList = ref([
       import.meta.url
     ).href,
     clicked: false,
+    customerClass: "graph-layers-icon",
   },
   {
     label: "Enlarge",
@@ -69,6 +71,7 @@ const toolList = ref([
       import.meta.url
     ).href,
     clicked: false,
+    customerClass: "graph-enlarge-icon",
   },
 ]);
 const emit = defineEmits();
