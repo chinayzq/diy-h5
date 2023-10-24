@@ -19,7 +19,7 @@
       <var-image
         v-else
         class="preview-image"
-        :src="`/colgifts/image/${previewImage}`"
+        :src="`/colgifts/image/${previewImage}?type=webp`"
         :loading="$LoadingImage"
         alt=""
       />
@@ -87,8 +87,8 @@ const confirmHandler = () => {
     align-items: center;
     justify-content: center;
     .loading-icon {
-      height: 120px;
-      width: 330px;
+      height: 80px;
+      width: 220px;
     }
     .preview-image {
       // height: 80%;

@@ -394,8 +394,16 @@ const countinueEvent = (event) => {
   if (event === "continue") {
     graphLoading.value = true;
     const currentLocal = getStorage();
-    const { phoneName, modelUrl, maskUrl, caseUrl, caseName, stickers } =
-      currentLocal || {};
+    const {
+      phoneName,
+      modelUrl,
+      maskUrl,
+      caseUrl,
+      caseName,
+      stickers,
+      caseItem,
+    } = currentLocal || {};
+    selectCaseItem.value = caseItem;
     selectPhoneName.value = phoneName;
     selectCaseName.value = caseName;
     selectMaskImage.value = maskUrl;
@@ -699,6 +707,7 @@ const selectCaseItem = ref({
 });
 const phoneCaseSelectHandler = (item) => {
   selectCaseItem.value = item;
+  setItem("caseItem", item);
   const { url, colorName } = item;
   graphLoading.value = true;
   selectCaseImage.value = url;
