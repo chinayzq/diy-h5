@@ -325,6 +325,12 @@
       height="588"
       style="display: none"
     ></canvas>
+    <canvas
+      id="myCanvasMax"
+      width="913"
+      height="1791"
+      style="display: none"
+    ></canvas>
   </div>
 </template>
 
@@ -348,7 +354,7 @@ import ContinueDialog from "./components/continueDialog.vue";
 
 import { uuid } from "@/utils";
 import { getTemplateDetail, saveDraft, saveProduct } from "@/api/workbench";
-import { exportAsImage } from "@/utils/domToImage";
+import { exportAsImage, exportPrintImage } from "@/utils/domToImage";
 import { useRouter } from "vue-router";
 import {
   setItem,
@@ -731,17 +737,47 @@ const printImage = ref(null);
 const printHandler = async () => {
   previewImage.value = null;
   printDialogShow.value = true;
-  setGraphDomsScale(1, true);
   setItem("stickers", JSON.stringify(dragStickerList.value));
-  const { templateUrl, printUrl } = await exportAsImage("mask-container", {
+  setGraphDomsScale(1, true);
+  const templateUrl = await exportAsImage("mask-container", {
     mask: selectMaskImage.value,
     model: selectModelImage.value,
     caseImage: selectCaseImage.value,
   });
-  previewImage.value = templateUrl;
-  printImage.value = printUrl;
+  const printMaxImage = await dealPrintImageHandler();
   setGraphDomsScale(0.65, false);
+  previewImage.value = templateUrl;
+  // printImage.value = printMaxImage;
   saveAsDraft(templateUrl);
+};
+const dealPrintImageHandler = async () => {
+  return new Promise(async (resolve) => {
+    // 获取图片当前实际宽高
+    const imageDom = document.getElementsByClassName("container-image")[0];
+    const naturalWidth = imageDom.naturalWidth;
+    const naturalHeight = imageDom.naturalHeight;
+    // 需要设置透明色，否则打印如片会有手机壳底图
+    imageDom.style.opacity = 0;
+    // 获取容器计算属性
+    const containerDom = document.getElementsByClassName("mask-container")[0];
+    const containerWidth = getComputedStyle(containerDom, null)["width"];
+    const containerHeight = getComputedStyle(containerDom, null)["height"];
+    // 计算设置的scaleX和Y
+    const scaleX =
+      naturalWidth /
+      Number(containerWidth.substr(0, containerWidth.length - 2));
+    const scaleY =
+      naturalHeight /
+      Number(containerHeight.substr(0, containerHeight.length - 2));
+    containerDom.style.transform = `scale(${scaleX}, ${scaleY})`;
+    const printMaxImage = await exportPrintImage(
+      "mask-container",
+      selectMaskImage.value,
+      naturalWidth,
+      naturalHeight
+    );
+    resolve(printMaxImage);
+  });
 };
 const printDialogClose = () => {
   printDialogShow.value = false;
@@ -798,14 +834,15 @@ const setGraphDomsScale = (scale, hideFlag) => {
   }
   document.getElementsByClassName(
     "single-graph-image"
-  )[0].style.transform = `scale(${scale})`;
+  )[0].style.transform = `scale(${scale}, ${scale})`;
   document.getElementsByClassName(
     "single-graph-image"
-  )[1].style.transform = `scale(${scale})`;
+  )[1].style.transform = `scale(${scale}, ${scale})`;
   document.getElementsByClassName(
     "mask-container"
-  )[0].style.transform = `scale(${scale})`;
+  )[0].style.transform = `scale(${scale}, ${scale})`;
   if (!hideFlag) {
+    document.getElementsByClassName("container-image")[0].style.opacity = 1;
     document.getElementsByClassName("graph-container")[0].style.top = "0";
   }
 };

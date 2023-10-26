@@ -117,7 +117,6 @@ export function exportAsImage(domId, images) {
         if (mask) {
           await drawSingle(myCanvas, mask, 'mask');
         }
-        const printUrl = await uploadPrintAndGetUrl();
         if (caseImage) {
           await drawSingle(myCanvas, caseImage, 'caseImage');
         }
@@ -125,8 +124,7 @@ export function exportAsImage(domId, images) {
           await drawSingle(myCanvas, model, 'model');
         }
         const templateUrl = await uploadAndGetTemplateUrl();
-
-        resolve({ templateUrl, printUrl });
+        resolve(templateUrl);
       };
     });
     // domtoimage.toPng(document.querySelector(`#${domId}`)).then((imgbase64) => {
@@ -149,4 +147,74 @@ export function exportAsImage(domId, images) {
     //   };
     // });
   });
+}
+
+export const exportPrintImage = (domId, maskImages, width, height) => {
+  const cavasDom = document.getElementById('myCanvasMax');
+  cavasDom.style.width = `${width}px`;
+  cavasDom.style.height = `${height}px`;
+  let myCanvasMax = cavasDom.getContext('2d');
+  return new Promise((resolve) => {
+    html2Canvas(document.querySelector(`#${domId}`), {
+      width,
+      height,
+    }).then((canvas) => {
+      let imageURL = canvas.toDataURL('image/png'); //canvas转base64图片
+      let img = new Image();
+      img.src = imageURL;
+      img.onload = async () => {
+        myCanvasMax.globalCompositeOperation = 'source-over';
+        myCanvasMax.drawImage(img, 0, 0, width, height);
+        if (maskImages) {
+          await drawSingleMax(myCanvasMax, maskImages, 'mask', width, height);
+        }
+        const printUrl = await uploadPrintAndGetUrlMax();
+        resolve(printUrl);
+      };
+    });
+  });
+};
+
+function uploadPrintAndGetUrlMax() {
+  return new Promise((resolve) => {
+    const finalData = document
+      .getElementById('myCanvasMax')
+      .toDataURL('image/png');
+    const blob = dataURItoBlob(finalData);
+    //组装formdata
+    var fd = new FormData();
+    fd.append('file', blob); //fileData为自定义
+    fd.append('fileName', 'print'); //fileName为自定义，名字随机生成或者写死，看需求
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open('POST', '/colgifts/upload');
+    xmlHttp.send(fd);
+    //ajax回调
+    xmlHttp.onreadystatechange = (res) => {
+      //todo  your code...
+      if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+        try {
+          resolve(JSON.parse(xmlHttp.responseText).data);
+        } catch (error) {}
+      }
+    };
+  });
+}
+function drawSingleMax(myCanvas, image, type, width, height) {
+  const operationMap = {
+    mask: 'destination-in',
+    model: 'destination-over',
+    caseImage: 'destination-over',
+  };
+  return new Promise((resolve) => {
+    let img = new Image();
+    img.src = image;
+    img.onload = () => {
+      myCanvas.globalCompositeOperation = operationMap[type];
+      myCanvas.drawImage(img, 0, 0, width, height);
+      setTimeout(() => {
+        resolve();
+      }, 200);
+    };
+  });
+  // };
 }
