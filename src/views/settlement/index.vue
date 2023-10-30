@@ -4,8 +4,10 @@
     <div class="second-title">
       <div class="title-line">My Masterpieces</div>
       <div class="link-line">
-        <span class="create-link link-span"> CREATE A NEW ONE </span>
-        <span class="share-link link-span"> share link </span>
+        <span class="create-link link-span" @click="jumpToWorkbench">
+          CREATE A NEW ONE
+        </span>
+        <!-- <span class="share-link link-span"> share link </span> -->
       </div>
     </div>
     <div class="list-container">
@@ -91,7 +93,11 @@
       position="right"
       v-model:show="cartShow"
     >
-      <CartList v-if="cartShow" @close="cartShow = false" />
+      <CartList
+        v-if="cartShow"
+        @close="cartShow = false"
+        :shipping="shipping"
+      />
     </var-popup>
   </div>
 </template>
@@ -106,17 +112,18 @@ import {
 import { onBeforeMount, ref, watch } from "vue";
 import { getStorage } from "@/utils/localStorage";
 import CartList from "./components/cartList.vue";
+import { useRouter } from "vue-router";
+
 const currentLocal = getStorage();
 const currentProductId = ref(currentLocal.selectProductId);
 
 const policyChecked = ref(true);
 const shipping = ref(0);
 const itemList = ref([]);
-onBeforeMount(() => {
-  getShipping().then((res) => {
-    shipping.value = Number(res.data).toFixed(2);
-  });
+onBeforeMount(async () => {
   listLoading.value = true;
+  const shippingValue = await getShipping();
+  shipping.value = Number(shippingValue.data).toFixed(2);
   getProductList()
     .then((res) => {
       itemList.value = res.data.map((item) => {
@@ -148,7 +155,11 @@ const countCalc = () => {
     }
   });
   free.value = checkedCount > 1;
-  Subtotal.value = subTotalTemp.toFixed(2);
+  if (checkedCount === 1) {
+    Subtotal.value = (subTotalTemp + Number(shipping.value)).toFixed(2);
+  } else {
+    Subtotal.value = subTotalTemp.toFixed(2);
+  }
 };
 
 const removeHandler = (item) => {
@@ -199,6 +210,13 @@ const addCardHandler = () => {
   saveCart(params).finally(() => {
     listLoading.value = false;
     cartShow.value = true;
+  });
+};
+
+const router = useRouter();
+const jumpToWorkbench = () => {
+  router.push({
+    path: "/",
   });
 };
 </script>

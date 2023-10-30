@@ -94,7 +94,7 @@
             ${{ payTotal }} USD
           </span>
         </div>
-        <div class="tips-line">Taxes and shipping calculated at checkout</div>
+        <!-- <div class="tips-line">Taxes and shipping calculated at checkout</div> -->
       </div>
       <div class="button-line">
         <div class="checkout-outer">
@@ -111,6 +111,15 @@
 <script setup>
 import { getCartList, deleteCart, couponAmount } from "@/api/workbench";
 import { onBeforeMount, ref, watch } from "vue";
+
+const props = defineProps({
+  shipping: {
+    type: Number,
+    default() {
+      return 0;
+    },
+  },
+});
 
 // 总优惠金额
 const savingTotal = ref(0);
@@ -167,12 +176,18 @@ watch(
 const countCalc = () => {
   let originTotalTemp = 0;
   let savingTotalTemp = 0;
+  let countTemp = 0;
   cartList.value.forEach((item) => {
     originTotalTemp += item.extendJson.curPrice * item.productCount;
+    countTemp += item.productCount;
   });
   originTotal.value = originTotalTemp;
   savingTotal.value = savingTotalTemp;
   payTotal.value = originTotalTemp - savingTotalTemp;
+  if (countTemp === 1) {
+    originTotal.value += Number(props.shipping);
+    payTotal.value += Number(props.shipping);
+  }
 };
 </script>
 

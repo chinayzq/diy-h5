@@ -1,13 +1,18 @@
 <template>
-  <div class="workbench-component" @click.stop="clearActiveState">
+  <div class="workbench-component" @mouseup.stop="clearActiveState">
     <div class="header-container">
       <div class="model-case-container" @click.stop="brandAndModelShow = true">
         {{ `${selectPhoneName} / ${selectCaseName}` }}
         <var-icon name="chevron-down" />
       </div>
-      <div class="print-button" @click.stop="printHandler">PRINT</div>
+      <div class="print-button" @click="printHandler">PRINT</div>
     </div>
-    <div class="graph-container">
+    <div
+      class="graph-container"
+      :style="{
+        top: stickersShow ? ' -100px' : '0',
+      }"
+    >
       <Loading v-show="graphLoading" :size="30" />
       <var-image
         style="z-index: 1"
@@ -66,8 +71,8 @@
               dragStartHandler(event, item);
             }
           "
-          @mouseup.prevent="eventEndHandler"
-          @touchend.prevent="eventEndHandler"
+          @mouseup.stop="eventEndHandler"
+          @touchend.stop="eventEndHandler"
           v-for="item in dragStickerList"
           :id="`drag_dom_${item.id}`"
           :key="item.id"
@@ -369,6 +374,9 @@ import PlusIcon from "@/assets/images/drag_plus_icon.svg";
 import ResizeIcon from "@/assets/images/drag_resize_icon.png";
 import RotateIcon from "@/assets/images/drag_rotate_icon.svg";
 
+import { judgeClient } from "@/utils";
+const currentClient = judgeClient();
+
 const { updateHandler, undoHandler, doHandler, canUndo, canDo } =
   useUndoAndDo();
 const undoOrDoHandler = (type) => {
@@ -384,7 +392,8 @@ const freshUndoList = () => {
   updateHandler(dragStickerList.value);
 };
 
-const scale = ref(0.65);
+const defaultScale = currentClient === "PC" ? 0.8 : 0.65;
+const scale = ref(defaultScale);
 
 onBeforeMount(() => {
   initLocalDatas();
@@ -392,8 +401,10 @@ onBeforeMount(() => {
 const continueDialogShow = ref(false);
 const initLocalDatas = () => {
   const currentLocal = getStorage();
-  if (currentLocal) {
+  if (currentLocal && currentLocal.caseItem) {
     continueDialogShow.value = true;
+  } else {
+    brandAndModelShow.value = true;
   }
 };
 const countinueEvent = (event) => {
@@ -418,7 +429,9 @@ const countinueEvent = (event) => {
     setTimeout(() => {
       graphLoading.value = false;
     }, 2000);
-    dragStickerList.value = JSON.parse(stickers);
+    if (stickers) {
+      dragStickerList.value = JSON.parse(stickers);
+    }
   } else {
     brandAndModelShow.value = true;
   }
@@ -572,7 +585,7 @@ const layerChangeHandler = (key) => {
 
 // fullscreen | layers Dialog
 const graphFullScreen = (flag) => {
-  scale.value = flag ? 0.9 : 0.65;
+  scale.value = flag ? 0.9 : defaultScale.value;
 };
 
 const draftDialogShow = ref(false);
@@ -745,7 +758,7 @@ const printHandler = async () => {
     caseImage: selectCaseImage.value,
   });
   const printMaxImage = await dealPrintImageHandler();
-  setGraphDomsScale(0.65, false);
+  setGraphDomsScale(defaultScale.value, false);
   previewImage.value = templateUrl;
   // printImage.value = printMaxImage;
   saveAsDraft(templateUrl);
@@ -786,7 +799,7 @@ watch(
   () => printDialogShow.value,
   (dialogShow) => {
     if (!dialogShow) {
-      setGraphDomsScale(0.65, false);
+      setGraphDomsScale(defaultScale.value, false);
     }
   }
 );
@@ -1088,8 +1101,9 @@ const resizeMove = (event, item) => {
   if (currentItem.type === "text") {
     item.fontSize += xDiff / scale.value;
   } else {
-    item.height = item.height + yDiff / scale.value;
-    item.width = item.width + xDiff / scale.value;
+    const offsetMax = Math.max(yDiff, xDiff);
+    item.height = item.height + offsetMax / scale.value;
+    item.width = item.width + offsetMax / scale.value;
   }
 };
 const resizeEnd = () => {

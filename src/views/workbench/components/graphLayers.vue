@@ -1,6 +1,8 @@
 <template>
   <div class="graph-layers-component" v-if="store.client === 'PC'">
-    <div class="layer-header"></div>
+    <div class="layer-header">
+      <img src="@/assets/images/project_logo.png" alt="" />
+    </div>
     <div class="main-container">
       <div class="left-part">
         <div class="single-icon">
@@ -57,9 +59,13 @@ const setActive = ({ id }) => {
   .layer-header {
     height: 100%;
     height: 48px;
-    background: url("../../../assets/images/project_logo.png");
-    background-size: 100% 100%;
     border-bottom: 1px solid #e6e9ef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      width: 90%;
+    }
   }
   .main-container {
     height: calc(100vh - 48px);

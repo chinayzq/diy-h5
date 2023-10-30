@@ -158,3 +158,14 @@ export function safeTopHeight() {
 export function statusBarHeight() {
   return judgeClient() === 'IOS' ? (isiPhoneX() ? 44 : 20) : 0;
 }
+
+export function setDynamicScript() {
+  var head = document.head || document.getElementsByTagName('head')[0];
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.setAttribute('async', true);
+  // script.setAttribute('src', 'https://www.googletagmanager.com/gtag/js');
+  // script.text = `alert(1)`;
+  script.text = `console.log('dynamic script init success')`;
+  head.appendChild(script);
+}
