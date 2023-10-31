@@ -82,7 +82,7 @@
             top: `${item.top}px`,
             left: `${item.left}px`,
             transform: `rotate(${item.rotate}deg)`,
-            zIndex: item.active ? 9999 : `${item.zIndex}`,
+            zIndex: `${item.zIndex}`,
           }"
           :class="['drag-item', item.active && 'drag-item-active']"
         >

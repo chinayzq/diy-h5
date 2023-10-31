@@ -54,3 +54,9 @@ export function deleteCart(cartId) {
 export function couponAmount(params) {
   return axios.get('/couponamount', { params });
 }
+export function getPrivacy(params) {
+  return axios.get('/privacy', { params });
+}
+export function getDynamicScript(params) {
+  return axios.get('/seo/content', { params });
+}

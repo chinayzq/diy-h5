@@ -84,8 +84,12 @@
       </div>
       <div class="policy-line">
         <var-checkbox v-model="policyChecked"></var-checkbox>
-        <span class="link-span"> our policy </span>
-        <span class="link-span"> contact us </span>
+        <span class="link-span" @click="policyLinkJump('policyUrl')">
+          our policy
+        </span>
+        <span class="link-span" @click="policyLinkJump('contactUrl')">
+          contact us
+        </span>
       </div>
     </div>
     <var-popup
@@ -108,6 +112,7 @@ import {
   deleteProduct,
   saveCart,
   getShipping,
+  getPrivacy,
 } from "@/api/workbench";
 import { onBeforeMount, ref, watch } from "vue";
 import { getStorage } from "@/utils/localStorage";
@@ -120,6 +125,10 @@ const currentProductId = ref(currentLocal.selectProductId);
 const policyChecked = ref(true);
 const shipping = ref(0);
 const itemList = ref([]);
+const policyUrlMap = ref({
+  policyUrl: null,
+  contactUrl: null,
+});
 onBeforeMount(async () => {
   listLoading.value = true;
   const shippingValue = await getShipping();
@@ -135,7 +144,19 @@ onBeforeMount(async () => {
     .finally(() => {
       listLoading.value = false;
     });
+  getPrivacy().then((res) => {
+    if (res.code === 200) {
+      const { extend1, extend2 } = res.data;
+      policyUrlMap.value.policyUrl = extend1;
+      policyUrlMap.value.contactUrl = extend2;
+    }
+  });
 });
+const policyLinkJump = (type) => {
+  const url = policyUrlMap.value[type];
+  window.open(url, "_self");
+};
+
 watch(
   () => itemList.value,
   () => {

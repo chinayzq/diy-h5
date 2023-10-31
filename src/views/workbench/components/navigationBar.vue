@@ -2,7 +2,7 @@
   <div class="navigation-bar-component">
     <div
       class="single-item"
-      @click.stop="itemClickHandler(item.key)"
+      @mouseup.stop="itemClickHandler(item.key)"
       v-for="item in activeItems"
       :key="item.key"
     >

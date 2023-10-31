@@ -1,5 +1,5 @@
 import { useStore } from '@/stores';
-
+import { getDynamicScript } from '@/api/workbench';
 // 获取assets静态资源
 export const getAssetsFile = (url) => {
   return new URL(`../assets/${url}`, import.meta.url).href;
@@ -160,12 +160,19 @@ export function statusBarHeight() {
 }
 
 export function setDynamicScript() {
-  var head = document.head || document.getElementsByTagName('head')[0];
-  var script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.setAttribute('async', true);
-  // script.setAttribute('src', 'https://www.googletagmanager.com/gtag/js');
-  // script.text = `alert(1)`;
-  script.text = `console.log('dynamic script init success')`;
-  head.appendChild(script);
+  getDynamicScript().then((res) => {
+    const scriptList = res.data.split('\n');
+    scriptList.forEach((item, index) => {
+      var head = document.head || document.getElementsByTagName('head')[0];
+      var script = document.createElement('script');
+      script.type = 'text/javascript';
+      // script.setAttribute('async', true);
+      if (index === 0) {
+        script.setAttribute('src', item);
+      } else {
+        script.textContent = item;
+      }
+      head.appendChild(script);
+    });
+  });
 }
