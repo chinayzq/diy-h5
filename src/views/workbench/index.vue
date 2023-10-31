@@ -324,18 +324,8 @@
     </var-overlay>
 
     <!-- 该canvas节点用来导出模板图片渲染用 -->
-    <canvas
-      id="myCanvas"
-      width="300"
-      height="588"
-      style="display: none"
-    ></canvas>
-    <canvas
-      id="myCanvasMax"
-      width="913"
-      height="1791"
-      style="display: none"
-    ></canvas>
+    <canvas id="myCanvas" style="display: none"></canvas>
+    <canvas id="myCanvasMax" style="display: none"></canvas>
   </div>
 </template>
 
@@ -392,7 +382,7 @@ const freshUndoList = () => {
   updateHandler(dragStickerList.value);
 };
 
-const defaultScale = currentClient === "PC" ? 0.8 : 0.65;
+const defaultScale = ref(currentClient === "PC" ? 0.8 : 0.65);
 const scale = ref(defaultScale);
 
 onBeforeMount(() => {
@@ -760,7 +750,7 @@ const printHandler = async () => {
   const printMaxImage = await dealPrintImageHandler();
   setGraphDomsScale(defaultScale.value, false);
   previewImage.value = templateUrl;
-  // printImage.value = printMaxImage;
+  printImage.value = printMaxImage;
   saveAsDraft(templateUrl);
 };
 const dealPrintImageHandler = async () => {
@@ -843,7 +833,9 @@ const confirmHandler = () => {
 const setGraphDomsScale = (scale, hideFlag) => {
   clearAllActive();
   if (hideFlag) {
-    document.getElementsByClassName("graph-container")[0].style.top = "50%";
+    // document.getElementsByClassName("graph-container")[0].style.left =
+    //   "10000px";
+    document.getElementsByClassName("graph-container")[0].style.opacity = 0;
   }
   document.getElementsByClassName(
     "single-graph-image"
@@ -856,7 +848,8 @@ const setGraphDomsScale = (scale, hideFlag) => {
   )[0].style.transform = `scale(${scale}, ${scale})`;
   if (!hideFlag) {
     document.getElementsByClassName("container-image")[0].style.opacity = 1;
-    document.getElementsByClassName("graph-container")[0].style.top = "0";
+    // document.getElementsByClassName("graph-container")[0].style.left = "0";
+    document.getElementsByClassName("graph-container")[0].style.opacity = 1;
   }
 };
 const saveAsDraft = (templateUrl) => {

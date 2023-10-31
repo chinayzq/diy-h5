@@ -20,7 +20,7 @@ function dataURItoBlob(base64Data) {
   return new Blob([ia], { type: mimeString });
 }
 
-function drawSingle(myCanvas, image, type) {
+function drawSingle(myCanvas, image, type, width, height) {
   const operationMap = {
     mask: 'destination-in',
     model: 'destination-over',
@@ -31,7 +31,7 @@ function drawSingle(myCanvas, image, type) {
     img.src = image;
     img.onload = () => {
       myCanvas.globalCompositeOperation = operationMap[type];
-      myCanvas.drawImage(img, 0, 0, 300, 588);
+      myCanvas.drawImage(img, 0, 0, width, height);
       setTimeout(() => {
         resolve();
       }, 200);
@@ -101,27 +101,39 @@ function uploadAndGetTemplateUrl() {
 }
 // 导出为图片
 export function exportAsImage(domId, images) {
-  let myCanvas = document.getElementById('myCanvas').getContext('2d');
+  debugger;
+  // const containerDom = document.getElementsByClassName('container-image')[0];
+  // const width = containerDom.naturalWidth * 0.65;
+  // const height = containerDom.naturalHeight * 0.65;
+  const containerDom = document.getElementsByClassName('mask-container')[0];
+  const containerWidth = getComputedStyle(containerDom, null)['width'];
+  const containerHeight = getComputedStyle(containerDom, null)['height'];
+  const width = Number(containerWidth.substr(0, containerWidth.length - 2));
+  const height = Number(containerHeight.substr(0, containerHeight.length - 2));
   const { mask, model, caseImage } = images;
+  const canvasDom = document.getElementById('myCanvas');
+  canvasDom.width = `${width}`;
+  canvasDom.height = `${height}`;
+  const myCanvas = canvasDom.getContext('2d');
   return new Promise((resolve) => {
     html2Canvas(document.querySelector(`#${domId}`), {
-      width: 300,
-      height: 588,
+      width,
+      height,
     }).then((canvas) => {
       let imageURL = canvas.toDataURL('image/png'); //canvas转base64图片
       let img = new Image();
       img.src = imageURL;
       img.onload = async () => {
         myCanvas.globalCompositeOperation = 'source-over';
-        myCanvas.drawImage(img, 0, 0, 300, 588);
+        myCanvas.drawImage(img, 0, 0, width, height);
         if (mask) {
-          await drawSingle(myCanvas, mask, 'mask');
+          await drawSingle(myCanvas, mask, 'mask', width, height);
         }
         if (caseImage) {
-          await drawSingle(myCanvas, caseImage, 'caseImage');
+          await drawSingle(myCanvas, caseImage, 'caseImage', width, height);
         }
         if (model) {
-          await drawSingle(myCanvas, model, 'model');
+          await drawSingle(myCanvas, model, 'model', width, height);
         }
         const templateUrl = await uploadAndGetTemplateUrl();
         resolve(templateUrl);
@@ -151,8 +163,8 @@ export function exportAsImage(domId, images) {
 
 export const exportPrintImage = (domId, maskImages, width, height) => {
   const cavasDom = document.getElementById('myCanvasMax');
-  cavasDom.style.width = `${width}px`;
-  cavasDom.style.height = `${height}px`;
+  cavasDom.width = `${width}`;
+  cavasDom.height = `${height}`;
   let myCanvasMax = cavasDom.getContext('2d');
   return new Promise((resolve) => {
     html2Canvas(document.querySelector(`#${domId}`), {
@@ -168,6 +180,9 @@ export const exportPrintImage = (domId, maskImages, width, height) => {
         if (maskImages) {
           await drawSingleMax(myCanvasMax, maskImages, 'mask', width, height);
         }
+        myCanvasMax.globalCompositeOperation = 'source-over';
+        myCanvasMax.strokeStyle = '#000000';
+        myCanvasMax.strokeRect(0, 0, width, height);
         const printUrl = await uploadPrintAndGetUrlMax();
         resolve(printUrl);
       };
