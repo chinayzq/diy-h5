@@ -164,15 +164,27 @@ export function setDynamicScript() {
     const scriptList = res.data.split('\n');
     scriptList.forEach((item, index) => {
       var head = document.head || document.getElementsByTagName('head')[0];
-      var script = document.createElement('script');
-      script.type = 'text/javascript';
-      // script.setAttribute('async', true);
-      if (index === 0) {
-        script.setAttribute('src', item);
-      } else {
-        script.textContent = item;
-      }
-      head.appendChild(script);
+      var range = document.createRange();
+      range.selectNode(document.body);
+      var documentFragment = range.createContextualFragment(item);
+      head.appendChild(documentFragment);
     });
   });
 }
+
+var set_innerHTML = function (el, htmlCode) {
+  var ua = navigator.userAgent.toLowerCase();
+  if (ua.indexOf('msie') >= 0 && ua.indexOf('opera') < 0) {
+    htmlCode = '<div style="display:none">for IE</div>' + htmlCode;
+    htmlCode = htmlCode.replace(/<script([^>]*)>/gi, '<script$1 defer="true">');
+    el.innerHTML = htmlCode;
+    el.removeChild(el.firstChild);
+  } else {
+    var el_next = el.nextSibling;
+    var el_parent = el.parentNode;
+    el_parent.removeChild(el);
+    el.innerHTML = htmlCode;
+    if (el_next) el_parent.insertBefore(el, el_next);
+    else el_parent.appendChild(el);
+  }
+};
