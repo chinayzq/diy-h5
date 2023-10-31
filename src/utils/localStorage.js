@@ -25,7 +25,9 @@ export const setItem = (key, value) => {
 export const removeItem = (key) => {
   const currentStore = localStorage.getItem(storageName);
   if (currentStore) {
-    delete JSON.parse(currentStore)[key];
+    const temp = JSON.parse(currentStore);
+    delete temp[key];
+    localStorage.setItem(storageName, JSON.stringify(temp));
   }
 };
 export const clearStorage = (key) => {
@@ -35,6 +37,14 @@ export const getStorage = () => {
   const currentStore = localStorage.getItem(storageName);
   if (currentStore) {
     return JSON.parse(currentStore);
+  } else {
+    return null;
+  }
+};
+export const getItem = (item) => {
+  const currentStore = localStorage.getItem(storageName);
+  if (currentStore) {
+    return JSON.parse(currentStore)[item];
   } else {
     return null;
   }

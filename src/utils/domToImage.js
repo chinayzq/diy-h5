@@ -101,7 +101,6 @@ function uploadAndGetTemplateUrl() {
 }
 // 导出为图片
 export function exportAsImage(domId, images) {
-  debugger;
   // const containerDom = document.getElementsByClassName('container-image')[0];
   // const width = containerDom.naturalWidth * 0.65;
   // const height = containerDom.naturalHeight * 0.65;
@@ -182,6 +181,7 @@ export const exportPrintImage = (domId, maskImages, width, height) => {
         }
         myCanvasMax.globalCompositeOperation = 'source-over';
         myCanvasMax.strokeStyle = '#000000';
+        myCanvasMax.lineWidth = '2';
         myCanvasMax.strokeRect(0, 0, width, height);
         const printUrl = await uploadPrintAndGetUrlMax();
         resolve(printUrl);

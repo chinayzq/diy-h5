@@ -356,6 +356,7 @@ import {
   removeItem,
   clearStorage,
   getStorage,
+  getItem,
 } from "@/utils/localStorage";
 import useUndoAndDo from "@/hooks/useUndoAndDo";
 // 拖拽ICons
@@ -692,6 +693,15 @@ const selectPhoneName = ref("iPhone 14");
 const selectPhoneCode = ref("IPHONE14");
 const selectCaseName = ref("Clear Impact Case - Black");
 const nextStepHandler = (datas) => {
+  if (
+    datas.printAdjust &&
+    datas.printAdjust.width &&
+    datas.printAdjust.height
+  ) {
+    setItem("printAdjust", datas.printAdjust);
+  } else {
+    removeItem("printAdjust");
+  }
   selectModelImage.value = datas.modelUrl;
   setItem("modelUrl", datas.modelUrl);
   selectMaskImage.value = datas.maskUrl;
@@ -755,10 +765,12 @@ const printHandler = async () => {
 };
 const dealPrintImageHandler = async () => {
   return new Promise(async (resolve) => {
+    // 获取打印设置，如果有就以打印设置为准
+    const { width, height } = getItem("printAdjust") || {};
     // 获取图片当前实际宽高
     const imageDom = document.getElementsByClassName("container-image")[0];
-    const naturalWidth = imageDom.naturalWidth;
-    const naturalHeight = imageDom.naturalHeight;
+    const naturalWidth = Number(width) || imageDom.naturalWidth;
+    const naturalHeight = Number(height) || imageDom.naturalHeight;
     // 需要设置透明色，否则打印如片会有手机壳底图
     imageDom.style.opacity = 0;
     // 获取容器计算属性

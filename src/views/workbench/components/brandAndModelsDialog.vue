@@ -107,6 +107,7 @@ const modelClickHandler = (model, index) => {
 const phoneColorList = ref([]);
 const caseList = ref([]);
 const maskList = ref([]);
+const printImage = ref([]);
 const listLoading = ref(false);
 const getCaseByPhoneCode = (phoneCode) => {
   listLoading.value = true;
@@ -118,6 +119,7 @@ const getCaseByPhoneCode = (phoneCode) => {
         phoneColorList.value = res.data.phoneColorList;
         caseList.value = res.data.modelColorList;
         maskList.value = res.data.maskImage;
+        printImage.value = res.data.printImage || [{}];
       }
     })
     .finally(() => {
@@ -130,6 +132,7 @@ const nextStepHandler = () => {
   const brandName = dataList.value[activeBrandIndex.value].brandName;
   const modelUrl = phoneColorList.value[activeCaseIndex.value].url;
   const maskUrl = maskList.value[0].url;
+  const printAdjust = printImage.value[0];
   emit("nextStep", {
     caseList: caseList.value, //手机壳列表&example列表
     phoneName: activePhoneName.value, // 机型名称
@@ -137,6 +140,11 @@ const nextStepHandler = () => {
     modelUrl, // 机型背景图
     brandName, // 品牌名称
     maskUrl, // 蒙版背景图
+    printAdjust: {
+      // 打印调整
+      width: printAdjust.extend1 || null,
+      height: printAdjust.extend2 || null,
+    },
   });
 };
 
