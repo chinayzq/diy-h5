@@ -161,7 +161,7 @@ export function statusBarHeight() {
 
 export function setDynamicScript() {
   getDynamicScript().then((res) => {
-    const scriptList = res.data.split('\n');
+    const scriptList = res.data;
     scriptList.forEach((item, index) => {
       var head = document.head || document.getElementsByTagName('head')[0];
       var range = document.createRange();

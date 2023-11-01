@@ -142,6 +142,10 @@ const closeHandler = () => {
         width: 120px;
         display: flex;
         align-items: flex-end;
+        justify-content: center;
+        .var-image {
+          height: 95%;
+        }
       }
       .right-part {
         display: flex;

@@ -384,7 +384,7 @@ const freshUndoList = () => {
 };
 
 const defaultScale = ref(currentClient === "PC" ? 0.8 : 0.65);
-const scale = ref(defaultScale);
+const scale = ref(defaultScale.value);
 
 onBeforeMount(() => {
   initLocalDatas();
