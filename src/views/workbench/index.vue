@@ -1,6 +1,11 @@
 <template>
   <div class="workbench-component" @mouseup.stop="clearActiveState">
-    <div class="header-container">
+    <div
+      class="header-container"
+      :style="{
+        display: stickersShow ? ' none' : 'flex',
+      }"
+    >
       <div class="model-case-container" @click.stop="brandAndModelShow = true">
         {{ `${selectPhoneName} / ${selectCaseName}` }}
         <var-icon name="chevron-down" />
@@ -10,7 +15,7 @@
     <div
       class="graph-container"
       :style="{
-        top: stickersShow ? ' -100px' : '0',
+        top: stickersShow ? `-80px` : '0',
       }"
     >
       <Loading v-show="graphLoading" :size="30" />
@@ -298,6 +303,7 @@
         @confirm="confirmHandler"
         :confirmLoading="confirmLoading"
         :previewImage="previewImage"
+        :selectPhoneName="selectPhoneName"
       />
     </var-popup>
 
@@ -330,7 +336,7 @@
 </template>
 
 <script setup>
-import { onBeforeMount, ref, watch } from "vue";
+import { onBeforeMount, ref, watch, onMounted } from "vue";
 import NavigationBar from "./components/navigationBar.vue";
 import StickersDialog from "./components/stickersDialog.vue";
 import FontDialog from "./components/fontDialog.vue";
@@ -625,6 +631,13 @@ const templateChangeHandler = (templateId) => {
 };
 
 const stickersShow = ref(false);
+const offsetTop = ref(0);
+onMounted(() => {
+  let element = document.querySelector(".mask-container");
+  let top = element.getBoundingClientRect();
+  console.log("top", top.top);
+  offsetTop.value = top;
+});
 const stickerSelectHandler = (url) => {
   if (replaceItem.value.id) {
     dragStickerList.value.forEach((item) => {

@@ -21,8 +21,10 @@
           :src="`${tab.stickerUrl}?type=webp`"
         />
       </var-tab>
-      <var-icon name="window-close" @click="emit('close')" />
     </var-tabs>
+    <div class="window-close-icon">
+      <var-icon name="window-close" @click="emit('close')" />
+    </div>
     <div class="images-container" v-if="tabs[active]">
       <Loading v-show="listLoading" />
       <div
@@ -129,6 +131,36 @@ const stickerClickHandler = (item) => {
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+  }
+  .window-close-icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 40px;
+    width: 30px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ee50f3;
+  }
+  // active bar display none!
+  :deep(.var-tabs__indicator) {
+    display: none;
+  }
+  // scroll bar styles
+  :deep(.var-tabs--layout-horizontal-scrollable::-webkit-scrollbar) {
+    display: block !important;
+  }
+  :deep(.var-tabs__tab-wrap) {
+    &::-webkit-scrollbar {
+    }
+
+    &::-webkit-scrollbar-thumb {
+      min-width: 40px !important;
+      background: #ee50f3;
+      border-radius: 20px;
     }
   }
 }

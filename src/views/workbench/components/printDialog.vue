@@ -25,7 +25,7 @@
       />
     </div>
     <div class="model-line">
-      {{ currentModel }}
+      {{ selectPhoneName }}
     </div>
     <div class="confirm-button" @click="confirmHandler">CONFIRM</div>
   </div>
@@ -34,7 +34,6 @@
 <script setup>
 import { ref } from "vue";
 
-const currentModel = ref("IPhone 14");
 const props = defineProps({
   previewImage: {
     type: String,
@@ -46,6 +45,12 @@ const props = defineProps({
     type: Boolean,
     default() {
       return false;
+    },
+  },
+  selectPhoneName: {
+    type: String,
+    default() {
+      return "IPhone 14";
     },
   },
 });
