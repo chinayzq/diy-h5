@@ -13,7 +13,6 @@
     "amfe-flexible": "^2.2.1",
     "axios": "^0.21.1",
     "dom-to-image": "^2.6.0",
-    "esbuild-windows-64": "^0.15.18",
     "html2canvas": "^1.4.1",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
