@@ -371,7 +371,9 @@ import PlusIcon from "@/assets/images/drag_plus_icon.svg";
 import ResizeIcon from "@/assets/images/drag_resize_icon.png";
 import RotateIcon from "@/assets/images/drag_rotate_icon.svg";
 
-import { judgeClient } from "@/utils";
+import { judgeClient, setCookie } from "@/utils";
+// 设置colgifts_c_sid，没登录时按照该cookie存储信息
+setCookie();
 const currentClient = judgeClient();
 
 const { updateHandler, undoHandler, doHandler, canUndo, canDo } =

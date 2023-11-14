@@ -1,5 +1,6 @@
 import { useStore } from '@/stores';
 import { getDynamicScript } from '@/api/workbench';
+import Cookies from 'js-cookie';
 // 获取assets静态资源
 export const getAssetsFile = (url) => {
   return new URL(`../assets/${url}`, import.meta.url).href;
@@ -93,6 +94,11 @@ export function uuid() {
   });
 }
 
+export function setCookie() {
+  if (!Cookies.get('colgifts_c_sid')) {
+    Cookies.set('colgifts_c_sid', uuid());
+  }
+}
 /** 判断客户端：Android，IOS，PC */
 export function judgeClient() {
   let u = navigator.userAgent;

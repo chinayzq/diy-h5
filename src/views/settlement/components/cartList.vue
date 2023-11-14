@@ -98,7 +98,7 @@
       </div>
       <div class="button-line">
         <div class="checkout-outer">
-          <div class="checkout-inner">Check out</div>
+          <div class="checkout-inner" @click="checkoutHandler">Check out</div>
         </div>
         <div class="home-button">
           <img src="@/assets/images/home.svg" alt="" />
@@ -111,6 +111,7 @@
 <script setup>
 import { getCartList, deleteCart, couponAmount } from "@/api/workbench";
 import { onBeforeMount, ref, watch } from "vue";
+import { useRouter } from "vue-router";
 
 const props = defineProps({
   shipping: {
@@ -188,6 +189,15 @@ const countCalc = () => {
     originTotal.value += Number(props.shipping);
     payTotal.value += Number(props.shipping);
   }
+};
+
+const router = useRouter();
+const checkoutHandler = () => {
+  // 调用checkout接口
+  // ...
+  router.push({
+    path: "/checkout",
+  });
 };
 </script>
 
