@@ -1,5 +1,5 @@
 <template>
-  <div class="gallery-component">
+<div class="gallery-component">
     <div class="header-container">
       <div class="header-icon"></div>
       <span class="first-title">INDIVISUAL's Gallery</span>

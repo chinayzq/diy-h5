@@ -93,7 +93,7 @@ const confirmHandler = () => {
     justify-content: center;
     .loading-icon {
       height: 80px;
-      width: 220px;
+      width: 240px;
     }
     .preview-image {
       // height: 80%;

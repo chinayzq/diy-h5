@@ -223,9 +223,56 @@
             src="@/assets/images/gateway_icon.svg"
             alt=""
           />
+          <div v-if="payMethod === 1" class="paypal-tips">Secure payment via PayPal.</div>
           <var-radio :checked-value="2"> Credit/Debit Payment </var-radio>
+          <div class="credit-container" v-if="payMethod === 2" >
+            <div class="credit-icons" >
+              <div class="visa"></div>
+              <div class="mastercard" style="background-position: 0 -100px;"></div>
+              <div class="amex" style="background-position: 0 -221px;"></div>
+            </div>
+            <div class="credit-form">
+              <var-row style="margin-top: 15px">
+                <var-col :span="24">
+                  <var-input
+                    style="width: 100%;"
+                    variant="outlined"
+                    size="small"
+                    placeholder="Card number *"
+                    :rules="[(v) => !!v || 'Card number is required']"
+                    v-model="creditForm.cardNumber"
+                  />
+                </var-col>
+              </var-row>  
+              <var-row :gutter="[10, 20]" style="margin-top: 15px">
+                <var-col :span="12">
+                  <var-input
+                    variant="outlined"
+                    size="small"
+                    placeholder="Valid date MM/YY *"
+                    :rules="[(v) => !!v || 'Valid date is required']"
+                    v-model="creditForm.validDate"
+                  />
+                </var-col>
+                <var-col :span="12">
+                  <var-input
+                    variant="outlined"
+                    size="small"
+                    placeholder="Safe Code *"
+                    :rules="[(v) => !!v || 'Safe Code is required']"
+                    v-model="creditForm.safeCode"
+                  />
+                </var-col>
+              </var-row> 
+            </div>
+          </div>
         </var-radio-group>
       </div>
+      <div class="button-container"> 
+        <var-icon name="lock" />
+        <span>Place Order  $66.00</span>
+      </div>
+      <p class="bottom-tips">Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our <a href="https://www.memtoys.com/privacy-policy/" class="woocommerce-privacy-policy-link" target="_blank">privacy policy</a>.</p>
     </div>
   </div>
 </template>
@@ -260,6 +307,11 @@ const shipform = ref({
   stateCountry: null,
   postcode: null,
 });
+const creditForm = ref({
+  cardNumber: null,
+  validDate: null,
+  safeCode: null
+})
 const countryJson = {
   China: [
     {
@@ -405,6 +457,71 @@ const orderList = ref([
     .value {
       font-weight: 700;
       font-size: 13px;
+    }
+  }
+  .pay-methods {
+    background: #f7f7f7;
+    padding: 20px;
+    box-sizing: border-box;
+    .paypal-tips {
+      font-size: 12px;
+      color: #949090;
+    }
+    .credit-container {
+      background: #fff;
+      padding: 15px;
+      box-sizing: border-box;
+      .credit-icons {
+        display: flex;
+        div {
+          zoom: .5;
+        }
+        .visa {
+          width: 61px;
+          height: 40px;
+          background: url('../../assets/images/cashier.png') 0 0;
+        }
+        .mastercard {
+          width: 66px;
+          height: 40px;
+          background: url('../../assets/images/cashier.png');
+        }
+        .amex {
+          width: 57px;
+          height: 40px;
+          background: url('../../assets/images/cashier.png');
+        }
+      }
+    }
+    .credit-form {
+      
+    }
+  }
+  .button-container {
+    margin-top: 30px;
+    width: 100%;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: rgb(241, 99, 52);
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: none;
+    span {
+      margin-left: 10px;
+    }
+  }
+  .bottom-tips {
+    margin-top: 20px;
+    line-height: 20px;
+    font-family: none;
+    a {
+      color: rgb(241, 99, 52);
+    background-color: transparent;
+    text-decoration: none;
     }
   }
 }
