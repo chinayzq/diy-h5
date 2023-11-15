@@ -17,6 +17,6 @@ export default {
   prod: {
     baseUrl: '/colgifts',
     uploadUrl: '/colgifts/upload',
-    buildPath: '/diy/',
+    buildPath: '/',
   },
 };
