@@ -3,7 +3,7 @@
     <div
       class="header-container"
       :style="{
-        display: stickersShow ? ' none' : 'flex',
+        display: stickersShow || fontShow ? ' none' : 'flex',
       }"
     >
       <div class="model-case-container" @click.stop="brandAndModelShow = true">
@@ -15,7 +15,7 @@
     <div
       class="graph-container"
       :style="{
-        top: stickersShow ? `-80px` : '0',
+        top: stickersShow || fontShow ? `-80px` : '0',
       }"
     >
       <Loading v-show="graphLoading" :size="30" />
@@ -522,7 +522,7 @@ const navigationEvent = (type, file) => {
       break;
     case "image":
       if (file) {
-        addStickerToGraph(file, true);
+        addStickerToGraph(file, false);
       }
       break;
     case "imageReplace":

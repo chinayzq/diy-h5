@@ -64,7 +64,7 @@
           height="30px"
           lazy
           :loading="$LoadingImage"
-          :src="`/src/assets/images/${item.icon}`"
+          :src="getAssetsFile(item.icon)"
           @click="styleChange(item)"
         />
       </div>
@@ -75,7 +75,7 @@
 <script setup>
 import { onBeforeMount, ref, watch } from "vue";
 import { getFontSize } from "@/api/workbench";
-
+import { getAssetsFile } from "@/utils";
 onBeforeMount(() => {
   initDatas();
 });

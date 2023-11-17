@@ -3,7 +3,7 @@ import { getDynamicScript } from '@/api/workbench';
 import Cookies from 'js-cookie';
 // 获取assets静态资源
 export const getAssetsFile = (url) => {
-  return new URL(`../assets/${url}`, import.meta.url).href;
+  return new URL(`../assets/images/${url}`, import.meta.url).href;
 };
 
 export function setLayout() {
