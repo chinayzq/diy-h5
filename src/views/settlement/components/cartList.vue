@@ -109,7 +109,12 @@
 </template>
 
 <script setup>
-import { getCartList, deleteCart, couponAmount } from "@/api/workbench";
+import {
+  getCartList,
+  deleteCart,
+  couponAmount,
+  saveOrder,
+} from "@/api/workbench";
 import { onBeforeMount, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
@@ -193,10 +198,21 @@ const countCalc = () => {
 
 const router = useRouter();
 const checkoutHandler = () => {
-  // 调用checkout接口
-  // ...
-  router.push({
-    path: "/checkout",
+  // 调用saveOrder接口生成订单
+  listLoading.value = true;
+  saveOrder({
+    description: null,
+    discountCode: coupon.value,
+    discountPrice: savingTotal.value,
+    originalPrice: originTotal.value,
+    paidPrice: payTotal.value,
+    productJson: cartList.value,
+    shippingFree: props.shipping,
+  }).finally(() => {
+    listLoading.value = false;
+    router.push({
+      path: "/checkout",
+    });
   });
 };
 </script>

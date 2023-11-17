@@ -60,3 +60,12 @@ export function getPrivacy(params) {
 export function getDynamicScript(params) {
   return axios.get('/seo/content', { params });
 }
+export function checkout(params) {
+  return axios.get('/checkout', { params });
+}
+export function saveOrder(params) {
+  return axios.post('/saveorder', params);
+}
+export function payOrder(params) {
+  return axios.post('/payorder', params);
+}

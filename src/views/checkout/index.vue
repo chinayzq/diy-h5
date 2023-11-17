@@ -7,7 +7,7 @@
     <div class="details-container">
       <div class="first-title">Billing details</div>
       <!-- billing form start -->
-      <var-form ref="form" scroll-to-error="start">
+      <var-form ref="formIns" scroll-to-error="start">
         <var-space direction="column" :size="[30, 0]">
           <var-input
             variant="outlined"
@@ -28,7 +28,7 @@
             size="small"
             placeholder="Email address *"
             :rules="[(v) => !!v || 'Email address is required']"
-            v-model="formData.emailAddress"
+            v-model="formData.email"
           />
           <var-input
             variant="outlined"
@@ -64,7 +64,7 @@
             size="small"
             placeholder="Town / city *"
             :rules="[(v) => !!v || 'Town / city is required']"
-            v-model="formData.townCity"
+            v-model="formData.city"
           />
           <var-input
             variant="outlined"
@@ -88,7 +88,7 @@
       >
       <!-- ship different form start -->
       <div v-show="shipDifferentAddress">
-        <var-form ref="shipform" scroll-to-error="start">
+        <var-form ref="shipFormIns" scroll-to-error="start">
           <var-space direction="column" :size="[30, 0]">
             <var-input
               variant="outlined"
@@ -109,7 +109,7 @@
               size="small"
               placeholder="Email address *"
               :rules="[(v) => !!v || 'Email address is required']"
-              v-model="shipform.emailAddress"
+              v-model="shipform.email"
             />
             <var-input
               variant="outlined"
@@ -148,7 +148,7 @@
               size="small"
               placeholder="Town / city *"
               :rules="[(v) => !!v || 'Town / city is required']"
-              v-model="shipform.townCity"
+              v-model="shipform.city"
             />
             <var-input
               variant="outlined"
@@ -223,19 +223,24 @@
             src="@/assets/images/gateway_icon.svg"
             alt=""
           />
-          <div v-if="payMethod === 1" class="paypal-tips">Secure payment via PayPal.</div>
+          <div v-if="payMethod === 1" class="paypal-tips">
+            Secure payment via PayPal.
+          </div>
           <var-radio :checked-value="2"> Credit/Debit Payment </var-radio>
-          <div class="credit-container" v-if="payMethod === 2" >
-            <div class="credit-icons" >
+          <div class="credit-container" v-if="payMethod === 2">
+            <div class="credit-icons">
               <div class="visa"></div>
-              <div class="mastercard" style="background-position: 0 -100px;"></div>
-              <div class="amex" style="background-position: 0 -221px;"></div>
+              <div
+                class="mastercard"
+                style="background-position: 0 -100px"
+              ></div>
+              <div class="amex" style="background-position: 0 -221px"></div>
             </div>
             <div class="credit-form">
               <var-row style="margin-top: 15px">
                 <var-col :span="24">
                   <var-input
-                    style="width: 100%;"
+                    style="width: 100%"
                     variant="outlined"
                     size="small"
                     placeholder="Card number *"
@@ -243,7 +248,7 @@
                     v-model="creditForm.cardNumber"
                   />
                 </var-col>
-              </var-row>  
+              </var-row>
               <var-row :gutter="[10, 20]" style="margin-top: 15px">
                 <var-col :span="12">
                   <var-input
@@ -263,55 +268,68 @@
                     v-model="creditForm.safeCode"
                   />
                 </var-col>
-              </var-row> 
+              </var-row>
             </div>
           </div>
         </var-radio-group>
       </div>
-      <div class="button-container"> 
+      <div class="button-container" @click="payHandler">
         <var-icon name="lock" />
-        <span>Place Order  $66.00</span>
+        <span>Place Order $66.00</span>
       </div>
-      <p class="bottom-tips">Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our <a href="https://www.memtoys.com/privacy-policy/" class="woocommerce-privacy-policy-link" target="_blank">privacy policy</a>.</p>
+      <p class="bottom-tips">
+        Your personal data will be used to process your order, support your
+        experience throughout this website, and for other purposes described in
+        our
+        <a
+          href="https://www.memtoys.com/privacy-policy/"
+          class="woocommerce-privacy-policy-link"
+          target="_blank"
+          >privacy policy</a
+        >.
+      </p>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import { checkout, payOrder } from "@/api/workbench";
 
 const shipDifferentAddress = ref(false);
 const countryList = ref(["China", "Korea", "American"]);
 const notesForOrder = ref(null);
+const formIns = ref(null);
+const shipFormIns = ref(null);
 const formData = ref({
   firstName: null,
   lastName: null,
-  emailAddress: null,
+  email: null,
   phone: null,
   country: null,
   streetAddress: null,
   apartment: null,
-  townCity: null,
+  city: null,
   stateCountry: null,
   postcode: null,
 });
 const shipform = ref({
   firstName: null,
   lastName: null,
-  emailAddress: null,
+  email: null,
   companyName: null,
   country: null,
   streetAddress: null,
   apartment: null,
-  townCity: null,
+  city: null,
   stateCountry: null,
   postcode: null,
 });
 const creditForm = ref({
   cardNumber: null,
   validDate: null,
-  safeCode: null
-})
+  safeCode: null,
+});
 const countryJson = {
   China: [
     {
@@ -347,6 +365,43 @@ const orderList = ref([
     count: 1,
   },
 ]);
+
+// get order details
+const initDatas = () => {
+  checkout().then((res) => {
+    console.log(res);
+    // display orderList & subtotal & shipping
+  });
+};
+initDatas();
+
+const payHandler = async () => {
+  const formValid = await formIns.value.validate();
+  if (!formValid) return;
+  if (shipDifferentAddress.value) {
+    const shipFormValid = await shipFormIns.value.validate();
+    if (!shipFormValid) return;
+  }
+  const params = buildRequestParams();
+  console.log("xxxx - params:", params);
+  // payOrder
+};
+const buildRequestParams = () => {
+  const { email, firstName, lastName, phone } = formData.value;
+  return {
+    description: notesForOrder.value,
+    orderId: "",
+    userDTO: {
+      billingJson: formData.value,
+      description: "",
+      email,
+      firstName,
+      lastName,
+      phone,
+      shipAddressJson: shipform.value,
+    },
+  };
+};
 </script>
 
 <style lang="less" scoped>
@@ -370,7 +425,7 @@ const orderList = ref([
     position: relative;
     .menu-icon {
       position: absolute;
-      left: 20px;
+      left: 0;
       top: calc(50% - 10px);
       cursor: pointer;
     }
@@ -474,27 +529,26 @@ const orderList = ref([
       .credit-icons {
         display: flex;
         div {
-          zoom: .5;
+          zoom: 0.5;
         }
         .visa {
           width: 61px;
           height: 40px;
-          background: url('../../assets/images/cashier.png') 0 0;
+          background: url("../../assets/images/cashier.png") 0 0;
         }
         .mastercard {
           width: 66px;
           height: 40px;
-          background: url('../../assets/images/cashier.png');
+          background: url("../../assets/images/cashier.png");
         }
         .amex {
           width: 57px;
           height: 40px;
-          background: url('../../assets/images/cashier.png');
+          background: url("../../assets/images/cashier.png");
         }
       }
     }
     .credit-form {
-      
     }
   }
   .button-container {
@@ -520,8 +574,8 @@ const orderList = ref([
     font-family: none;
     a {
       color: rgb(241, 99, 52);
-    background-color: transparent;
-    text-decoration: none;
+      background-color: transparent;
+      text-decoration: none;
     }
   }
 }
