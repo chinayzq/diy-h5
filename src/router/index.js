@@ -47,6 +47,12 @@ const router = createRouter({
           component: () => import('@/views/checkout/index.vue'),
           meta: { title: 'checkout' },
         },
+        {
+          path: '/orderDetail',
+          name: 'orderDetail',
+          component: () => import('@/views/orderDetail/index.vue'),
+          meta: { title: 'orderDetail' },
+        },
       ],
     },
   ],

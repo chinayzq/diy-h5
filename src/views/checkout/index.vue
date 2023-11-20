@@ -193,7 +193,7 @@
               src="@/assets/images/gallery_example.webp"
               alt=""
             />
-            <var-icon name="close-circle-outline" class="delete-icon" />
+            <!-- <var-icon name="close-circle-outline" class="delete-icon" /> -->
           </span>
           <div class="description">
             {{ item.description }}
@@ -295,23 +295,36 @@
 <script setup>
 import { ref } from "vue";
 import { checkout, payOrder } from "@/api/workbench";
+import { useRouter } from "vue-router";
 
 const shipDifferentAddress = ref(false);
 const countryList = ref(["China", "Korea", "American"]);
 const notesForOrder = ref(null);
 const formIns = ref(null);
 const shipFormIns = ref(null);
+// const formData = ref({
+//   firstName: null,
+//   lastName: null,
+//   email: null,
+//   phone: null,
+//   country: null,
+//   streetAddress: null,
+//   apartment: null,
+//   city: null,
+//   stateCountry: null,
+//   postcode: null,
+// });
 const formData = ref({
-  firstName: null,
-  lastName: null,
-  email: null,
-  phone: null,
-  country: null,
-  streetAddress: null,
-  apartment: null,
-  city: null,
-  stateCountry: null,
-  postcode: null,
+  firstName: 'yi',
+  lastName: 'ziqi',
+  email: 'yiziqi_234@163.com',
+  phone: 18566206515,
+  country: 'China',
+  streetAddress: 'xxx1',
+  apartment: 'xxx2',
+  city: 'shenzhen',
+  stateCountry: 'xxx3',
+  postcode: 518000,
 });
 const shipform = ref({
   firstName: null,
@@ -360,10 +373,11 @@ const payMethod = ref(1);
 const productList = ref([]);
 const subTotal = ref(0)
 const shipping = ref(0)
+const resourceInfo = ref({})
 // get order details
 const initDatas = () => {
   checkout().then((res) => {
-    console.log(res);
+    resourceInfo.value = res.data
     // display productList & subtotal & shipping
     productList.value = res.data.productJson.map(item => {
       const {phoneName, caseColor, extend1, extend2} = item.extendJson
@@ -376,6 +390,7 @@ const initDatas = () => {
 };
 initDatas();
 
+const router = useRouter()
 const payHandler = async () => {
   const formValid = await formIns.value.validate();
   if (!formValid) return;
@@ -387,16 +402,26 @@ const payHandler = async () => {
   console.log("xxxx - params:", params);
   payOrder(params).then(res => {
     if (res.code === 200) {
-      console.log('生成订单成功！')
+      router.push({
+        path: '/orderDetail',
+        query: {
+          orderId: res.data
+        }
+      })
     }
   })
 };
 const buildRequestParams = () => {
   const { email, firstName, lastName, phone } = formData.value;
+  const { originalPrice, paidPrice, shippingFree } = resourceInfo.value
   return {
-    productJson: productList.value,
     description: notesForOrder.value,
-    orderId: "",
+    discountCode: null,
+    discountPrice: null,
+    originalPrice,
+    paidPrice,
+    productJson: productList.value,
+    shippingFree,
     userDTO: {
       billingJson: formData.value,
       description: "",
@@ -481,14 +506,14 @@ const buildRequestParams = () => {
         position: relative;
         .order-image {
           width: 55px;
-          padding-left: 15px;
+          // padding-left: 15px;
         }
-        .delete-icon {
-          position: absolute;
-          left: -5px;
-          top: -5px;
-          cursor: pointer;
-        }
+        // .delete-icon {
+        //   position: absolute;
+        //   left: -5px;
+        //   top: -5px;
+        //   cursor: pointer;
+        // }
       }
       .description {
         width: 45%;
