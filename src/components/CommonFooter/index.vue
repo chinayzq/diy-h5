@@ -56,6 +56,7 @@ const linkList = ref([
     margin-top: 10px;
     font-size: 14px;
     font-family: "JostMedium";
+    text-decoration: underline;
   }
 }
 </style>
