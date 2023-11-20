@@ -199,20 +199,8 @@ const countCalc = () => {
 const router = useRouter();
 const checkoutHandler = () => {
   // 调用saveOrder接口生成订单
-  listLoading.value = true;
-  saveOrder({
-    description: null,
-    discountCode: coupon.value,
-    discountPrice: savingTotal.value,
-    originalPrice: originTotal.value,
-    paidPrice: payTotal.value,
-    productJson: cartList.value,
-    shippingFree: props.shipping,
-  }).finally(() => {
-    listLoading.value = false;
-    router.push({
-      path: "/checkout",
-    });
+  router.push({
+    path: "/checkout",
   });
 };
 </script>

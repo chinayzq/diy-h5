@@ -9,7 +9,12 @@
         alt=""
       />
     </div>
-    <CommonFooter />
+    <div>
+      <div style="margin-bottom: 20px;">
+        only sale phone cases and not original products, only adapters.
+      </div>
+      <CommonFooter />
+    </div>
   </div>
 </template>
 

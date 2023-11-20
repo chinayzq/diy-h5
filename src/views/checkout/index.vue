@@ -1,6 +1,9 @@
 <template>
   <div class="checkout-page-component">
-    <CommonHeader />
+    <div class="title-line">
+      <var-icon name="menu" class="menu-icon" />
+      <img src="@/assets/images/project_logo.png" alt="" />
+    </div>
     <div class="details-container">
       <div class="first-title">Billing details</div>
       <!-- billing form start -->
@@ -179,7 +182,7 @@
         <span> Subtotal </span>
       </div>
       <div
-        v-for="(item, index) in orderList"
+        v-for="(item, index) in productList"
         :key="index"
         class="single-order border-line"
       >
@@ -196,20 +199,20 @@
             {{ item.description }}
           </div>
           <div class="count">
-            {{ `X ${item.count}` }}
+            {{ `X ${item.productCount}` }}
           </div>
         </div>
         <div class="right-part">
-          {{ `$${item.orderCount}` }}
+          {{ `$${item.extendJson.curPrice}` }}
         </div>
       </div>
       <div class="subtotal-line">
         <span class="label"> Subtotal </span>
-        <span class="value"> $85.00 </span>
+        <span class="value"> ${{ subTotal }} </span>
       </div>
       <div class="subtotal-line border-line" style="padding-bottom: 20px">
         <span class="label"> Shipping </span>
-        <span class="value"> Free shipping </span>
+        <span class="value"> {{ shipping }} </span>
       </div>
       <div class="pay-methods">
         <var-radio-group v-model="payMethod" direction="vertical">
@@ -292,7 +295,6 @@
 <script setup>
 import { ref } from "vue";
 import { checkout, payOrder } from "@/api/workbench";
-import CommonHeader from "@/components/CommonHeader/index.vue";
 
 const shipDifferentAddress = ref(false);
 const countryList = ref(["China", "Korea", "American"]);
@@ -355,20 +357,21 @@ const countryJson = {
 };
 
 const payMethod = ref(1);
-const orderList = ref([
-  {
-    description:
-      "10 kinds vibration of frequency usb rechargeable male masturbator self-retractable masturbation cup adult sex products",
-    orderCount: 85.0,
-    count: 1,
-  },
-]);
-
+const productList = ref([]);
+const subTotal = ref(0)
+const shipping = ref(0)
 // get order details
 const initDatas = () => {
   checkout().then((res) => {
     console.log(res);
-    // display orderList & subtotal & shipping
+    // display productList & subtotal & shipping
+    productList.value = res.data.productJson.map(item => {
+      const {phoneName, caseColor, extend1, extend2} = item.extendJson
+      item.description = `${phoneName} - ${caseColor} ${extend1} - ${extend2}`
+      return item
+    })
+    subTotal.value = res.data.paidPrice
+    shipping.value = res.data.shippingFree === 0 ? 'Free shipping' : `$${res.data.shippingFree}`
   });
 };
 initDatas();
@@ -382,11 +385,16 @@ const payHandler = async () => {
   }
   const params = buildRequestParams();
   console.log("xxxx - params:", params);
-  // payOrder
+  payOrder(params).then(res => {
+    if (res.code === 200) {
+      console.log('生成订单成功！')
+    }
+  })
 };
 const buildRequestParams = () => {
   const { email, firstName, lastName, phone } = formData.value;
   return {
+    productJson: productList.value,
     description: notesForOrder.value,
     orderId: "",
     userDTO: {
@@ -413,6 +421,21 @@ const buildRequestParams = () => {
   background: #fff;
   overflow: hidden auto;
   box-sizing: border-box;
+  .title-line {
+    height: 70px;
+    width: 100%;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    .menu-icon {
+      position: absolute;
+      left: 0;
+      top: calc(50% - 10px);
+      cursor: pointer;
+    }
+  }
   .margin30 {
     margin-top: 30px;
   }

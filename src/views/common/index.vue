@@ -1,6 +1,7 @@
 <template>
   <div class="common-page common-mobile-component">
-    <CommonHeader />
+    <Loading v-show="pageLoading" />
+    <CommonHeader style="padding: 0 20px;" />
     <div v-html="htmlContent" class="content-container"></div>
     <!-- 123 -->
   </div>
@@ -14,13 +15,17 @@ import { getArticleById } from "@/api/workbench";
 const htmlContent = ref(``);
 
 const route = useRoute();
+const pageLoading = ref(false)
 const initDatas = () => {
   const { id } = route.query;
   if (id) {
     htmlContent.value = "";
+    pageLoading.value = true
     getArticleById(id).then((res) => {
       htmlContent.value = res.data.content;
-    });
+    }).finally(() => {
+      pageLoading.value = false
+    })
   }
 };
 watch(
@@ -40,10 +45,14 @@ watch(
   left: 0;
   top: 0;
   background: #fff;
-  padding: 0 20px 30px;
+  // padding: 0 20px 30px;
   box-sizing: border-box;
   .content-container {
-    padding: 20px 0;
+    padding: 20px;
+    height: calc(100% - 90px);
+    overflow: auto;
+    margin-bottom: 20px;
+    box-sizing: border-box;
   }
 }
 </style>
