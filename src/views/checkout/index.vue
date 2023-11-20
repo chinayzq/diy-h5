@@ -1,9 +1,6 @@
 <template>
   <div class="checkout-page-component">
-    <div class="title-line">
-      <var-icon name="menu" class="menu-icon" />
-      <img src="@/assets/images/project_logo.png" alt="" />
-    </div>
+    <CommonHeader />
     <div class="details-container">
       <div class="first-title">Billing details</div>
       <!-- billing form start -->
@@ -295,6 +292,7 @@
 <script setup>
 import { ref } from "vue";
 import { checkout, payOrder } from "@/api/workbench";
+import CommonHeader from "@/components/CommonHeader/index.vue";
 
 const shipDifferentAddress = ref(false);
 const countryList = ref(["China", "Korea", "American"]);
@@ -415,21 +413,6 @@ const buildRequestParams = () => {
   background: #fff;
   overflow: hidden auto;
   box-sizing: border-box;
-  .title-line {
-    height: 70px;
-    width: 100%;
-    border-bottom: 1px solid #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    .menu-icon {
-      position: absolute;
-      left: 0;
-      top: calc(50% - 10px);
-      cursor: pointer;
-    }
-  }
   .margin30 {
     margin-top: 30px;
   }

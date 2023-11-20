@@ -1236,6 +1236,9 @@ const eventEndHandler = () => {
     flex-direction: row;
     align-items: center;
     justify-content: space-evenly;
+    gap: 0 10px;
+    padding: 0 10px;
+    box-sizing: border-box;
     .model-case-container {
       border: 1px solid rgb(143, 142, 136);
       color: #333;

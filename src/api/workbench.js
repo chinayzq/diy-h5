@@ -69,3 +69,6 @@ export function saveOrder(params) {
 export function payOrder(params) {
   return axios.post('/payorder', params);
 }
+export function getArticleById(id) {
+  return axios.post(`/detail/${id}`);
+}

@@ -8,9 +8,21 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/workbench',
+      redirect: '/home',
       component: Layout,
       children: [
+        {
+          path: '/home',
+          name: 'home',
+          component: () => import('@/views/home/index.vue'),
+          meta: { title: 'home' },
+        },
+        {
+          path: '/common',
+          name: 'common',
+          component: () => import('@/views/common/index.vue'),
+          meta: { title: 'common' },
+        },
         {
           path: '/gallery',
           name: 'gallery',
