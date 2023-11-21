@@ -10,7 +10,7 @@
       />
     </div>
     <div>
-      <div style="margin-bottom: 20px;">
+      <div style="margin-bottom: 20px">
         only sale phone cases and not original products, only adapters.
       </div>
       <CommonFooter />

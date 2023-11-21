@@ -18,6 +18,12 @@ const router = createRouter({
           meta: { title: 'home' },
         },
         {
+          path: '/login',
+          name: 'login',
+          component: () => import('@/views/login/index.vue'),
+          meta: { title: 'login' },
+        },
+        {
           path: '/common',
           name: 'common',
           component: () => import('@/views/common/index.vue'),

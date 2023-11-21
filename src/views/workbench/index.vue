@@ -840,6 +840,7 @@ const confirmHandler = () => {
       phoneName: selectPhoneName.value,
       printUrl: printImage.value,
     },
+    productImageList: dragStickerList.value.map(item => item.id),
     phoneCode: selectPhoneCode.value,
     templateUrl: previewImage.value,
   };

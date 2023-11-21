@@ -1,7 +1,7 @@
 <template>
   <div class="checkout-page-component">
     <div class="title-line">
-      <var-icon name="menu" class="menu-icon" />
+      <!-- <var-icon name="menu" class="menu-icon" /> -->
       <img src="@/assets/images/project_logo.png" alt="" />
     </div>
     <div class="details-container">
@@ -62,16 +62,16 @@
           <var-input
             variant="outlined"
             size="small"
-            placeholder="Town / city *"
-            :rules="[(v) => !!v || 'Town / city is required']"
+            placeholder="city *"
+            :rules="[(v) => !!v || 'city is required']"
             v-model="formData.city"
           />
           <var-input
             variant="outlined"
             size="small"
-            placeholder="State / Country *"
-            :rules="[(v) => !!v || 'State / Country is required']"
-            v-model="formData.stateCountry"
+            placeholder="State *"
+            :rules="[(v) => !!v || 'State is required']"
+            v-model="formData.state"
           />
           <var-input
             variant="outlined"
@@ -147,16 +147,16 @@
             <var-input
               variant="outlined"
               size="small"
-              placeholder="Town / city *"
-              :rules="[(v) => !!v || 'Town / city is required']"
+              placeholder="city *"
+              :rules="[(v) => !!v || 'city is required']"
               v-model="shipform.city"
             />
             <var-input
               variant="outlined"
               size="small"
-              placeholder="State / Country *"
-              :rules="[(v) => !!v || 'State / Country is required']"
-              v-model="shipform.stateCountry"
+              placeholder="State *"
+              :rules="[(v) => !!v || 'State is required']"
+              v-model="shipform.state"
             />
             <var-input
               variant="outlined"
@@ -312,7 +312,7 @@ const shipFormIns = ref(null);
 //   streetAddress: null,
 //   apartment: null,
 //   city: null,
-//   stateCountry: null,
+//   state: null,
 //   postcode: null,
 // });
 const formData = ref({
@@ -324,7 +324,7 @@ const formData = ref({
   streetAddress: "xxx1",
   apartment: "xxx2",
   city: "shenzhen",
-  stateCountry: "xxx3",
+  state: "xxx3",
   postcode: 518000,
 });
 const shipform = ref({
@@ -336,7 +336,7 @@ const shipform = ref({
   streetAddress: null,
   apartment: null,
   city: null,
-  stateCountry: null,
+  state: null,
   postcode: null,
 });
 const creditForm = ref({

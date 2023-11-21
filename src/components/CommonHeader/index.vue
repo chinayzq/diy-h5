@@ -36,33 +36,44 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
+// 判断，如果当前已经登录，则展示UserInfo，没有登录则展示Login
 const linkList = ref([
   {
     label: "Home",
-    id: 0,
+    path: "/home",
+  },
+  {
+    label: "Login",
+    path: "/login",
   },
   {
     label: "about us",
+    type: "common",
     id: 6,
   },
   {
     label: "contact us",
+    type: "common",
     id: 5,
   },
   {
     label: "Returnd & Refunds",
+    type: "common",
     id: 4,
   },
   {
     label: "Terms & Conditions",
+    type: "common",
     id: 3,
   },
   {
     label: "Shipping & Delivery",
+    type: "common",
     id: 2,
   },
   {
     label: "Privacy Policy",
+    type: "common",
     id: 1,
   },
 ]);
@@ -75,12 +86,17 @@ const jumpToHome = () => {
     path: "/",
   });
 };
-const jumpToPage = ({ id }) => {
-  if (id === 0) {
-    router.push("/");
-  } else {
+const jumpToPage = ({ id, type, path }) => {
+  if (type === "common") {
     router.push(`/common?id=${id}`);
+  } else {
+    router.push(path);
   }
+  // if (id === 0) {
+  //   router.push("/");
+  // } else {
+  //   router.push(`/common?id=${id}`);
+  // }
   menuShow.value = false;
 };
 </script>
