@@ -49,7 +49,28 @@ export function initGlableFilters(app) {
     },
   };
 }
-
+export const orderTimeRender = (dat) => {
+  if (!dat) return '--';
+  dat = new Date(dat);
+  const year = dat.getFullYear();
+  const mon =
+    dat.getMonth() + 1 < 10 ? '0' + (dat.getMonth() + 1) : dat.getMonth() + 1;
+  const monMap = {
+    1: 'January',
+    2: 'February',
+    3: 'March',
+    4: 'April',
+    5: 'May',
+    6: 'June',
+    7: 'July',
+    8: 'August',
+    9: 'September',
+    10: 'October',
+    11: 'November',
+    12: 'December',
+  };
+  return `${monMap[mon]} ${mon},${year}`;
+};
 export const dateFormat = (dat) => {
   if (!dat) return '--';
   dat = new Date(dat);

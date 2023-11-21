@@ -24,7 +24,7 @@ axios.interceptors.response.use(
       //   router.push({ path: '/login' });
       // }, 2000);
     }
-    if (res.data === 0) return res.data;
+    if (res?.data?.data === 0) return res.data;
     if (res.data && res.config && res.headers && res.request) return res.data;
     return res;
     // return res.data;

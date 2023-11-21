@@ -73,7 +73,7 @@
           variant="outlined"
           class="coupon-input"
           size="small"
-          @blur="couponValid"
+          @input="couponValid"
           v-model="coupon"
         />
       </div>
@@ -113,7 +113,7 @@ import {
   getCartList,
   deleteCart,
   couponAmount,
-  saveOrder,
+  savecardmount,
 } from "@/api/workbench";
 import { onBeforeMount, ref, watch } from "vue";
 import { useRouter } from "vue-router";
@@ -197,7 +197,13 @@ const countCalc = () => {
 };
 
 const router = useRouter();
-const checkoutHandler = () => {
+const checkoutHandler = async () => {
+  if (coupon.value) {
+    await savecardmount({
+      couponCode: coupon.value,
+      originalPrice: originTotal.value,
+    });
+  }
   // 调用saveOrder接口生成订单
   router.push({
     path: "/checkout",
