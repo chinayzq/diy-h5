@@ -5,7 +5,7 @@
       <img src="@/assets/images/project_logo.png" alt="" />
     </div>
     <div class="details-container">
-      <div class="first-title">Billing details</div>
+      <div class="first-title">Delivery</div>
       <!-- billing form start -->
       <var-form ref="formIns" scroll-to-error="start">
         <var-space direction="column" :size="[30, 0]">
@@ -114,8 +114,9 @@
             <var-input
               variant="outlined"
               size="small"
-              placeholder="Company name"
-              v-model="shipform.companyName"
+              placeholder="Phone *"
+              :rules="[(v) => !!v || 'Phone is required']"
+              v-model="shipform.phone"
             />
             <var-select
               variant="outlined"
@@ -315,22 +316,22 @@ const shipFormIns = ref(null);
 //   postcode: null,
 // });
 const formData = ref({
-  firstName: 'yi',
-  lastName: 'ziqi',
-  email: 'yiziqi_234@163.com',
+  firstName: "yi",
+  lastName: "ziqi",
+  email: "yiziqi_234@163.com",
   phone: 18566206515,
-  country: 'China',
-  streetAddress: 'xxx1',
-  apartment: 'xxx2',
-  city: 'shenzhen',
-  stateCountry: 'xxx3',
+  country: "China",
+  streetAddress: "xxx1",
+  apartment: "xxx2",
+  city: "shenzhen",
+  stateCountry: "xxx3",
   postcode: 518000,
 });
 const shipform = ref({
   firstName: null,
   lastName: null,
   email: null,
-  companyName: null,
+  phone: null,
   country: null,
   streetAddress: null,
   apartment: null,
@@ -371,26 +372,29 @@ const countryJson = {
 
 const payMethod = ref(1);
 const productList = ref([]);
-const subTotal = ref(0)
-const shipping = ref(0)
-const resourceInfo = ref({})
+const subTotal = ref(0);
+const shipping = ref(0);
+const resourceInfo = ref({});
 // get order details
 const initDatas = () => {
   checkout().then((res) => {
-    resourceInfo.value = res.data
+    resourceInfo.value = res.data;
     // display productList & subtotal & shipping
-    productList.value = res.data.productJson.map(item => {
-      const {phoneName, caseColor, extend1, extend2} = item.extendJson
-      item.description = `${phoneName} - ${caseColor} ${extend1} - ${extend2}`
-      return item
-    })
-    subTotal.value = res.data.paidPrice
-    shipping.value = res.data.shippingFree === 0 ? 'Free shipping' : `$${res.data.shippingFree}`
+    productList.value = res.data.productJson.map((item) => {
+      const { phoneName, caseColor, extend1, extend2 } = item.extendJson;
+      item.description = `${phoneName} - ${caseColor} ${extend1} - ${extend2}`;
+      return item;
+    });
+    subTotal.value = res.data.paidPrice;
+    shipping.value =
+      res.data.shippingFree === 0
+        ? "Free shipping"
+        : `$${res.data.shippingFree}`;
   });
 };
 initDatas();
 
-const router = useRouter()
+const router = useRouter();
 const payHandler = async () => {
   const formValid = await formIns.value.validate();
   if (!formValid) return;
@@ -400,20 +404,20 @@ const payHandler = async () => {
   }
   const params = buildRequestParams();
   console.log("xxxx - params:", params);
-  payOrder(params).then(res => {
+  payOrder(params).then((res) => {
     if (res.code === 200) {
       router.push({
-        path: '/orderDetail',
+        path: "/orderDetail",
         query: {
-          orderId: res.data
-        }
-      })
+          orderId: res.data,
+        },
+      });
     }
-  })
+  });
 };
 const buildRequestParams = () => {
   const { email, firstName, lastName, phone } = formData.value;
-  const { originalPrice, paidPrice, shippingFree } = resourceInfo.value
+  const { originalPrice, paidPrice, shippingFree } = resourceInfo.value;
   return {
     description: notesForOrder.value,
     discountCode: null,
