@@ -276,7 +276,7 @@
       </div>
       <div class="button-container" @click="payHandler">
         <var-icon name="lock" />
-        <span>Place Order $66.00</span>
+        <span>Place Order ${{ subTotal }}</span>
       </div>
       <p class="bottom-tips">
         Your personal data will be used to process your order, support your
