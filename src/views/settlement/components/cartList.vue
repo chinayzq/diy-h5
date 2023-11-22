@@ -198,12 +198,10 @@ const countCalc = () => {
 
 const router = useRouter();
 const checkoutHandler = async () => {
-  if (coupon.value) {
-    await savecardmount({
-      couponCode: coupon.value,
-      originalPrice: originTotal.value,
-    });
-  }
+  await savecardmount({
+    couponCode: coupon.value,
+    originalPrice: originTotal.value,
+  });
   // 调用saveOrder接口生成订单
   router.push({
     path: "/checkout",
