@@ -194,8 +194,10 @@
         @clickEvent="undoOrDoHandler"
       />
     </div>
+    <!-- 底部 navbar -->
     <NavigationBar
       @naviClick="navigationEvent"
+      @loadingChange="loadingChangeHandler"
       :dragStickerList="dragStickerList"
     />
 
@@ -509,6 +511,9 @@ const dragStickerList = ref([
 ]);
 
 const graphLoading = ref(false);
+const loadingChangeHandler = (fresh) => {
+  graphLoading.value = fresh;
+};
 
 const navigationEvent = (type, file) => {
   console.log("type", type);
@@ -641,6 +646,7 @@ onMounted(() => {
   offsetTop.value = top;
 });
 const stickerSelectHandler = (url) => {
+  console.log("url", url);
   if (replaceItem.value.id) {
     dragStickerList.value.forEach((item) => {
       if (item.id === replaceItem.value.id) {

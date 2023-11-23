@@ -78,3 +78,6 @@ export function savecardmount(params) {
 export function getOrderDetailById(orderId) {
   return axios.get(`/order/${orderId}`);
 }
+export function imageUpload(params) {
+  return axios.post('/upload', params);
+}

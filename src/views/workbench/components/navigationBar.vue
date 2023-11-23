@@ -31,8 +31,9 @@
 
 <script setup>
 import { judgeClient } from "@/utils";
+import { uploadImageRequest } from "@/utils/domToImage.js";
 import { ref, watch } from "vue";
-
+// import { uploadImage } from "@/api/workbench";
 const files = ref([]);
 const activeItems = ref([]);
 const resourceItems = ref([
@@ -78,12 +79,16 @@ const itemClickHandler = (key) => {
   emit("naviClick", key);
 };
 
-const uploadSuccess = (file) => {
+const uploadSuccess = async (file) => {
+  console.log("file", file);
+  emit("loadingChange", true);
+  const imageUrl = await uploadImageRequest(file.file);
   if (activeCountRef.value === 0) {
-    emit("naviClick", "image", file.cover);
+    emit("naviClick", "image", `/colgifts/image/${imageUrl}`);
   } else {
-    emit("naviClick", "imageReplace", file.cover);
+    emit("naviClick", "imageReplace", `/colgifts/image/${imageUrl}`);
   }
+  emit("loadingChange", false);
 };
 
 const props = defineProps({

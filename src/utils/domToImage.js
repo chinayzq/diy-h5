@@ -65,6 +65,24 @@ function uploadPrintAndGetUrl() {
   });
 }
 
+export function uploadImageRequest(file) {
+  return new Promise((resolve) => {
+    var fd = new FormData();
+    fd.append('file', file);
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open('POST', '/colgifts/upload');
+    xmlHttp.send(fd);
+    xmlHttp.onreadystatechange = (res) => {
+      //todo  your code...
+      if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+        try {
+          resolve(JSON.parse(xmlHttp.responseText).data);
+        } catch (error) {}
+      }
+    };
+  });
+}
+
 function uploadAndGetTemplateUrl() {
   return new Promise((resolve) => {
     const finalData = document
