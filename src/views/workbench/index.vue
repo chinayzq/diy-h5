@@ -86,7 +86,7 @@
             width: `${item.width}px`,
             top: `${item.top}px`,
             left: `${item.left}px`,
-            transform: `rotate(${item.rotate}deg)`,
+            transform: `rotate(${item.rotate}deg) scale(${item.scale})`,
             zIndex: `${item.zIndex}`,
           }"
           :class="['drag-item', item.active && 'drag-item-active']"
@@ -927,6 +927,7 @@ const addStickerToGraph = (url, activeFlag = false) => {
     rotate: 0,
     rotateY: false,
     rotateZ: false,
+    scale: 1,
     zIndex: getMaxIndex(),
     active: activeFlag,
   });
@@ -956,6 +957,7 @@ const addTextToGraph = () => {
     rotateZ: false,
     zIndex: 1001,
     fontSize: 26,
+    scale: 1,
     content: "",
     color: "#1a4cec",
     fontFamily: "JostMedium",
@@ -1088,7 +1090,8 @@ const iconDeleteHandler = ({ id }) => {
 
 // icon - 复制
 const iconCopyHandler = (item) => {
-  const { url, height, width, top, left, rotate, rotateY, rotateZ } = item;
+  const { url, height, width, top, left, rotate, rotateY, rotateZ, scale } =
+    item;
   dragStickerList.value.push({
     id: uuid(),
     url,
@@ -1099,6 +1102,7 @@ const iconCopyHandler = (item) => {
     rotateZ,
     top: top + 40,
     left: left + 40,
+    scale,
     zIndex: getMaxIndex(),
     active: false,
   });
