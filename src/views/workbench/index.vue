@@ -624,6 +624,7 @@ const templateChangeHandler = (templateId) => {
   getTemplateDetail({ templateId })
     .then((res) => {
       if (res.code === 200) {
+        dragStickerList.value = [];
         dragStickerList.value = dragStickerList.value.concat(
           res.data.templateData.basedata
         );
@@ -633,7 +634,7 @@ const templateChangeHandler = (templateId) => {
       freshUndoList();
       setTimeout(() => {
         graphLoading.value = false;
-      }, Math.min(200 * dragStickerList.value.length, 2000));
+      }, Math.min(300 * dragStickerList.value.length, 3000));
     });
 };
 
