@@ -5,6 +5,7 @@
       <img src="@/assets/images/project_logo.png" alt="" />
     </div>
     <div class="details-container">
+      <Loading v-show="pageLoading" :size="30" />
       <div class="first-title">Delivery</div>
       <!-- billing form start -->
       <var-form ref="formIns" scroll-to-error="start">
@@ -228,8 +229,12 @@
             Secure payment via PayPal.
           </div>
           <var-radio :checked-value="2"> Credit/Debit Payment </var-radio>
-          <div class="credit-container" v-if="payMethod === 2">
-            <div class="credit-icons">
+          <div class="credit-container" v-show="payMethod === 2">
+            <div id="cardElement"></div>
+            <div class="error-tips">
+              {{ errorTips }}
+            </div>
+            <!-- <div class="credit-icons">
               <div class="visa"></div>
               <div
                 class="mastercard"
@@ -270,13 +275,20 @@
                   />
                 </var-col>
               </var-row>
-            </div>
+            </div> -->
           </div>
         </var-radio-group>
       </div>
-      <div class="button-container" @click="payHandler">
-        <var-icon name="lock" />
-        <span>Place Order ${{ subTotal }}</span>
+      <div @click="payHandler" class="button-container">
+        <var-button
+          :loading="submitLoading"
+          loading-type="wave"
+          block
+          type="warning"
+          ><var-icon name="lock" />Place Order ${{ subTotal }}</var-button
+        >
+        <!-- <var-icon name="lock" />
+        <span>Place Order ${{ subTotal }}</span> -->
       </div>
       <p class="bottom-tips">
         Your personal data will be used to process your order, support your
@@ -294,9 +306,33 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { checkout, payOrder } from "@/api/workbench";
 import { useRouter } from "vue-router";
+
+const submitLoading = ref(false);
+const useepay = UseePay({
+  env: "sandbox",
+  layout: "multiLine",
+  // window.navigator.language,
+  locale: "en",
+  merchantNo: "500000000011183",
+});
+const errorTips = ref(null);
+onMounted(() => {
+  useepay.mount(document.getElementById("cardElement"));
+  useepay.on("change", (valid, code, message) => {
+    console.log("valid, code, message", valid, code, message);
+    errorTips.value = message;
+    // if (valid) {
+    //   $('#payBtn').attr('disabled', false)
+    //   $('#errorTip').text('All input fields valid')
+    // } else {
+    //   $('#payBtn').attr('disabled', true)
+    //   $('#errorTip').text(message)
+    // }
+  });
+});
 
 const shipDifferentAddress = ref(false);
 const countryList = ref(["China", "Korea", "American"]);
@@ -396,6 +432,7 @@ initDatas();
 
 const router = useRouter();
 const payHandler = async () => {
+  submitLoading.value = true;
   const formValid = await formIns.value.validate();
   if (!formValid) return;
   if (shipDifferentAddress.value) {
@@ -403,6 +440,10 @@ const payHandler = async () => {
     if (!shipFormValid) return;
   }
   const params = buildRequestParams();
+  useepay.validate((valid, code, message) => {
+    console.log("valid, code, message", valid, code, message);
+  });
+  return;
   console.log("xxxx - params:", params);
   payOrder(params).then((res) => {
     if (res.code === 200) {
@@ -582,6 +623,11 @@ const buildRequestParams = () => {
           background: url("../../assets/images/cashier.png");
         }
       }
+      .error-tips {
+        position: relative;
+        top: -25px;
+        color: #ff0000;
+      }
     }
     .credit-form {
     }
@@ -601,6 +647,10 @@ const buildRequestParams = () => {
     font-family: none;
     span {
       margin-left: 10px;
+    }
+    button {
+      height: 100%;
+      background: rgb(241, 99, 52);
     }
   }
   .bottom-tips {
