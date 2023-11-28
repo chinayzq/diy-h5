@@ -307,9 +307,9 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { checkout, payOrder } from "@/api/workbench";
+import { checkout, payOrder, useePayToken } from "@/api/workbench";
 import { useRouter } from "vue-router";
-import md5 from 'md5'
+import md5 from "md5";
 const submitLoading = ref(false);
 const useepay = UseePay({
   env: "sandbox",
@@ -432,6 +432,11 @@ initDatas();
 
 const router = useRouter();
 const payHandler = async () => {
+  const TOKEN = "mop:mapi:redis:987ed000-8dc7-11ee-b2c1-af129e85d189";
+  useepay.confirm(TOKEN, function (resp) {
+    console.log("resp", resp);
+  });
+  return;
   submitLoading.value = true;
   const formValid = await formIns.value.validate();
   if (!formValid) return;
@@ -443,11 +448,6 @@ const payHandler = async () => {
   useepay.validate((valid, code, message) => {
     console.log("valid, code, message", valid, code, message);
   });
-  const TOKEN = "";
-  useepay.confirm(TOKEN, function (resp) {
-    console.log("resp", resp);
-  });
-  return;
   console.log("xxxx - params:", params);
   payOrder(params).then((res) => {
     if (res.code === 200) {
@@ -483,104 +483,111 @@ const buildRequestParams = () => {
   };
 };
 
-function getPayload(){
-    payload['version'] = '1.0'
-    payload['autoRedirect'] = false
-    payload['transactionId'] = '6b4f4765-ceb6-4b34-af47-2e02eb706c6a'
-    payload['transactionType'] = 'pay'
-    payload['transactionExpirationTime'] = 14400
-    payload['appId'] = 'memtoys.com'
-    payload['amount'] = 1234
-    payload['currency'] = 'USD'
-
-    const userInfo = {
-        userId: '111',
-        phoneNo: 18566206515,
-        email: 'yiziqi@163.com',
-        IP: '192.168.0.1'
-    }
-    payload['userInfo'] = JSON.stringify(userInfo)
-
-    const payerInfo = {
-        paymentMethod: 'credit_card',
-        authorizationMethod: 'cvv'
-    }
-    const billingAddress = {}
-    billingAddress['houseNo'] = 'xxx1'
-    billingAddress['email'] = 'yiziqi@163.com'
-    billingAddress['phoneNo'] = '18566206515'
-    billingAddress['firstName'] = 'yi'
-    billingAddress['lastName'] = 'ziqi'
-    billingAddress['street'] = 'xxx2'
-    billingAddress['postalCode'] = '518000'
-    billingAddress['city'] = 'shenzhen'
-    billingAddress['state'] = 'guangdong'
-    billingAddress['country'] = 'CN'
-    payerInfo['billingAddress'] = billingAddress
-    payload['payerInfo'] = JSON.stringify(payerInfo)
-
-    const orderInfo = {
-        subject: 'xxx3',
-    }
-    const goodsInfo = Array()
-    goodsInfo.push(
+function getPayload() {
+  let payload = {};
+  payload["amount"] = "100";
+  payload["appId"] = "memtoys.com";
+  payload["autoRedirect"] = "false";
+  payload["country"] = "JP";
+  payload["currency"] = "USD";
+  payload["deviceInfo"] = JSON.stringify({
+    fingerPrintId: "设备指纹id",
+    mac: "设备mac地址",
+  });
+  console.log("xxx1", payload["deviceInfo"]);
+  payload["echoParam"] = "echoParam";
+  payload["merchantNo"] = "500000000009501";
+  payload["notifyUrl"] = "http://gatewaytest.useepay.com/notifyV2u0";
+  payload["orderInfo"] = JSON.stringify({
+    subject: "order title",
+    goodsInfo: [
       {
-        id: SKU_ID_IN_YOUR_SYSTEM,
-        name: PRODUCT_NAME,
-        price: PRICE,
-        quantity: QUANTITY,
-        url: PRODUCT_LINK,
-        image: IMAGE_OF_PRODUCT
+        id: "商品编号",
+        name: "商品名称",
+        body: "商品描述",
+        category: "商品类目",
+        categoryTree: "商品类目树，不同级别类目使用”|”分割",
+        brand: "商品品牌",
+        quantity: 1,
+        price: 1234,
+        url: "商品url",
+        sku: "商品sku",
+        image: "商品图片url",
       },
-      {
-        id: SKU_ID_IN_YOUR_SYSTEM,
-        name: PRODUCT_NAME,
-        price: PRICE,
-        quantity: QUANTITY,
-        url: PRODUCT_LINK,
-        image: IMAGE_OF_PRODUCT
-      },
-    )
-    const shippingAddress = {}
-    shippingAddress['houseNo'] = CUSTOMER'S_HOUSE_NO
-    shippingAddress['email'] = CUSTOMER'S_EMAIL
-    shippingAddress['phoneNo'] = CUSTOMER'S_PHONE_NO
-    shippingAddress['firstName'] = CUSTOMER'S_FIRST_NAME
-    shippingAddress['lastName'] = CUSTOMER'S_LAST_NAME
-    shippingAddress['street'] = CUSTOMER'S_STREET
-    shippingAddress['postalCode'] = CUSTOMER'S_POSTAL_CODE
-    shippingAddress['city'] = CUSTOMER'S_CITY
-    shippingAddress['state'] = CUSTOMER'S_STATE
-    shippingAddress['country'] = CUSTOMER'S_COUNTRY // ISO 3166-1-alpha-2
-    orderInfo['goodsInfo'] = goodsInfo
-    orderInfo['shippingAddress'] = shippingAddress
-    payload['orderInfo'] = JSON.stringify(orderInfo)
-
-    payload['signType'] = 'MD5'
-    payload['merchantNo'] = YOUR_MERCHANT_NO
-    payload['notifyUrl'] = ASYNC_NOTIFY_URL
-    payload['echoParam'] = ECHO_PARAM
-    payload['sign'] = calcMD5(payload)
-
+    ],
+    shippingAddress: {
+      email: "haile1y@useepay.com",
+      phoneNo: "123123",
+      firstName: "Victor",
+      lastName: "Yang",
+      street: "Heathcoat House, 20 Savile Row",
+      postalCode: "W1S 3PR",
+      city: "London",
+      state: "LND",
+      country: "GB",
+    },
+  });
+  console.log("xxx2", payload["orderInfo"]);
+  payload["payerInfo"] = JSON.stringify({
+    paymentMethod: "credit_card",
+    authorizationMethod: "cvv",
+    billingAddress: {
+      houseNo: "El Gallo Giro(https://gallogiro.com/)",
+      email: "hai1ley@useepay.com",
+      phoneNo: "1235854433",
+      firstName: "amber",
+      lastName: "Yang",
+      stlogreet: "7148 Pacific Blvd, Huntington Park, CA",
+      postalCode: "90225",
+      city: "Huntington Park",
+      state: "CA",
+      country: "MX",
+      street: "street",
+    },
+  });
+  console.log("xxx3", payload["payerInfo"]);
+  payload["redirectUrl"] = "http://192.168.1.56:8005/redirectV2u0";
+  payload["signType"] = "MD5";
+  payload["terminalType"] = "WEB";
+  payload["transactionExpirationTime"] = "1880";
+  payload["transactionId"] = "test001";
+  payload["transactionType"] = "authorization";
+  payload["userInfo"] = JSON.stringify({
+    userId: "victor1",
+    ip: "103.25.65.178",
+    email: "dynam1ic_3d@useepay.com",
+  });
+  console.log("xxx4", payload["userInfo"]);
+  payload["version"] = "1.0";
+  payload["sign"] = calcMD5(payload);
+  // useePayToken(payload).then(res => {
+  //   console.log('xxx1', res)
+  // })
+  // https://pay-gateway1.uat.useepay.com/cashier
+  return payload;
 }
 
 function calcMD5(payload) {
   const data = Object.keys(payload)
     .sort()
     .reduce((obj, key) => {
-      obj[key] = payload[key]
-      return obj
-    }, {})
-  var str = ''
+      obj[key] = payload[key];
+      return obj;
+    }, {});
+  var str = "";
   Object.keys(data).forEach((key) => {
-    if (data[key] != '' && key != 'sign') {
-      str = str + key + '=' + data[key] + '&'
+    if (data[key] != "" && key != "sign") {
+      str = str + key + "=" + data[key] + "&";
     }
-  })
-  str = str + 'pkey=' + YOUR_MD5_SECRET_KEY
-  return md5(str)
+  });
+  str =
+    str +
+    "pkey=" +
+    "GH3VceBRSQdvYpo3eLiQ4xPrqHFiSyqVmffh2337LTZhx7l1mkMVI7VwzNK3DS5wufzIU05iB7BcXWMeb5B4oZ0Z15c0F7tveL83Le6TURqb1nnPwnUvWb7Io0qDYN1U";
+  console.log("xxx-sign", str);
+  return md5(str);
 }
-getPayload()
+console.log("xxx5", getPayload());
 </script>
 
 <style lang="less" scoped>

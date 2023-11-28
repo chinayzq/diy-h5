@@ -81,3 +81,6 @@ export function getOrderDetailById(orderId) {
 export function imageUpload(params) {
   return axios.post('/upload', params);
 }
+export function useePayToken(params) {
+  return axios.post('/useepaytoken', params);
+}
