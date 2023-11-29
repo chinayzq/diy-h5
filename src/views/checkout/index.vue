@@ -269,7 +269,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { checkout, payOrder, useePayToken } from "@/api/workbench";
 import { useRouter } from "vue-router";
 import { Snackbar } from "@varlet/ui";
@@ -289,14 +289,8 @@ onMounted(() => {
   useepay.on("change", (valid, code, message) => {
     console.log("valid, code, message", valid, code, message);
     errorTips.value = message;
-    // if (valid) {
-    //   $('#payBtn').attr('disabled', false)
-    //   $('#errorTip').text('All input fields valid')
-    // } else {
-    //   $('#payBtn').attr('disabled', true)
-    //   $('#errorTip').text(message)
-    // }
   });
+  getFormDataFromLocal();
 });
 
 const shipDifferentAddress = ref(false);
@@ -313,30 +307,42 @@ const countryList = ref([
 const notesForOrder = ref(null);
 const formIns = ref(null);
 const shipFormIns = ref(null);
-// const formData = ref({
-//   firstName: null,
-//   lastName: null,
-//   email: null,
-//   phone: null,
-//   country: null,
-//   streetAddress: null,
-//   apartment: null,
-//   city: null,
-//   state: null,
-//   postcode: null,
-// });
 const formData = ref({
-  firstName: "yi",
-  lastName: "ziqi",
-  email: "yiziqi_234@163.com",
-  phone: 18566206515,
-  country: "CN",
-  streetAddress: "xxx1",
-  apartment: "xxx2",
-  city: "shenzhen",
-  state: "xxx3",
-  postcode: 518000,
+  firstName: null,
+  lastName: null,
+  email: null,
+  phone: null,
+  country: null,
+  streetAddress: null,
+  apartment: null,
+  city: null,
+  state: null,
+  postcode: null,
 });
+const setFormDataToLocal = () => {
+  localStorage.setItem("colgift-billing-form", JSON.stringify(formData.value));
+  localStorage.setItem("colgift-shipping-form", JSON.stringify(shipform.value));
+};
+const getFormDataFromLocal = () => {
+  try {
+    const billingForm = localStorage.getItem(
+      "colgift-billing-form",
+      JSON.stringify(formData.value)
+    );
+    if (billingForm) {
+      formData.value = JSON.parse(billingForm);
+    }
+    const shippingForm = localStorage.getItem(
+      "colgift-shipping-form",
+      JSON.stringify(shipform.value)
+    );
+    if (shippingForm) {
+      shipform.value = JSON.parse(shippingForm);
+    }
+  } catch (error) {
+    console.log("init local datas failed!");
+  }
+};
 const shipform = ref({
   firstName: null,
   lastName: null,
@@ -401,6 +407,7 @@ initDatas();
 
 const router = useRouter();
 const payHandler = async () => {
+  setFormDataToLocal();
   // 支付状态校验
   if (submitLoading.value) {
     return;
