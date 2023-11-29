@@ -5,7 +5,6 @@
       <img src="@/assets/images/project_logo.png" alt="" />
     </div>
     <div class="details-container">
-      <Loading v-show="pageLoading" :size="30" />
       <div class="first-title">Delivery</div>
       <!-- billing form start -->
       <var-form ref="formIns" scroll-to-error="start">
@@ -240,48 +239,6 @@
             <div class="error-tips">
               {{ errorTips }}
             </div>
-            <!-- <div class="credit-icons">
-              <div class="visa"></div>
-              <div
-                class="mastercard"
-                style="background-position: 0 -100px"
-              ></div>
-              <div class="amex" style="background-position: 0 -221px"></div>
-            </div>
-            <div class="credit-form">
-              <var-row style="margin-top: 15px">
-                <var-col :span="24">
-                  <var-input
-                    style="width: 100%"
-                    variant="outlined"
-                    size="small"
-                    placeholder="Card number *"
-                    :rules="[(v) => !!v || 'Card number is required']"
-                    v-model="creditForm.cardNumber"
-                  />
-                </var-col>
-              </var-row>
-              <var-row :gutter="[10, 20]" style="margin-top: 15px">
-                <var-col :span="12">
-                  <var-input
-                    variant="outlined"
-                    size="small"
-                    placeholder="Valid date MM/YY *"
-                    :rules="[(v) => !!v || 'Valid date is required']"
-                    v-model="creditForm.validDate"
-                  />
-                </var-col>
-                <var-col :span="12">
-                  <var-input
-                    variant="outlined"
-                    size="small"
-                    placeholder="Safe Code *"
-                    :rules="[(v) => !!v || 'Safe Code is required']"
-                    v-model="creditForm.safeCode"
-                  />
-                </var-col>
-              </var-row>
-            </div> -->
           </div>
         </var-radio-group>
       </div>
@@ -392,11 +349,6 @@ const shipform = ref({
   state: null,
   postcode: null,
 });
-const creditForm = ref({
-  cardNumber: null,
-  validDate: null,
-  safeCode: null,
-});
 const countryJson = {
   China: [
     {
@@ -478,9 +430,7 @@ const payHandler = async () => {
           console.log("confirm callback:", resp);
           if (resp.success) {
             Snackbar.success("Transaction successful");
-            setTimeout(() => {
-              Snackbar.success("调用payorder?然后跳转订单详情?");
-            }, 2000);
+            saveOrderHandler();
           } else {
             Snackbar.error(data.message);
           }
@@ -491,7 +441,8 @@ const payHandler = async () => {
       }
     });
   }
-  return;
+};
+const saveOrderHandler = () => {
   const params = buildRequestParams();
   payOrder(params).then((res) => {
     if (res.code === 200) {

@@ -770,6 +770,7 @@ const printDialogShow = ref(false);
 const previewImage = ref(null);
 const printImage = ref(null);
 const printHandler = async () => {
+  confirmLoading.value = true;
   previewImage.value = null;
   printDialogShow.value = true;
   setItem("stickers", JSON.stringify(dragStickerList.value));
@@ -831,6 +832,7 @@ watch(
 const router = useRouter();
 const confirmLoading = ref(false);
 const confirmHandler = () => {
+  if (confirmLoading.value) return;
   confirmLoading.value = true;
   const { curPrice, oriPrice, description, extend1, extend2, extend3 } =
     selectCaseItem.value;
@@ -903,7 +905,9 @@ const saveAsDraft = (templateUrl) => {
     },
     templateUrl,
   };
-  saveDraft(params);
+  saveDraft(params).finally(() => {
+    confirmLoading.value = false;
+  });
 };
 
 const setActiveById = (id) => {
