@@ -449,12 +449,13 @@ initDatas();
 
 const router = useRouter();
 const payHandler = async () => {
+  // 支付状态校验
   if (submitLoading.value) {
-    // 支付中
     return;
   }
-  const formValid = await formIns.value.validate();
-  if (!formValid) return;
+  // form表单必填校验
+  let valid = await formIns.value.validate();
+  if (!valid) return;
   if (shipDifferentAddress.value) {
     const shipFormValid = await shipFormIns.value.validate();
     if (!shipFormValid) return;
@@ -490,18 +491,8 @@ const payHandler = async () => {
       }
     });
   }
-
   return;
-
-  const formValid = await formIns.value.validate();
-  if (!formValid) return;
-  if (shipDifferentAddress.value) {
-    const shipFormValid = await shipFormIns.value.validate();
-    if (!shipFormValid) return;
-  }
   const params = buildRequestParams();
-
-  console.log("xxxx - params:", params);
   payOrder(params).then((res) => {
     if (res.code === 200) {
       router.push({
@@ -568,6 +559,7 @@ const buildRequestParams = () => {
   };
 };
 
+// MD5 加密测试
 function getPayload() {
   let payload = {};
   payload["amount"] = "100";
@@ -672,7 +664,7 @@ function calcMD5(payload) {
   console.log("xxx-sign", str);
   return md5(str);
 }
-console.log("xxx5", getPayload());
+// console.log("xxx5", getPayload());
 </script>
 
 <style lang="less" scoped>
