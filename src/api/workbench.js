@@ -1,4 +1,6 @@
 import axios from '@/utils/axios.js';
+import qs from 'qs';
+
 export function getBrandAndModels(params) {
   return axios.get('/list/phonemodel', params);
 }
@@ -81,6 +83,10 @@ export function getOrderDetailById(orderId) {
 export function imageUpload(params) {
   return axios.post('/upload', params);
 }
-export function useePayToken(params) {
-  return axios.post('/useepaytoken', params);
+export function useePayToken(data) {
+  return axios.post('/useepaytoken', qs.stringify(data), {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+    },
+  });
 }

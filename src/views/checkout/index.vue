@@ -45,7 +45,12 @@
             :rules="[(v) => !!v || 'Country is required']"
             v-model="formData.country"
           >
-            <var-option v-for="item in countryList" :label="item" :key="item" />
+            <var-option
+              v-for="item in countryList"
+              :label="item.label"
+              :value="item.value"
+              :key="item"
+            />
           </var-select>
           <var-input
             variant="outlined"
@@ -128,7 +133,8 @@
             >
               <var-option
                 v-for="item in countryList"
-                :label="item"
+                :label="item.label"
+                :value="item.value"
                 :key="item"
               />
             </var-select>
@@ -309,7 +315,9 @@
 import { ref, onMounted } from "vue";
 import { checkout, payOrder, useePayToken } from "@/api/workbench";
 import { useRouter } from "vue-router";
+import { Snackbar } from "@varlet/ui";
 import md5 from "md5";
+
 const submitLoading = ref(false);
 const useepay = UseePay({
   env: "sandbox",
@@ -335,7 +343,16 @@ onMounted(() => {
 });
 
 const shipDifferentAddress = ref(false);
-const countryList = ref(["China", "Korea", "American"]);
+const countryList = ref([
+  {
+    label: "China",
+    value: "CN",
+  },
+  {
+    label: "Japan",
+    value: "JP",
+  },
+]);
 const notesForOrder = ref(null);
 const formIns = ref(null);
 const shipFormIns = ref(null);
@@ -356,7 +373,7 @@ const formData = ref({
   lastName: "ziqi",
   email: "yiziqi_234@163.com",
   phone: 18566206515,
-  country: "China",
+  country: "CN",
   streetAddress: "xxx1",
   apartment: "xxx2",
   city: "shenzhen",
@@ -432,12 +449,50 @@ initDatas();
 
 const router = useRouter();
 const payHandler = async () => {
-  const TOKEN = "mop:mapi:redis:987ed000-8dc7-11ee-b2c1-af129e85d189";
-  useepay.confirm(TOKEN, function (resp) {
-    console.log("resp", resp);
-  });
+  if (submitLoading.value) {
+    // 支付中
+    return;
+  }
+  const formValid = await formIns.value.validate();
+  if (!formValid) return;
+  if (shipDifferentAddress.value) {
+    const shipFormValid = await shipFormIns.value.validate();
+    if (!shipFormValid) return;
+  }
+  if (payMethod.value === 1) {
+    // 如果是PayPal支付
+    Snackbar.error("paypal api对接中！");
+  } else {
+    // 如果是信用卡支付
+    useepay.validate(async (valid, code, message) => {
+      if (valid) {
+        submitLoading.value = true;
+        const tokenRes = await useePayToken(buildTokenParams());
+        const { data } = tokenRes || {};
+        if (!data || !data?.token) {
+          Snackbar.error("Failed to obtain payment token");
+          return;
+        }
+        useepay.confirm(data.token, (resp) => {
+          console.log("confirm callback:", resp);
+          if (resp.success) {
+            Snackbar.success("Transaction successful");
+            setTimeout(() => {
+              Snackbar.success("调用payorder?然后跳转订单详情?");
+            }, 2000);
+          } else {
+            Snackbar.error(data.message);
+          }
+          submitLoading.value = false;
+        });
+      } else {
+        Snackbar.error("Please fill in the credit card information correctly");
+      }
+    });
+  }
+
   return;
-  submitLoading.value = true;
+
   const formValid = await formIns.value.validate();
   if (!formValid) return;
   if (shipDifferentAddress.value) {
@@ -445,9 +500,7 @@ const payHandler = async () => {
     if (!shipFormValid) return;
   }
   const params = buildRequestParams();
-  useepay.validate((valid, code, message) => {
-    console.log("valid, code, message", valid, code, message);
-  });
+
   console.log("xxxx - params:", params);
   payOrder(params).then((res) => {
     if (res.code === 200) {
@@ -459,6 +512,38 @@ const payHandler = async () => {
       });
     }
   });
+};
+const buildTokenParams = () => {
+  const { country, email } = formData.value;
+  let payload = {};
+  payload["amount"] = subTotal.value;
+  payload["autoRedirect"] = "false";
+  payload["country"] = country;
+  payload["currency"] = "USD";
+  payload["deviceInfo"] = JSON.stringify({
+    fingerPrintId: "设备指纹id",
+    mac: "设备mac地址",
+  });
+  payload["echoParam"] = "echoParam";
+  payload["notifyUrl"] = "http://gatewaytest.useepay.com/notifyV2u0";
+  payload["orderInfo"] = JSON.stringify({
+    subject: "order title",
+    goodsInfo: productList.value,
+    shippingAddress: shipform.value,
+  });
+  payload["redirectUrl"] = "http://192.168.1.56:8005/redirectV2u0";
+  payload["terminalType"] = "WEB";
+  payload["userInfo"] = JSON.stringify({
+    userId: "",
+    ip: "",
+    email,
+  });
+  payload["payerInfo"] = JSON.stringify({
+    paymentMethod: "credit_card",
+    authorizationMethod: "cvv",
+    billingAddress: formData.value,
+  });
+  return payload;
 };
 const buildRequestParams = () => {
   const { email, firstName, lastName, phone } = formData.value;
