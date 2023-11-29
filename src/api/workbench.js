@@ -90,3 +90,6 @@ export function useePayToken(data) {
     },
   });
 }
+export function loginRequest(params) {
+  return axios.post('/login', params);
+}

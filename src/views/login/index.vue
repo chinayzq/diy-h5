@@ -7,9 +7,9 @@
           <var-input
             variant="outlined"
             size="small"
-            placeholder="User name *"
-            :rules="[(v) => !!v || 'First name is required']"
-            v-model="loginForm.userName"
+            placeholder="email *"
+            :rules="[(v) => !!v || 'email is required']"
+            v-model="loginForm.email"
           />
           <var-input
             variant="outlined"
@@ -40,9 +40,12 @@ import CommonHeader from "@/components/CommonHeader/index.vue";
 import CommonFooter from "@/components/CommonFooter/index.vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { loginRequest } from "@/api/workbench";
+import Cookies from "js-cookie";
+import { Snackbar } from "@varlet/ui";
 
 const loginForm = ref({
-  userName: null,
+  email: null,
   password: null,
 });
 const submitLoading = ref(false);
@@ -52,11 +55,23 @@ const loginSubmit = async () => {
   const formValid = await formIns.value.validate();
   if (!formValid) return;
   submitLoading.value = true;
-  setTimeout(() => {
-    // 登录完以后，跳转账号详情页
-    submitLoading.value = false;
-    router.push("/userInfo");
-  }, 1000);
+  loginRequest(loginForm.value)
+    .then((res) => {
+      if (res.code === 200) {
+        Cookies.set("token", res.data);
+        router.push("/userInfo");
+      } else {
+        Snackbar.error(res.message);
+      }
+    })
+    .finally(() => {
+      submitLoading.value = false;
+    });
+  // setTimeout(() => {
+  //   // 登录完以后，跳转账号详情页
+  //   submitLoading.value = false;
+  //   router.push("/userInfo");
+  // }, 1000);
 };
 </script>
 
