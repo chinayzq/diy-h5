@@ -30,6 +30,18 @@ const router = createRouter({
           meta: { title: 'userInfo' },
         },
         {
+          path: '/forget',
+          name: 'forget',
+          component: () => import('@/views/forget/index.vue'),
+          meta: { title: 'forget' },
+        },
+        {
+          path: '/reset',
+          name: 'reset',
+          component: () => import('@/views/reset/index.vue'),
+          meta: { title: 'reset' },
+        },
+        {
           path: '/common',
           name: 'common',
           component: () => import('@/views/common/index.vue'),

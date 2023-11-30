@@ -51,6 +51,7 @@ const linkList = ref([
 
 <style lang="less" scoped>
 .common-footer {
+  border-top: 1px solid #ccc;
   .single-item {
     cursor: pointer;
     margin-top: 10px;

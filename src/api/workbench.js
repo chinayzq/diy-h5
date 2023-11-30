@@ -80,8 +80,20 @@ export function savecardmount(params) {
 export function getOrderDetailById(orderId) {
   return axios.get(`/order/${orderId}`);
 }
+export function getUserOrderList() {
+  return axios.get(`/list/order`);
+}
+export function getUserInfo(params) {
+  return axios.get('/user', { params });
+}
 export function imageUpload(params) {
   return axios.post('/upload', params);
+}
+export function sendPasswordMail(params) {
+  return axios.post('/passwordmail', params);
+}
+export function setNewPassword(params) {
+  return axios.post('/reset/password', params);
 }
 export function useePayToken(data) {
   return axios.post('/useepaytoken', qs.stringify(data), {

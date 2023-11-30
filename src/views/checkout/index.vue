@@ -85,6 +85,14 @@
             :rules="[(v) => !!v || 'Postcode / ZIP is required']"
             v-model="formData.postcode"
           />
+          <var-input
+            v-if="needCPF(formData.country)"
+            variant="outlined"
+            size="small"
+            placeholder="CPF *"
+            :rules="[(v) => !!v || 'CPF is required']"
+            v-model="formData.cpf"
+          />
         </var-space>
       </var-form>
       <!-- billing form end -->
@@ -170,6 +178,14 @@
               placeholder="Postcode / ZIP *"
               :rules="[(v) => !!v || 'Postcode / ZIP is required']"
               v-model="shipform.postcode"
+            />
+            <var-input
+              v-if="needCPF(shipform.country)"
+              variant="outlined"
+              size="small"
+              placeholder="CPF *"
+              :rules="[(v) => !!v || 'CPF is required']"
+              v-model="shipform.cpf"
             />
           </var-space>
         </var-form>
@@ -274,7 +290,19 @@ import { checkout, payOrder, useePayToken } from "@/api/workbench";
 import { useRouter } from "vue-router";
 import { Snackbar } from "@varlet/ui";
 import md5 from "md5";
+import * as CountryList from "./country.js";
 
+const countryList = ref(CountryList.default);
+const needCPF = (country) => {
+  console.log("country", country);
+  for (let i = 0; i < countryList.value.length; i++) {
+    const { needCPF, value } = countryList.value[i] || {};
+    if (value === country && needCPF) {
+      return true;
+    }
+  }
+  return false;
+};
 const submitLoading = ref(false);
 const useepay = UseePay({
   env: "sandbox",
@@ -294,16 +322,16 @@ onMounted(() => {
 });
 
 const shipDifferentAddress = ref(false);
-const countryList = ref([
-  {
-    label: "China",
-    value: "CN",
-  },
-  {
-    label: "Japan",
-    value: "JP",
-  },
-]);
+// const countryList = ref([
+//   {
+//     label: "China",
+//     value: "CN",
+//   },
+//   {
+//     label: "Japan",
+//     value: "JP",
+//   },
+// ]);
 const notesForOrder = ref(null);
 const formIns = ref(null);
 const shipFormIns = ref(null);
@@ -318,6 +346,7 @@ const formData = ref({
   city: null,
   state: null,
   postcode: null,
+  cpf: null,
 });
 const setFormDataToLocal = () => {
   localStorage.setItem("colgift-billing-form", JSON.stringify(formData.value));
@@ -354,6 +383,7 @@ const shipform = ref({
   city: null,
   state: null,
   postcode: null,
+  cpf: null,
 });
 const countryJson = {
   China: [
@@ -391,11 +421,13 @@ const initDatas = () => {
   checkout().then((res) => {
     resourceInfo.value = res.data;
     // display productList & subtotal & shipping
-    productList.value = res.data.productJson.map((item) => {
-      const { phoneName, caseColor, extend1, extend2 } = item.extendJson;
-      item.description = `${phoneName} - ${caseColor} ${extend1} - ${extend2}`;
-      return item;
-    });
+    productList.value = res?.data?.productJson
+      ? res?.data?.productJson.map((item) => {
+          const { phoneName, caseColor, extend1, extend2 } = item.extendJson;
+          item.description = `${phoneName} - ${caseColor} ${extend1} - ${extend2}`;
+          return item;
+        })
+      : [];
     subTotal.value = res.data.paidPrice;
     shipping.value =
       res.data.shippingFree === 0

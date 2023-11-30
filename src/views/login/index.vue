@@ -21,6 +21,9 @@
           />
         </var-space>
       </var-form>
+      <div class="lost-password" @click="jumpToSetPassword">
+        Lost your password?
+      </div>
       <var-button
         class="login-button"
         :loading="submitLoading"
@@ -44,13 +47,17 @@ import { loginRequest } from "@/api/workbench";
 import Cookies from "js-cookie";
 import { Snackbar } from "@varlet/ui";
 
+const router = useRouter();
+const jumpToSetPassword = () => {
+  router.push("/forget");
+};
+
 const loginForm = ref({
   email: null,
   password: null,
 });
 const submitLoading = ref(false);
 const formIns = ref(null);
-const router = useRouter();
 const loginSubmit = async () => {
   const formValid = await formIns.value.validate();
   if (!formValid) return;
@@ -93,6 +100,10 @@ const loginSubmit = async () => {
     margin-top: 30px;
     .login-button {
       margin-top: 30px;
+    }
+    .lost-password {
+      text-decoration: underline;
+      margin-top: 20px;
     }
   }
 }
