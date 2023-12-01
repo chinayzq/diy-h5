@@ -8,13 +8,6 @@
           <var-input
             variant="outlined"
             size="small"
-            placeholder="email *"
-            :rules="[(v) => !!v || 'email is required']"
-            v-model="formData.email"
-          />
-          <var-input
-            variant="outlined"
-            size="small"
             type="password"
             placeholder="New Password *"
             :rules="[(v) => !!v || 'New Password is required']"
@@ -49,7 +42,6 @@ import { Snackbar } from "@varlet/ui";
 const route = useRoute();
 const formIns = ref(null);
 const formData = ref({
-  email: null,
   password: null,
   password2: null,
   code: route.query.code,

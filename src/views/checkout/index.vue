@@ -255,6 +255,9 @@
             <div class="error-tips">
               {{ errorTips }}
             </div>
+            <div id="checkout">
+              <!-- Checkout will insert the payment form here -->
+            </div>
           </div>
         </var-radio-group>
       </div>
@@ -305,10 +308,9 @@ const needCPF = (country) => {
 };
 const submitLoading = ref(false);
 const useepay = UseePay({
-  env: "sandbox",
+  env: "production",
   layout: "multiLine",
-  // window.navigator.language,
-  locale: "en",
+  locale: window.navigator.language,
   merchantNo: "500000000011183",
 });
 const errorTips = ref(null);
@@ -469,7 +471,7 @@ const payHandler = async () => {
           console.log("confirm callback:", resp);
           if (resp.success) {
             Snackbar.success("Transaction successful");
-            saveOrderHandler();
+            saveOrderHandler(data.transactionId);
           } else {
             Snackbar.error(data.message);
           }
@@ -481,8 +483,8 @@ const payHandler = async () => {
     });
   }
 };
-const saveOrderHandler = () => {
-  const params = buildRequestParams();
+const saveOrderHandler = (orderId) => {
+  const params = buildRequestParams(orderId);
   payOrder(params).then((res) => {
     if (res.code === 200) {
       router.push({
@@ -497,7 +499,9 @@ const saveOrderHandler = () => {
 const buildTokenParams = () => {
   const { country, email } = formData.value;
   let payload = {};
-  payload["amount"] = subTotal.value;
+  // 测试
+  // payload["amount"] = subTotal.value;
+  payload["amount"] = 0.1;
   payload["autoRedirect"] = "false";
   payload["country"] = country;
   payload["currency"] = "USD";
@@ -526,10 +530,11 @@ const buildTokenParams = () => {
   });
   return payload;
 };
-const buildRequestParams = () => {
+const buildRequestParams = (orderId) => {
   const { email, firstName, lastName, phone } = formData.value;
   const { originalPrice, paidPrice, shippingFree } = resourceInfo.value;
   return {
+    orderId,
     description: notesForOrder.value,
     discountCode: null,
     discountPrice: null,

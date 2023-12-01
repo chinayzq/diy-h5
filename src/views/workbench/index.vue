@@ -1292,6 +1292,7 @@ const eventEndHandler = () => {
       width: 300px;
     }
     .mask-container {
+      line-height: 0;
       width: 300px;
       position: relative;
       -webkit-mask-size: cover;
