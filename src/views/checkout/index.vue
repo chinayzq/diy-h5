@@ -470,8 +470,13 @@ const payHandler = async () => {
         useepay.confirm(data.token, (resp) => {
           console.log("confirm callback:", resp);
           if (resp.success) {
-            Snackbar.success("Transaction successful");
-            saveOrderHandler(data.transactionId);
+            const errorMessage = JSON.parse(resp.data).errorCode
+            if (errorMessage) {
+              Snackbar.error(errorMessage);
+            } else {
+              Snackbar.success("Transaction successful");
+              saveOrderHandler(data.transactionId);
+            }
           } else {
             Snackbar.error(data.message);
           }
@@ -501,7 +506,7 @@ const buildTokenParams = () => {
   let payload = {};
   // 测试
   // payload["amount"] = subTotal.value;
-  payload["amount"] = 0.1;
+  payload["amount"] = 2;
   payload["autoRedirect"] = "false";
   payload["country"] = country;
   payload["currency"] = "USD";

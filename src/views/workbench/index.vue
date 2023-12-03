@@ -775,16 +775,33 @@ const printHandler = async () => {
   printDialogShow.value = true;
   setItem("stickers", JSON.stringify(dragStickerList.value));
   setGraphDomsScale(1, true);
-  const templateUrl = await exportAsImage("mask-container", {
-    mask: selectMaskImage.value,
-    model: selectModelImage.value,
-    caseImage: selectCaseImage.value,
-  });
-  const printMaxImage = await dealPrintImageHandler();
+  const resultList = await exportImageAsync();
+  const templateUrl = resultList[0];
+  const printMaxImage = resultList[1];
+  // const templateUrl = await exportAsImage("mask-container", {
+  //   mask: selectMaskImage.value,
+  //   model: selectModelImage.value,
+  //   caseImage: selectCaseImage.value,
+  // });
+  // const printMaxImage = await dealPrintImageHandler();
   setGraphDomsScale(defaultScale.value, false);
   previewImage.value = templateUrl;
   printImage.value = printMaxImage;
   saveAsDraft(templateUrl);
+};
+const exportImageAsync = () => {
+  return new Promise((resolve) => {
+    Promise.all([
+      exportAsImage("mask-container", {
+        mask: selectMaskImage.value,
+        model: selectModelImage.value,
+        caseImage: selectCaseImage.value,
+      }),
+      dealPrintImageHandler(),
+    ]).then((result) => {
+      resolve(result);
+    });
+  });
 };
 const dealPrintImageHandler = async () => {
   return new Promise(async (resolve) => {
