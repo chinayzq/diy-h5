@@ -294,6 +294,7 @@ import {
   payOrder,
   useePayToken,
   createStripeSession,
+  updateStatusToProcess,
 } from "@/api/workbench";
 import { useRouter } from "vue-router";
 import { Snackbar } from "@varlet/ui";
@@ -321,7 +322,7 @@ const useepay = UseePay({
   merchantNo: "500000000011183",
 });
 const stripe = Stripe(
-  "pk_live_51OHDvHF3YGXX14nuqBXxrHuWfNKwri4nSboLWf9rngy0W4Att1lJ8qwHQtZyStenrFpFmkYms1YyxVeyp2xaAFf600oE2mMcie"
+  "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"
 );
 const errorTips = ref(null);
 onMounted(() => {
@@ -502,6 +503,7 @@ const payHandler = async () => {
         useepay.validate(async (valid, code, message) => {
           if (valid) {
             submitLoading.value = true;
+            // 1.调接口生成token，失败后提示用户
             const tokenRes = await useePayToken(buildTokenParams());
             console.log("token callback:", tokenRes);
             const { data } = tokenRes || {};
@@ -509,13 +511,23 @@ const payHandler = async () => {
               Snackbar.error("Failed to obtain payment token");
               return;
             }
+            // 2.保存订单
+            await saveOrderHandler(data.transactionId, 1);
+            // 3.JSSDK confirm
             useepay.confirm(data.token, (resp) => {
               console.log("confirm callback:", resp);
               if (resp.success) {
                 const resultData = JSON.parse(resp.data);
                 if (resultData.errorCode == "0000") {
                   Snackbar.success("Transaction successful");
-                  saveOrderHandler(data.transactionId);
+                  setTimeout(() => {
+                    router.push({
+                      path: "/orderDetail",
+                      query: {
+                        orderId: res.data,
+                      },
+                    });
+                  }, 1000);
                 } else {
                   Snackbar.error(resultData.errorMsg);
                 }
@@ -536,25 +548,20 @@ const payHandler = async () => {
     }
   }
 };
-const saveOrderHandler = (orderId) => {
-  const params = buildRequestParams(orderId);
-  payOrder(params).then((res) => {
-    if (res.code === 200) {
-      router.push({
-        path: "/orderDetail",
-        query: {
-          orderId: res.data,
-        },
-      });
-    }
+const saveOrderHandler = (orderId, payMethod) => {
+  return new Promise((resolve) => {
+    const params = buildRequestParams(orderId, payMethod);
+    payOrder(params).then((res) => {
+      if (res.code === 200) {
+        resolve();
+      }
+    });
   });
 };
 const buildTokenParams = () => {
   const { country, email } = formData.value;
   let payload = {};
-  // 测试
-  // payload["amount"] = subTotal.value;
-  payload["amount"] = 2 * 100;
+  payload["amount"] = subTotal.value;
   payload["autoRedirect"] = "false";
   payload["country"] = country;
   payload["currency"] = "USD";
@@ -584,8 +591,7 @@ const buildTokenParams = () => {
   payload["terminalType"] = "WEB";
   payload["userInfo"] = JSON.stringify({
     userId: "",
-    ip: "172.24.253.69",
-    // ip: "",
+    ip: "",
     email,
   });
   payload["payerInfo"] = JSON.stringify({
@@ -606,7 +612,7 @@ const buildTokenParams = () => {
   });
   return payload;
 };
-const buildRequestParams = (orderId) => {
+const buildRequestParams = (orderId, paymentMethod) => {
   const { email, firstName, lastName, phone } = formData.value;
   const { originalPrice, paidPrice, shippingFree } = resourceInfo.value;
   return {
@@ -618,6 +624,7 @@ const buildRequestParams = (orderId) => {
     paidPrice,
     productJson: productList.value,
     shippingFree,
+    paymentMethod,
     userDTO: {
       billingJson: formData.value,
       description: "",

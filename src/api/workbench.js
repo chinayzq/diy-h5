@@ -108,3 +108,6 @@ export function loginRequest(params) {
 export function createStripeSession(params) {
   return axios.post('/createstripesession', params);
 }
+export function updateStatusToProcess(orderId) {
+  return axios.post(`/order/processing/${orderId}`);
+}
