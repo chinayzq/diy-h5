@@ -105,3 +105,6 @@ export function useePayToken(data) {
 export function loginRequest(params) {
   return axios.post('/login', params);
 }
+export function createStripeSession(params) {
+  return axios.post('/createstripesession', params);
+}

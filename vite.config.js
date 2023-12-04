@@ -69,6 +69,7 @@ export default ({ mode }) =>
     },
     server: {
       hmr: true,
+      https: true,
       proxy: {
         '/colgifts': {
           target: 'http://43.159.137.119:8084/',

@@ -252,11 +252,11 @@
           <var-radio :checked-value="2"> Credit/Debit Payment </var-radio>
           <div class="credit-container" v-show="payMethod === 2">
             <div id="cardElement"></div>
-            <div class="error-tips">
-              {{ errorTips }}
-            </div>
             <div id="checkout">
               <!-- Checkout will insert the payment form here -->
+            </div>
+            <div class="error-tips">
+              {{ errorTips }}
             </div>
           </div>
         </var-radio-group>
@@ -289,7 +289,12 @@
 
 <script setup>
 import { ref, onMounted, watch } from "vue";
-import { checkout, payOrder, useePayToken } from "@/api/workbench";
+import {
+  checkout,
+  payOrder,
+  useePayToken,
+  createStripeSession,
+} from "@/api/workbench";
 import { useRouter } from "vue-router";
 import { Snackbar } from "@varlet/ui";
 import md5 from "md5";
@@ -307,21 +312,51 @@ const needCPF = (country) => {
   return false;
 };
 const submitLoading = ref(false);
+// useePay | stripe
+const creditCardType = ref("useePay");
 const useepay = UseePay({
   env: "production",
   layout: "multiLine",
   locale: window.navigator.language,
   merchantNo: "500000000011183",
 });
+const stripe = Stripe(
+  "pk_live_51OHDvHF3YGXX14nuqBXxrHuWfNKwri4nSboLWf9rngy0W4Att1lJ8qwHQtZyStenrFpFmkYms1YyxVeyp2xaAFf600oE2mMcie"
+);
 const errorTips = ref(null);
 onMounted(() => {
-  useepay.mount(document.getElementById("cardElement"));
-  useepay.on("change", (valid, code, message) => {
-    console.log("valid, code, message", valid, code, message);
-    errorTips.value = message;
-  });
   getFormDataFromLocal();
 });
+const initCreditCard = async () => {
+  switch (creditCardType.value) {
+    case "useePay":
+      useepay.mount(document.getElementById("cardElement"));
+      useepay.on("change", (valid, code, message) => {
+        console.log("valid, code, message", valid, code, message);
+        errorTips.value = message;
+      });
+      break;
+    case "stripe":
+      const { clientSecret } = await createStripeSession({
+        cancelUrl: "https://172.24.253.69:3000/",
+        productList: productList.value.map((item) => {
+          return {
+            imageUrl: item.templateUrl,
+            productId: item.productId,
+            productName: item.phoneCode,
+            quantity: item.productCount,
+            unitPrice: item.extendJson.curPrice,
+          };
+        }),
+      });
+      const checkout = await stripe.initEmbeddedCheckout({
+        clientSecret,
+      });
+      // Mount Checkout
+      checkout.mount("#checkout");
+      break;
+  }
+};
 
 const shipDifferentAddress = ref(false);
 // const countryList = ref([
@@ -420,22 +455,26 @@ const shipping = ref(0);
 const resourceInfo = ref({});
 // get order details
 const initDatas = () => {
-  checkout().then((res) => {
-    resourceInfo.value = res.data;
-    // display productList & subtotal & shipping
-    productList.value = res?.data?.productJson
-      ? res?.data?.productJson.map((item) => {
-          const { phoneName, caseColor, extend1, extend2 } = item.extendJson;
-          item.description = `${phoneName} - ${caseColor} ${extend1} - ${extend2}`;
-          return item;
-        })
-      : [];
-    subTotal.value = res.data.paidPrice;
-    shipping.value =
-      res.data.shippingFree === 0
-        ? "Free shipping"
-        : `$${res.data.shippingFree}`;
-  });
+  checkout()
+    .then((res) => {
+      resourceInfo.value = res.data;
+      // display productList & subtotal & shipping
+      productList.value = res?.data?.productJson
+        ? res?.data?.productJson.map((item) => {
+            const { phoneName, caseColor, extend1, extend2 } = item.extendJson;
+            item.description = `${phoneName} - ${caseColor} ${extend1} - ${extend2}`;
+            return item;
+          })
+        : [];
+      subTotal.value = res.data.paidPrice;
+      shipping.value =
+        res.data.shippingFree === 0
+          ? "Free shipping"
+          : `$${res.data.shippingFree}`;
+    })
+    .finally(() => {
+      initCreditCard();
+    });
 };
 initDatas();
 
@@ -457,35 +496,44 @@ const payHandler = async () => {
     // 如果是PayPal支付
     Snackbar.error("paypal api对接中！");
   } else {
-    // 如果是信用卡支付
-    useepay.validate(async (valid, code, message) => {
-      if (valid) {
-        submitLoading.value = true;
-        const tokenRes = await useePayToken(buildTokenParams());
-        const { data } = tokenRes || {};
-        if (!data || !data?.token) {
-          Snackbar.error("Failed to obtain payment token");
-          return;
-        }
-        useepay.confirm(data.token, (resp) => {
-          console.log("confirm callback:", resp);
-          if (resp.success) {
-            const errorMessage = JSON.parse(resp.data).errorCode
-            if (errorMessage) {
-              Snackbar.error(errorMessage);
-            } else {
-              Snackbar.success("Transaction successful");
-              saveOrderHandler(data.transactionId);
+    // 信用卡 - useePay
+    switch (creditCardType.value) {
+      case "useePay":
+        useepay.validate(async (valid, code, message) => {
+          if (valid) {
+            submitLoading.value = true;
+            const tokenRes = await useePayToken(buildTokenParams());
+            console.log("token callback:", tokenRes);
+            const { data } = tokenRes || {};
+            if (!data || !data?.token) {
+              Snackbar.error("Failed to obtain payment token");
+              return;
             }
+            useepay.confirm(data.token, (resp) => {
+              console.log("confirm callback:", resp);
+              if (resp.success) {
+                const resultData = JSON.parse(resp.data);
+                if (resultData.errorCode == "0000") {
+                  Snackbar.success("Transaction successful");
+                  saveOrderHandler(data.transactionId);
+                } else {
+                  Snackbar.error(resultData.errorMsg);
+                }
+              } else {
+                Snackbar.error(data.message);
+              }
+              submitLoading.value = false;
+            });
           } else {
-            Snackbar.error(data.message);
+            Snackbar.error(
+              "Please fill in the credit card information correctly"
+            );
           }
-          submitLoading.value = false;
         });
-      } else {
-        Snackbar.error("Please fill in the credit card information correctly");
-      }
-    });
+        break;
+      case "stripe":
+        break;
+    }
   }
 };
 const saveOrderHandler = (orderId) => {
@@ -506,7 +554,7 @@ const buildTokenParams = () => {
   let payload = {};
   // 测试
   // payload["amount"] = subTotal.value;
-  payload["amount"] = 2;
+  payload["amount"] = 2 * 100;
   payload["autoRedirect"] = "false";
   payload["country"] = country;
   payload["currency"] = "USD";
@@ -519,19 +567,42 @@ const buildTokenParams = () => {
   payload["orderInfo"] = JSON.stringify({
     subject: "order title",
     goodsInfo: productList.value,
-    shippingAddress: shipform.value,
+    shippingAddress: {
+      email: formData.value.email,
+      firstName: formData.value.firstName,
+      lastName: formData.value.lastName,
+      phoneNo: formData.value.phone,
+      street: formData.value.streetAddress,
+      houseNo: formData.value.apartment,
+      postalCode: formData.value.postcode,
+      state: formData.value.state,
+      city: formData.value.city,
+      country: formData.value.country,
+    },
   });
   payload["redirectUrl"] = "http://192.168.1.56:8005/redirectV2u0";
   payload["terminalType"] = "WEB";
   payload["userInfo"] = JSON.stringify({
     userId: "",
-    ip: "",
+    ip: "172.24.253.69",
+    // ip: "",
     email,
   });
   payload["payerInfo"] = JSON.stringify({
     paymentMethod: "credit_card",
     authorizationMethod: "cvv",
-    billingAddress: formData.value,
+    billingAddress: {
+      email: formData.value.email,
+      firstName: formData.value.firstName,
+      lastName: formData.value.lastName,
+      phoneNo: formData.value.phone,
+      street: formData.value.streetAddress,
+      houseNo: formData.value.apartment,
+      postalCode: formData.value.postcode,
+      state: formData.value.state,
+      city: formData.value.city,
+      country: formData.value.country,
+    },
   });
   return payload;
 };
@@ -558,113 +629,6 @@ const buildRequestParams = (orderId) => {
     },
   };
 };
-
-// MD5 加密测试
-function getPayload() {
-  let payload = {};
-  payload["amount"] = "100";
-  payload["appId"] = "memtoys.com";
-  payload["autoRedirect"] = "false";
-  payload["country"] = "JP";
-  payload["currency"] = "USD";
-  payload["deviceInfo"] = JSON.stringify({
-    fingerPrintId: "设备指纹id",
-    mac: "设备mac地址",
-  });
-  console.log("xxx1", payload["deviceInfo"]);
-  payload["echoParam"] = "echoParam";
-  payload["merchantNo"] = "500000000009501";
-  payload["notifyUrl"] = "http://gatewaytest.useepay.com/notifyV2u0";
-  payload["orderInfo"] = JSON.stringify({
-    subject: "order title",
-    goodsInfo: [
-      {
-        id: "商品编号",
-        name: "商品名称",
-        body: "商品描述",
-        category: "商品类目",
-        categoryTree: "商品类目树，不同级别类目使用”|”分割",
-        brand: "商品品牌",
-        quantity: 1,
-        price: 1234,
-        url: "商品url",
-        sku: "商品sku",
-        image: "商品图片url",
-      },
-    ],
-    shippingAddress: {
-      email: "haile1y@useepay.com",
-      phoneNo: "123123",
-      firstName: "Victor",
-      lastName: "Yang",
-      street: "Heathcoat House, 20 Savile Row",
-      postalCode: "W1S 3PR",
-      city: "London",
-      state: "LND",
-      country: "GB",
-    },
-  });
-  console.log("xxx2", payload["orderInfo"]);
-  payload["payerInfo"] = JSON.stringify({
-    paymentMethod: "credit_card",
-    authorizationMethod: "cvv",
-    billingAddress: {
-      houseNo: "El Gallo Giro(https://gallogiro.com/)",
-      email: "hai1ley@useepay.com",
-      phoneNo: "1235854433",
-      firstName: "amber",
-      lastName: "Yang",
-      stlogreet: "7148 Pacific Blvd, Huntington Park, CA",
-      postalCode: "90225",
-      city: "Huntington Park",
-      state: "CA",
-      country: "MX",
-      street: "street",
-    },
-  });
-  console.log("xxx3", payload["payerInfo"]);
-  payload["redirectUrl"] = "http://192.168.1.56:8005/redirectV2u0";
-  payload["signType"] = "MD5";
-  payload["terminalType"] = "WEB";
-  payload["transactionExpirationTime"] = "1880";
-  payload["transactionId"] = "test001";
-  payload["transactionType"] = "authorization";
-  payload["userInfo"] = JSON.stringify({
-    userId: "victor1",
-    ip: "103.25.65.178",
-    email: "dynam1ic_3d@useepay.com",
-  });
-  console.log("xxx4", payload["userInfo"]);
-  payload["version"] = "1.0";
-  payload["sign"] = calcMD5(payload);
-  // useePayToken(payload).then(res => {
-  //   console.log('xxx1', res)
-  // })
-  // https://pay-gateway1.uat.useepay.com/cashier
-  return payload;
-}
-
-function calcMD5(payload) {
-  const data = Object.keys(payload)
-    .sort()
-    .reduce((obj, key) => {
-      obj[key] = payload[key];
-      return obj;
-    }, {});
-  var str = "";
-  Object.keys(data).forEach((key) => {
-    if (data[key] != "" && key != "sign") {
-      str = str + key + "=" + data[key] + "&";
-    }
-  });
-  str =
-    str +
-    "pkey=" +
-    "GH3VceBRSQdvYpo3eLiQ4xPrqHFiSyqVmffh2337LTZhx7l1mkMVI7VwzNK3DS5wufzIU05iB7BcXWMeb5B4oZ0Z15c0F7tveL83Le6TURqb1nnPwnUvWb7Io0qDYN1U";
-  console.log("xxx-sign", str);
-  return md5(str);
-}
-// console.log("xxx5", getPayload());
 </script>
 
 <style lang="less" scoped>
