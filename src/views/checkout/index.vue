@@ -322,7 +322,7 @@ const useepay = UseePay({
   merchantNo: "500000000011183",
 });
 const stripe = Stripe(
-  "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"
+  "pk_live_51OHDvHF3YGXX14nuqBXxrHuWfNKwri4nSboLWf9rngy0W4Att1lJ8qwHQtZyStenrFpFmkYms1YyxVeyp2xaAFf600oE2mMcie"
 );
 const errorTips = ref(null);
 onMounted(() => {
