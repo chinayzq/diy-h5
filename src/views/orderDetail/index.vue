@@ -50,11 +50,17 @@
       </div>
       <div class="subtotal-line">
         <span class="flex-8 label">Subtotal:</span>
-        <span class="flex-2">${{ paidPrice }}</span>
+        <span class="flex-2">${{ paidPrice - shippingFree }}</span>
+      </div>
+      <div class="subtotal-line">
+        <span class="flex-8 label">Shipping cost:</span>
+        <span class="flex-2">${{ shippingFree }}</span>
       </div>
       <div class="subtotal-line">
         <span class="flex-8 label">Payment method:</span>
-        <span class="flex-2">-</span>
+        <span class="flex-2">{{
+          paymentMethod == "1" ? "Credit card" : "Paypal"
+        }}</span>
       </div>
       <div class="subtotal-line">
         <span class="flex-8 label">Total:</span>
@@ -121,6 +127,8 @@ const userName = computed(
 const orderId = computed(() => orderDetails.value?.orderId);
 const productList = computed(() => orderDetails.value?.productJson);
 const paidPrice = computed(() => orderDetails.value?.paidPrice);
+const shippingFree = computed(() => orderDetails.value?.shippingFree);
+const paymentMethod = computed(() => orderDetails.value?.paymentMethod);
 const billingJson = computed(() => orderDetails.value?.userDTO?.billingJson);
 </script>
 

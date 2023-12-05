@@ -1328,8 +1328,12 @@ const eventEndHandler = () => {
         .drag-text {
           display: inline-block;
           min-width: 100px;
+          min-height: 40px;
           width: 100%;
           height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
         .drag-image {
           width: 100%;

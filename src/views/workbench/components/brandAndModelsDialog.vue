@@ -232,12 +232,13 @@ const closeHandler = () => {
       padding-bottom: 10px;
       width: 100%;
       overflow: auto;
-      min-height: 130px;
+      min-height: 120px;
       position: relative;
       .single-image {
         padding: 5px 10px;
         border: 2.5px solid #f8f8f8;
         min-width: 75px;
+        max-width: 75px;
       }
       .single-image-active {
         border: 2.5px solid rgb(143, 191, 255);

@@ -267,7 +267,7 @@
           loading-type="wave"
           block
           type="warning"
-          ><var-icon name="lock" />Place Order ${{ subTotal }}</var-button
+          ><var-icon name="lock" />Place Order ${{ paidTotal }}</var-button
         >
         <!-- <var-icon name="lock" />
         <span>Place Order ${{ subTotal }}</span> -->
@@ -452,6 +452,7 @@ const payMethod = ref(1);
 const productList = ref([]);
 const subTotal = ref(0);
 const shipping = ref(0);
+const paidTotal = ref(0);
 const resourceInfo = ref({});
 // get order details
 const initDatas = () => {
@@ -466,7 +467,8 @@ const initDatas = () => {
             return item;
           })
         : [];
-      subTotal.value = res.data.paidPrice;
+      subTotal.value = res.data.paidPrice - res.data.shippingFree;
+      paidTotal.value = res.data.paidPrice;
       shipping.value =
         res.data.shippingFree === 0
           ? "Free shipping"
