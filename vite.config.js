@@ -5,6 +5,7 @@ import path from 'path';
 import copy from 'rollup-plugin-copy';
 import topLevelAwait from 'vite-plugin-top-level-await';
 import DefineOptions from 'unplugin-vue-define-options/vite';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 const px2rem = require('postcss-plugin-px2rem');
 const px2remOptions = {
   rootValue: 3.75, //换算基数， 默认100 ,也就是1440px ，这样的话把根标签的字体规定为1rem为50px,这样就可以从设计稿上量出多少个px直接在代码中写多少px了
@@ -33,6 +34,7 @@ const getBaseByMode = (mode) => {
 export default ({ mode }) =>
   defineConfig({
     plugins: [
+      basicSsl(),
       vue(),
       DefineOptions(),
       topLevelAwait({

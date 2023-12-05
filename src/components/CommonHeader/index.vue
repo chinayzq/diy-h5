@@ -1,11 +1,23 @@
 <template>
   <div class="common-header">
     <div class="title-line">
-      <var-icon @click="menuShow = true" name="menu" class="menu-icon" />
+      <var-icon
+        v-show="props.source !== 'home'"
+        @click="menuShow = true"
+        name="menu"
+        class="menu-icon"
+      />
       <img
         @click="jumpToHome"
         class="title-logo"
         src="@/assets/images/project_logo.png"
+        alt=""
+      />
+      <img
+        v-show="props.source === 'home'"
+        @click="jumpToLogin"
+        class="login-logo"
+        src="@/assets/images/user.svg"
         alt=""
       />
     </div>
@@ -35,7 +47,16 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import Cookies from "js-cookie";
 
+const props = defineProps({
+  source: {
+    type: String,
+    default() {
+      return "";
+    },
+  },
+});
 // 判断，如果当前已经登录，则展示UserInfo，没有登录则展示Login
 const linkList = ref([
   {
@@ -86,6 +107,13 @@ const jumpToHome = () => {
     path: "/",
   });
 };
+const jumpToLogin = () => {
+  const currentToken = Cookies.get("token");
+  const path = currentToken ? "/userInfo" : "/login";
+  router.push({
+    path,
+  });
+};
 const jumpToPage = ({ id, type, path }) => {
   if (type === "common") {
     router.push(`/common?id=${id}`);
@@ -114,6 +142,14 @@ const jumpToPage = ({ id, type, path }) => {
     .menu-icon {
       position: absolute;
       left: 0;
+      top: calc(50% - 10px);
+      cursor: pointer;
+    }
+    .login-logo {
+      height: 20px;
+      width: 20px;
+      position: absolute;
+      right: 0;
       top: calc(50% - 10px);
       cursor: pointer;
     }

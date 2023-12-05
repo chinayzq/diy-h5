@@ -303,7 +303,6 @@ import * as CountryList from "./country.js";
 
 const countryList = ref(CountryList.default);
 const needCPF = (country) => {
-  console.log("country", country);
   for (let i = 0; i < countryList.value.length; i++) {
     const { needCPF, value } = countryList.value[i] || {};
     if (value === country && needCPF) {
@@ -346,7 +345,7 @@ const initCreditCard = async () => {
             productId: item.productId,
             productName: item.phoneCode,
             quantity: item.productCount,
-            unitPrice: item.extendJson.curPrice,
+            unitPrice: item.extendJson.curPrice * 100,
           };
         }),
       });
@@ -561,7 +560,7 @@ const saveOrderHandler = (orderId, payMethod) => {
 const buildTokenParams = () => {
   const { country, email } = formData.value;
   let payload = {};
-  payload["amount"] = subTotal.value;
+  payload["amount"] = subTotal.value * 100;
   payload["autoRedirect"] = "false";
   payload["country"] = country;
   payload["currency"] = "USD";

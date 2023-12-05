@@ -1,6 +1,6 @@
 <template>
   <div class="home-page common-mobile-component">
-    <CommonHeader />
+    <CommonHeader source="home" />
     <div class="main-container">
       <img
         @click="jumpToWorkbench"
