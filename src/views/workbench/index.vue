@@ -92,8 +92,8 @@
           :id="`drag_dom_${item.id}`"
           :key="item.id"
           :style="{
-            height: `${item.height}px`,
-            width: `${item.width}px`,
+            height: item.height === 'auto' ? 'auto' : `${item.height}px`,
+            width: item.width === 'auto' ? 'auto' : `${item.width}px`,
             top: `${item.top}px`,
             left: `${item.left}px`,
             transform: `rotate(${item.rotate}deg) scale(${item.scale})`,
@@ -668,13 +668,6 @@ const templateChangeHandler = (templateId) => {
 };
 
 const stickersShow = ref(false);
-const offsetTop = ref(0);
-onMounted(() => {
-  let element = document.querySelector(".mask-container");
-  let top = element.getBoundingClientRect();
-  console.log("top", top.top);
-  offsetTop.value = top;
-});
 const stickerSelectHandler = (url) => {
   console.log("url", url);
   if (replaceItem.value.id) {
@@ -999,14 +992,14 @@ const addTextToGraph = () => {
   dragStickerList.value.push({
     id,
     type: "text",
-    // height: 32,
-    // width: 100,
+    height: "auto",
+    width: "auto",
     top: 280,
     left: 100,
     rotate: 0,
     rotateY: false,
     rotateZ: false,
-    zIndex: 1001,
+    zIndex: getMaxIndex(),
     fontSize: 26,
     scale: 1,
     content: "",
@@ -1209,9 +1202,9 @@ const rotateStart = (event, item) => {
   currentItem = item;
   rotateObj.start = true;
   // 计算元素中心点
-  const { height, width, id } = item;
+  const { id } = item;
   const currentDom = document.getElementById(`drag_dom_${id}`);
-  const { left, top } = currentDom.getBoundingClientRect();
+  const { left, top, width, height } = currentDom.getBoundingClientRect();
   pointA.X = (width / 2 + left) / scale.value;
   pointA.Y = (height / 2 + top) / scale.value;
   // 记录起始坐标
@@ -1265,7 +1258,10 @@ const rotating = (event, item) => {
 const rotateEnd = () => {
   rotateObj.start = false;
   rotateObj.rotate = 0;
-  pointA = {};
+  pointA = {
+    X: 0,
+    Y: 0,
+  };
   pointB = {};
   pointC = {};
   // currentItem = {};
@@ -1358,10 +1354,10 @@ const eventEndHandler = (flag) => {
         border: 1px solid #00000000;
         .drag-text {
           display: inline-block;
-          min-width: 100px;
-          min-height: 40px;
-          width: 100%;
-          height: 100%;
+          // min-width: 100px;
+          // min-height: 40px;
+          // width: 100%;
+          // height: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
