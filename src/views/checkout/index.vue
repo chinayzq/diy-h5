@@ -508,37 +508,45 @@ const payHandler = async () => {
             const { data } = tokenRes || {};
             if (!data || !data?.token) {
               Snackbar.error("Failed to obtain payment token");
+              submitLoading.value = false;
               return;
             }
-            // 2.保存订单
-            await saveOrderHandler(data.transactionId, 1);
-            // 3.JSSDK confirm
-            useepay.confirm(data.token, (resp) => {
+            // 2.JSSDK confirm
+            useepay.confirm(data.token, async (resp) => {
               console.log("confirm callback:", resp);
               if (resp.success) {
                 const resultData = JSON.parse(resp.data);
                 if (resultData.errorCode == "0000") {
-                  Snackbar.success("Transaction successful");
-                  setTimeout(() => {
-                    router.push({
-                      path: "/orderDetail",
-                      query: {
-                        orderId: res.data,
-                      },
-                    });
-                  }, 1000);
+                  // 3.保存订单
+                  const params = buildRequestParams(data.transactionId, 1);
+                  payOrder(params).then((res) => {
+                    if (res.code === 200) {
+                      Snackbar.success("Transaction successful");
+                      submitLoading.value = false;
+                      setTimeout(() => {
+                        router.push({
+                          path: "/orderDetail",
+                          query: {
+                            orderId: res.data,
+                          },
+                        });
+                      }, 1000);
+                    }
+                  });
                 } else {
                   Snackbar.error(resultData.errorMsg);
+                  submitLoading.value = false;
                 }
               } else {
                 Snackbar.error(data.message);
+                submitLoading.value = false;
               }
-              submitLoading.value = false;
             });
           } else {
             Snackbar.error(
               "Please fill in the credit card information correctly"
             );
+            submitLoading.value = false;
           }
         });
         break;
@@ -548,14 +556,7 @@ const payHandler = async () => {
   }
 };
 const saveOrderHandler = (orderId, payMethod) => {
-  return new Promise((resolve) => {
-    const params = buildRequestParams(orderId, payMethod);
-    payOrder(params).then((res) => {
-      if (res.code === 200) {
-        resolve();
-      }
-    });
-  });
+  return new Promise((resolve) => {});
 };
 const buildTokenParams = () => {
   const { country, email } = formData.value;
