@@ -55,6 +55,16 @@
             moveHandler(event, item);
           }
         "
+        @mouseup.stop="
+          () => {
+            eventEndHandler(true);
+          }
+        "
+        @touchend.stop="
+          () => {
+            eventEndHandler(true);
+          }
+        "
         id="mask-container"
       >
         <!-- 该图只为撑起来mask容器 touchstart.prevent为了解决ios上长按能获取图片的问题-->
@@ -91,7 +101,7 @@
           }"
           :class="['drag-item', item.active && 'drag-item-active']"
         >
-          <span
+          <div
             class="drag-text"
             v-if="item.type === 'text'"
             :style="{
@@ -106,7 +116,7 @@
             }"
           >
             {{ item.content }}
-          </span>
+          </div>
           <img
             v-else
             class="drag-image"
@@ -122,21 +132,37 @@
               draggable="false"
               @click.stop="iconDeleteHandler(item)"
               :src="DeleteIcon"
+              :style="{
+                transform: `scale(${1 / item.scale})`,
+              }"
               class="operation-icon delete-icon"
               alt=""
             />
             <span
               v-if="item.type !== 'text'"
               class="replace-icon"
+              :style="{
+                transform: `scale(${1 / item.scale})`,
+              }"
               @click.stop="replaceHandler(item)"
             >
               Replace
             </span>
-            <span v-else class="edit-icon" @click.stop="editHandler(item)">
+            <span
+              v-else
+              :style="{
+                transform: `scale(${1 / item.scale})`,
+              }"
+              class="edit-icon"
+              @click.stop="editHandler(item)"
+            >
               Edit
             </span>
             <img
               draggable="false"
+              :style="{
+                transform: `scale(${1 / item.scale})`,
+              }"
               @click.stop="iconCopyHandler(item)"
               :src="PlusIcon"
               class="operation-icon plus-icon"
@@ -155,7 +181,7 @@
               "
               class="operation-icon resize-icon"
               :style="{
-                transform: item.type === 'text' && 'rotate(137deg)',
+                transform: `scale(${1 / item.scale})`,
               }"
             >
               <img draggable="false" :src="ResizeIcon" alt="" />
@@ -173,6 +199,9 @@
                 }
               "
               :src="RotateIcon"
+              :style="{
+                transform: `scale(${1 / item.scale})`,
+              }"
               class="operation-icon rotate-icon"
               alt=""
             />
@@ -970,8 +999,8 @@ const addTextToGraph = () => {
   dragStickerList.value.push({
     id,
     type: "text",
-    height: "auto",
-    width: "auto",
+    // height: 32,
+    // width: 100,
     top: 280,
     left: 100,
     rotate: 0,
@@ -1242,13 +1271,14 @@ const rotateEnd = () => {
   // currentItem = {};
 };
 
-const eventEndHandler = () => {
+const eventEndHandler = (flag) => {
   rotateEnd();
   resizeEnd();
   dragEndHandler();
   if (new Date().getTime() - startTimestamp > 100) {
     freshUndoList();
   }
+  flag === true && clearAllActive();
 };
 </script>
 <style lang="less" scoped>
@@ -1318,6 +1348,7 @@ const eventEndHandler = () => {
         height: 100%;
       }
       .drag-item {
+        line-height: normal;
         user-select: none;
         position: absolute;
         cursor: pointer;
