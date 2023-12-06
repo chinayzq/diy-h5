@@ -439,31 +439,6 @@ const shipform = ref({
   postcode: null,
   cpf: null,
 });
-const countryJson = {
-  China: [
-    {
-      type: "selector", //什么类型，selector | input
-      require: true, // 是否必填
-      placeHolder: "Province",
-      key: "province", // 传给后端的key
-      emuList: [
-        //如果是selector，emuList就是下拉项的数据
-        {
-          value: "hunan",
-          label: "湖南",
-        },
-      ],
-    },
-  ],
-  American: [
-    {
-      type: "input", //什么类型，selector | input
-      require: true, // 是否必填
-      placeHolder: "Region",
-      key: "region", // 传给后端的key
-    },
-  ],
-};
 
 const payMethod = ref(1);
 const productList = ref([]);

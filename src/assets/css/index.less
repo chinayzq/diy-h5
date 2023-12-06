@@ -12,6 +12,12 @@
 .popup-custom-overlay {
   background: #ffffff00 !important;
 }
+.popup-custom-overlay-none {
+  background: #ffffff00 !important;
+  & + .var-popup__content {
+    box-shadow: none;
+  }
+}
 .popup-custom-overlay-offset {
   background: #ffffff00 !important;
   & + .var-popup__content {
