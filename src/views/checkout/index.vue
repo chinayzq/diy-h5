@@ -86,12 +86,14 @@
             v-model="formData.postcode"
           />
           <var-input
-            v-if="needCPF(formData.country)"
+            v-if="specialItem(formData.country)"
             variant="outlined"
             size="small"
-            placeholder="CPF *"
-            :rules="[(v) => !!v || 'CPF is required']"
-            v-model="formData.cpf"
+            :placeholder="`${specialItemValue(formData.country)} *`"
+            :rules="[
+              (v) => !!v || `${specialItemValue(formData.country)} is required`,
+            ]"
+            v-model="formData[specialItemValue(formData.country)]"
           />
         </var-space>
       </var-form>
@@ -180,12 +182,15 @@
               v-model="shipform.postcode"
             />
             <var-input
-              v-if="needCPF(shipform.country)"
+              v-if="specialItem(shipform.country)"
               variant="outlined"
               size="small"
-              placeholder="CPF *"
-              :rules="[(v) => !!v || 'CPF is required']"
-              v-model="shipform.cpf"
+              :placeholder="`${specialItemValue(shipform.country)} *`"
+              :rules="[
+                (v) =>
+                  !!v || `${specialItemValue(shipform.country)} is required`,
+              ]"
+              v-model="shipform[specialItemValue(shipform.country)]"
             />
           </var-space>
         </var-form>
@@ -213,7 +218,7 @@
           <span class="image-container">
             <img
               class="order-image"
-              src="@/assets/images/gallery_example.webp"
+              :src="`/colgifts/image/${item.templateUrl}`"
               alt=""
             />
             <!-- <var-icon name="close-circle-outline" class="delete-icon" /> -->
@@ -235,7 +240,7 @@
       </div>
       <div class="subtotal-line border-line" style="padding-bottom: 20px">
         <span class="label"> Shipping </span>
-        <span class="value"> {{ shipping }} </span>
+        <span class="value"> {{ shippingLabel }} </span>
       </div>
       <div class="pay-methods">
         <var-radio-group v-model="payMethod" direction="vertical">
@@ -302,18 +307,28 @@ import md5 from "md5";
 import * as CountryList from "./country.js";
 
 const countryList = ref(CountryList.default);
-const needCPF = (country) => {
+const specialItem = (country) => {
   for (let i = 0; i < countryList.value.length; i++) {
-    const { needCPF, value } = countryList.value[i] || {};
-    if (value === country && needCPF) {
+    const { special, value } = countryList.value[i] || {};
+    if (value === country && special) {
       return true;
     }
   }
   return false;
 };
+const specialItemValue = (country) => {
+  console.log("country", country);
+  for (let i = 0; i < countryList.value.length; i++) {
+    const { special, value, key } = countryList.value[i] || {};
+    if (value === country && special) {
+      console.log("key", key);
+      return key;
+    }
+  }
+};
 const submitLoading = ref(false);
 // useePay | stripe
-const creditCardType = ref("useePay");
+const creditCardType = ref("stripe");
 const useepay = UseePay({
   env: "production",
   layout: "multiLine",
@@ -337,8 +352,8 @@ const initCreditCard = async () => {
       });
       break;
     case "stripe":
-      const { clientSecret } = await createStripeSession({
-        cancelUrl: "https://172.24.253.69:3000/",
+      const { data } = await createStripeSession({
+        customerEmail: formData.value.email,
         productList: productList.value.map((item) => {
           return {
             imageUrl: item.templateUrl,
@@ -348,9 +363,11 @@ const initCreditCard = async () => {
             unitPrice: item.extendJson.curPrice * 100,
           };
         }),
+        shippingFree: shipping.value,
       });
+      console.log("data", data.id);
       const checkout = await stripe.initEmbeddedCheckout({
-        clientSecret,
+        clientSecret: data.id,
       });
       // Mount Checkout
       checkout.mount("#checkout");
@@ -451,6 +468,7 @@ const countryJson = {
 const payMethod = ref(1);
 const productList = ref([]);
 const subTotal = ref(0);
+const shippingLabel = ref(0);
 const shipping = ref(0);
 const paidTotal = ref(0);
 const resourceInfo = ref({});
@@ -469,7 +487,8 @@ const initDatas = () => {
         : [];
       subTotal.value = res.data.paidPrice - res.data.shippingFree;
       paidTotal.value = res.data.paidPrice;
-      shipping.value =
+      shipping.value = res.data.shippingFree;
+      shippingLabel.value =
         res.data.shippingFree === 0
           ? "Free shipping"
           : `$${res.data.shippingFree}`;
@@ -563,7 +582,7 @@ const saveOrderHandler = (orderId, payMethod) => {
 const buildTokenParams = () => {
   const { country, email } = formData.value;
   let payload = {};
-  payload["amount"] = subTotal.value * 100;
+  payload["amount"] = paidTotal.value * 100;
   payload["autoRedirect"] = "false";
   payload["country"] = country;
   payload["currency"] = "USD";

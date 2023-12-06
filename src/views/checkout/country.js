@@ -152,7 +152,8 @@ export default [
   {
     value: 'BR',
     label: 'Brazil',
-    needCPF: true,
+    special: true,
+    key: 'CPF',
   },
 
   {
@@ -223,6 +224,8 @@ export default [
   {
     value: 'CL',
     label: 'Chile',
+    special: true,
+    key: 'TIN',
   },
 
   {
@@ -523,6 +526,8 @@ export default [
   {
     value: 'IN',
     label: 'India',
+    special: true,
+    key: 'GST',
   },
 
   {
@@ -593,6 +598,8 @@ export default [
   {
     value: 'KR',
     label: 'Korea (South)',
+    special: true,
+    key: 'BRN',
   },
 
   {
@@ -1053,6 +1060,8 @@ export default [
   {
     value: 'TW',
     label: 'Taiwan',
+    special: true,
+    key: 'TIN',
   },
 
   {
