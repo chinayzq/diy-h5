@@ -257,8 +257,12 @@
           <var-radio :checked-value="2"> Credit/Debit Payment </var-radio>
           <div class="credit-container" v-show="payMethod === 2">
             <div id="cardElement"></div>
+            <!-- 1.
             <div id="checkout">
-              <!-- Checkout will insert the payment form here -->
+            </div> -->
+            <!-- 2. -->
+            <div id="payment-element">
+              <!-- Elements will create form elements here -->
             </div>
             <div class="error-tips">
               {{ errorTips }}
@@ -299,6 +303,8 @@ import {
   payOrder,
   useePayToken,
   createStripeSession,
+  createPaymentIntent,
+  createPaymentIntent2,
   updateStatusToProcess,
 } from "@/api/workbench";
 import { useRouter } from "vue-router";
@@ -342,6 +348,9 @@ const errorTips = ref(null);
 onMounted(() => {
   getFormDataFromLocal();
 });
+const stripeClientSecret = ref(null);
+const currentOrderId = ref(null);
+const stripeElements = ref(null);
 const initCreditCard = async () => {
   switch (creditCardType.value) {
     case "useePay":
@@ -352,40 +361,54 @@ const initCreditCard = async () => {
       });
       break;
     case "stripe":
-      const { data } = await createStripeSession({
-        customerEmail: formData.value.email,
-        productList: productList.value.map((item) => {
-          return {
-            imageUrl: item.templateUrl,
-            productId: item.productId,
-            productName: item.phoneCode,
-            quantity: item.productCount,
-            unitPrice: item.extendJson.curPrice * 100,
-          };
-        }),
-        shippingFree: shipping.value,
+      // 1.
+      // const { data } = await createStripeSession({
+      //   customerEmail: formData.value.email,
+      //   productList: productList.value.map((item) => {
+      //     return {
+      //       imageUrl: item.templateUrl,
+      //       productId: item.productId,
+      //       productName: item.phoneCode,
+      //       quantity: item.productCount,
+      //       unitPrice: item.extendJson.curPrice * 100,
+      //     };
+      //   }),
+      //   shippingFree: shipping.value,
+      // });
+      // console.log("data", data.id);
+      // const checkout = await stripe.initEmbeddedCheckout({
+      //   clientSecret: data.id,
+      // });
+      // // Mount Checkout
+      // checkout.mount("#checkout");
+      // 2.
+      const { data, code } = await createPaymentIntent({
+        amount: 200,
       });
-      console.log("data", data.id);
-      const checkout = await stripe.initEmbeddedCheckout({
-        clientSecret: data.id,
-      });
-      // Mount Checkout
-      checkout.mount("#checkout");
+      if (code !== 200) {
+        Snackbar.error("Stripe Pay initialization failed");
+        return;
+      }
+      stripeClientSecret.value = data.client_secret;
+      currentOrderId.value = data.orderId;
+      const options = {
+        clientSecret: data.client_secret,
+        appearance: {
+          theme: "stripe",
+        },
+      };
+      const paymentElementOptions = {
+        layout: "tabs",
+      };
+      const elements = stripe.elements(options);
+      stripeElements.value = elements;
+      const paymentElement = elements.create("payment", paymentElementOptions);
+      paymentElement.mount("#payment-element");
       break;
   }
 };
 
 const shipDifferentAddress = ref(false);
-// const countryList = ref([
-//   {
-//     label: "China",
-//     value: "CN",
-//   },
-//   {
-//     label: "Japan",
-//     value: "JP",
-//   },
-// ]);
 const notesForOrder = ref(null);
 const formIns = ref(null);
 const shipFormIns = ref(null);
@@ -547,6 +570,26 @@ const payHandler = async () => {
         });
         break;
       case "stripe":
+        submitLoading.value = true;
+        const { error } = await stripe.confirmPayment({
+          elements: stripeElements.value,
+          redirect: "if_required", // 不自动跳转需要设置 if_required
+        });
+        if (error) {
+          Snackbar.error(error.message);
+          submitLoading.value = false;
+        } else {
+          Snackbar.success("Transaction successful");
+          submitLoading.value = false;
+          setTimeout(() => {
+            router.push({
+              path: "/orderDetail",
+              query: {
+                orderId: currentOrderId.value,
+              },
+            });
+          }, 1000);
+        }
         break;
     }
   }

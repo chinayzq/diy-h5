@@ -111,3 +111,9 @@ export function createStripeSession(params) {
 export function updateStatusToProcess(orderId) {
   return axios.post(`/order/processing/${orderId}`);
 }
+export function createPaymentIntent(params) {
+  return axios.post('/createpaymentintent', params);
+}
+export function createPaymentIntent2(params) {
+  return axios.post('/createpaymentintent2', params);
+}
