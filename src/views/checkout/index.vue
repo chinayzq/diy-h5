@@ -579,16 +579,23 @@ const payHandler = async () => {
           Snackbar.error(error.message);
           submitLoading.value = false;
         } else {
-          Snackbar.success("Transaction successful");
-          submitLoading.value = false;
-          setTimeout(() => {
-            router.push({
-              path: "/orderDetail",
-              query: {
-                orderId: currentOrderId.value,
-              },
-            });
-          }, 1000);
+          // stripe流程是先生成的订单号，需不需要再调payOrder需要再讨论下
+          // 保存订单
+          const params = buildRequestParams(currentOrderId.value, 1);
+          payOrder(params).then((res) => {
+            if (res.code === 200) {
+              Snackbar.success("Transaction successful");
+              submitLoading.value = false;
+              setTimeout(() => {
+                router.push({
+                  path: "/orderDetail",
+                  query: {
+                    orderId: currentOrderId.value,
+                  },
+                });
+              }, 1000);
+            }
+          });
         }
         break;
     }
