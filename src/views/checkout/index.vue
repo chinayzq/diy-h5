@@ -361,27 +361,6 @@ const initCreditCard = async () => {
       });
       break;
     case "stripe":
-      // 1.
-      // const { data } = await createStripeSession({
-      //   customerEmail: formData.value.email,
-      //   productList: productList.value.map((item) => {
-      //     return {
-      //       imageUrl: item.templateUrl,
-      //       productId: item.productId,
-      //       productName: item.phoneCode,
-      //       quantity: item.productCount,
-      //       unitPrice: item.extendJson.curPrice * 100,
-      //     };
-      //   }),
-      //   shippingFree: shipping.value,
-      // });
-      // console.log("data", data.id);
-      // const checkout = await stripe.initEmbeddedCheckout({
-      //   clientSecret: data.id,
-      // });
-      // // Mount Checkout
-      // checkout.mount("#checkout");
-      // 2.
       const { data, code } = await createPaymentIntent({
         amount: 200,
       });
