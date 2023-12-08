@@ -334,7 +334,7 @@ const specialItemValue = (country) => {
 };
 const submitLoading = ref(false);
 // useePay | stripe
-const creditCardType = ref("stripe");
+const creditCardType = ref("useePay");
 const useepay = UseePay({
   env: "production",
   layout: "multiLine",
@@ -537,7 +537,13 @@ const payHandler = async () => {
                 const resultData = JSON.parse(resp.data);
                 if (resultData.errorCode == "0000") {
                   // 3.保存订单
-                  const params = buildRequestParams(data.transactionId, 1);
+                  const params = buildRequestParams(
+                    data.transactionId,
+                    1,
+                    "usee",
+                    data.sign,
+                    data.reference
+                  );
                   payOrder(params).then((res) => {
                     if (res.code === 200) {
                       Snackbar.success("Transaction successful");
@@ -581,7 +587,7 @@ const payHandler = async () => {
         } else {
           // stripe流程是先生成的订单号，需不需要再调payOrder需要再讨论下
           // 保存订单
-          const params = buildRequestParams(currentOrderId.value, 1);
+          const params = buildRequestParams(currentOrderId.value, 1, "stripe");
           payOrder(params).then((res) => {
             if (res.code === 200) {
               Snackbar.success("Transaction successful");
@@ -658,7 +664,13 @@ const buildTokenParams = () => {
   });
   return payload;
 };
-const buildRequestParams = (orderId, paymentMethod) => {
+const buildRequestParams = (
+  orderId,
+  paymentMethod,
+  payCatelog,
+  sign,
+  reference
+) => {
   const { email, firstName, lastName, phone } = formData.value;
   const { originalPrice, paidPrice, shippingFree } = resourceInfo.value;
   return {
@@ -680,6 +692,18 @@ const buildRequestParams = (orderId, paymentMethod) => {
       phone,
       shipAddressJson: shipform.value,
     },
+    payExtendJson:
+      payCatelog === "usee"
+        ? {
+            sign,
+            transactionId: orderId,
+            creditType: payCatelog,
+            originalTransactionId: reference,
+          }
+        : {
+            transactionId: orderId,
+            creditType: payCatelog,
+          },
   };
 };
 </script>
