@@ -218,7 +218,7 @@
           <span class="image-container">
             <img
               class="order-image"
-              :src="`/colgifts/image/${item.templateUrl}`"
+              :src="`https://ossdiyphone.com/${item.templateUrl}`"
               alt=""
             />
             <!-- <var-icon name="close-circle-outline" class="delete-icon" /> -->
@@ -520,8 +520,7 @@ const payHandler = async () => {
                     data.transactionId,
                     1,
                     "usee",
-                    data.sign,
-                    data.reference
+                    data.sign
                   );
                   payOrder(params).then((res) => {
                     if (res.code === 200) {
@@ -643,13 +642,7 @@ const buildTokenParams = () => {
   });
   return payload;
 };
-const buildRequestParams = (
-  orderId,
-  paymentMethod,
-  payCatelog,
-  sign,
-  reference
-) => {
+const buildRequestParams = (orderId, paymentMethod, payCatelog, sign) => {
   const { email, firstName, lastName, phone } = formData.value;
   const { originalPrice, paidPrice, shippingFree } = resourceInfo.value;
   return {
@@ -674,10 +667,9 @@ const buildRequestParams = (
     payExtendJson:
       payCatelog === "usee"
         ? {
-            sign,
-            transactionId: orderId,
-            creditType: payCatelog,
-            originalTransactionId: reference,
+            sign, // 签名
+            transactionId: orderId, //订单ID
+            creditType: payCatelog, //支付渠道
           }
         : {
             transactionId: orderId,

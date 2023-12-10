@@ -18,7 +18,7 @@
           height="30px"
           lazy
           :loading="$LoadingImage"
-          :src="`${tab.stickerUrl}?type=webp`"
+          :src="dealImageUrl(tab.stickerUrl)"
         />
       </var-tab>
     </var-tabs>
@@ -39,7 +39,7 @@
           height="40px"
           lazy
           :loading="$LoadingImage"
-          :src="`${single.url}?type=webp`"
+          :src="dealImageUrl(single.url)"
         />
       </div>
     </div>
@@ -49,6 +49,7 @@
 <script setup>
 import { onBeforeMount, ref } from "vue";
 import { getStickers, getStickerList } from "@/api/workbench.js";
+import { dealImageUrl } from "@/utils";
 
 const props = defineProps({
   stickersShow: {
@@ -104,7 +105,7 @@ const tabChange = (index) => {
 };
 
 const stickerClickHandler = (item) => {
-  emit("stickerSelect", item.url);
+  emit("stickerSelect", dealImageUrl(item.url));
 };
 </script>
 

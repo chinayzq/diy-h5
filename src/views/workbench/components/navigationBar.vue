@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { judgeClient } from "@/utils";
+import { judgeClient, dealImageUrl } from "@/utils";
 import { uploadImageRequest } from "@/utils/domToImage.js";
 import { ref, watch } from "vue";
 // import { uploadImage } from "@/api/workbench";
@@ -84,9 +84,9 @@ const uploadSuccess = async (file) => {
   emit("loadingChange", true);
   const imageUrl = await uploadImageRequest(file.file);
   if (activeCountRef.value === 0) {
-    emit("naviClick", "image", `/colgifts/image/${imageUrl}`);
+    emit("naviClick", "image", dealImageUrl(imageUrl));
   } else {
-    emit("naviClick", "imageReplace", `/colgifts/image/${imageUrl}`);
+    emit("naviClick", "imageReplace", dealImageUrl(imageUrl));
   }
   emit("loadingChange", false);
 };

@@ -19,7 +19,7 @@
       <var-image
         v-else
         class="preview-image"
-        :src="`/colgifts/image/${previewImage}?type=webp`"
+        :src="`https://ossdiyphone.com/${previewImage}`"
         :loading="$LoadingImage"
         alt=""
       />

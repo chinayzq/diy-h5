@@ -21,8 +21,7 @@
             height="135"
             style="display: flex; justify-content: center; align-items: center"
             :loading="$LoadingImage"
-            :src="`/colgifts/image/${item.templateUrl}`"
-            lazy
+            :src="`https://ossdiyphone.com/${item.templateUrl}`"
             alt=""
           />
         </div>
@@ -196,7 +195,7 @@ const removeHandler = (item) => {
 const saveImageToLocal = (item) => {
   let image = new Image();
   image.setAttribute("crossOrigin", "anonymous");
-  image.src = `/colgifts/image/${item.templateUrl}`;
+  image.src = dealImageUrl(`https://ossdiyphone.com/${item.templateUrl}`);
   image.onload = function () {
     let canvas = document.createElement("canvas");
     canvas.width = image.width;

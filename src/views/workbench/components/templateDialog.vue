@@ -43,7 +43,7 @@
           <var-image
             lazy
             :loading="$LoadingImage"
-            :src="`${single.templateUrl}?type=webp`"
+            :src="dealImageUrl(single.templateUrl)"
           />
           <span class="diy-span" v-show="!listLoading">Diy it</span>
         </div>
@@ -55,6 +55,7 @@
 <script setup>
 import { onBeforeMount, ref } from "vue";
 import { getTemplateTypeList, getTemplateListByCode } from "@/api/workbench";
+import { dealImageUrl } from "@/utils";
 
 onBeforeMount(() => {
   initDatas();

@@ -28,6 +28,7 @@ function drawSingle(myCanvas, image, type, width, height) {
   };
   return new Promise((resolve) => {
     let img = new Image();
+    img.setAttribute("crossOrigin",'Anonymous')
     img.src = image;
     img.onload = () => {
       myCanvas.globalCompositeOperation = operationMap[type];
@@ -136,6 +137,8 @@ export function exportAsImage(domId, images) {
     html2Canvas(document.querySelector(`#${domId}`), {
       width,
       height,
+      useCORS: true,
+      allowTaint: true
     }).then((canvas) => {
       let imageURL = canvas.toDataURL('image/png'); //canvas转base64图片
       let img = new Image();
@@ -187,6 +190,8 @@ export const exportPrintImage = (domId, maskImages, width, height) => {
     html2Canvas(document.querySelector(`#${domId}`), {
       width,
       height,
+      useCORS: true,
+      allowTaint: true
     }).then((canvas) => {
       let imageURL = canvas.toDataURL('image/png'); //canvas转base64图片
       let img = new Image();
@@ -240,6 +245,7 @@ function drawSingleMax(myCanvas, image, type, width, height) {
   };
   return new Promise((resolve) => {
     let img = new Image();
+    img.setAttribute("crossOrigin",'Anonymous')
     img.src = image;
     img.onload = () => {
       myCanvas.globalCompositeOperation = operationMap[type];

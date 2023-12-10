@@ -13,7 +13,12 @@ export function setLayout() {
   }
 }
 export function dealImageUrl(url) {
-  return url.replace('?fileId=', '/');
+  let returnUrl = url
+  if (returnUrl.includes('colgifts/image')){
+    returnUrl = returnUrl.replace('/colgifts/image/', 'https://ossdiyphone.com/')
+  }
+  return returnUrl.replace('?fileId=', '/');
+  
 }
 export function getCookie(cname) {
   let name = cname + '=';

@@ -23,7 +23,7 @@
             width="50"
             height="100"
             :loading="$LoadingImage"
-            :src="`/colgifts/image/${item.templateUrl}`"
+            :src="`https://ossdiyphone.com/${item.templateUrl}`"
             lazy
             alt=""
           />

@@ -384,7 +384,7 @@ import LayersDialog from "./components/layersDialog.vue";
 import FlipDialog from "./components/flipDialog.vue";
 import ContinueDialog from "./components/continueDialog.vue";
 
-import { uuid } from "@/utils";
+import { uuid, dealImageUrl } from "@/utils";
 import { getTemplateDetail, saveDraft, saveProduct } from "@/api/workbench";
 import { exportAsImage, exportPrintImage } from "@/utils/domToImage";
 import { useRouter } from "vue-router";
@@ -655,7 +655,10 @@ const templateChangeHandler = (templateId) => {
       if (res.code === 200) {
         dragStickerList.value = [];
         dragStickerList.value = dragStickerList.value.concat(
-          res.data.templateData.basedata
+          res.data.templateData.basedata.map((item) => {
+            item.url = dealImageUrl(item.url);
+            return item;
+          })
         );
       }
     })
@@ -746,10 +749,10 @@ const nextStepHandler = (datas) => {
   } else {
     removeItem("printAdjust");
   }
-  selectModelImage.value = datas.modelUrl;
-  setItem("modelUrl", datas.modelUrl);
-  selectMaskImage.value = datas.maskUrl;
-  setItem("maskUrl", datas.maskUrl);
+  selectModelImage.value = dealImageUrl(datas.modelUrl);
+  setItem("modelUrl", dealImageUrl(datas.modelUrl));
+  selectMaskImage.value = dealImageUrl(datas.maskUrl);
+  setItem("maskUrl", dealImageUrl(datas.maskUrl));
   selectCaseList.value = datas.caseList;
   selectPhoneName.value = datas.phoneName;
   selectPhoneCode.value = datas.phoneCode;
@@ -769,12 +772,14 @@ const selectCaseItem = ref({
   // colorName
 });
 const phoneCaseSelectHandler = (item) => {
+  item.url = dealImageUrl(item.url);
+  item.exampleUrl = dealImageUrl(item.exampleUrl);
   selectCaseItem.value = item;
   setItem("caseItem", item);
   const { url, colorName } = item;
   graphLoading.value = true;
-  selectCaseImage.value = url;
-  setItem("caseUrl", url);
+  selectCaseImage.value = dealImageUrl(url);
+  setItem("caseUrl", dealImageUrl(url));
   selectCaseName.value = colorName;
   setItem("caseName", colorName);
   caseDialogShow.value = false;
