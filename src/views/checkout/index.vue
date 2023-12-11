@@ -334,7 +334,7 @@ const specialItemValue = (country) => {
 };
 const submitLoading = ref(false);
 // useePay | stripe
-const creditCardType = ref("useePay");
+const creditCardType = ref("stripe");
 const useepay = UseePay({
   env: "production",
   layout: "multiLine",

@@ -13,12 +13,18 @@ export function setLayout() {
   }
 }
 export function dealImageUrl(url) {
-  let returnUrl = url
-  if (returnUrl.includes('colgifts/image')){
-    returnUrl = returnUrl.replace('/colgifts/image/', 'https://ossdiyphone.com/')
+  let returnUrl = url;
+  if (returnUrl.includes('colgifts/image')) {
+    returnUrl = returnUrl.replace(
+      '/colgifts/image/',
+      'https://ossdiyphone.com/'
+    );
   }
   return returnUrl.replace('?fileId=', '/');
-  
+}
+export function dealImageUrlNew(id) {
+  if (!id) return '';
+  return `https://ossdiyphone.com/${id}`;
 }
 export function getCookie(cname) {
   let name = cname + '=';
