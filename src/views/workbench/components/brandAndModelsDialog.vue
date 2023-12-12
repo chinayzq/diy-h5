@@ -26,10 +26,14 @@
             >
               {{ item.brandName }} case
             </span>
-            <span class="single-brand" @click="caseStickerSelect">
-              Case Sticker
-            </span>
           </div>
+          <span
+            class="single-brand"
+            style="margin: 15px 0; display: inline-block"
+            @click="caseStickerSelect"
+          >
+            Case Sticker
+          </span>
         </div>
         <div class="model-container">
           <div class="title-line">Model</div>
@@ -195,18 +199,18 @@ const closeHandler = () => {
     }
   }
   .brand-container {
+    .single-brand {
+      height: 30px;
+      padding: 5px 10px;
+      background-color: #f8f8f8;
+      border: 2.5px solid #f8f8f8;
+      border-radius: 5px;
+    }
     .brand-list {
       display: flex;
       gap: 0 10px;
       margin-top: 15px;
       padding-bottom: 10px;
-      .single-brand {
-        height: 30px;
-        padding: 5px 10px;
-        background-color: #f8f8f8;
-        border: 2.5px solid #f8f8f8;
-        border-radius: 5px;
-      }
       .single-brand-active {
         border: 2.5px solid rgb(143, 191, 255);
       }
