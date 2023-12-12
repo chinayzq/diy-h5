@@ -834,19 +834,20 @@ const previewImageBase64 = ref(null);
 const printImage = ref(null);
 // 手机壳贴纸测试
 const printHandler = async () => {
-  if (stickerType === 1) {
+  if (stickerType.value === 1) {
     confirmLoading.value = true;
     previewImage.value = null;
     printDialogShow.value = true;
     setItem("stickers", JSON.stringify(dragStickerList.value));
     setGraphDomsScale(1, true);
     const resultList = await exportImageAsync();
-    const templateUrl = resultList[0];
+    const templateObj = resultList[0];
     const printMaxImage = resultList[1];
     setGraphDomsScale(defaultScale.value, false);
-    previewImage.value = templateUrl;
+    previewImage.value = templateObj.templateUrl;
+    previewImageBase64.value = templateObj.templateUrlBase64;
     printImage.value = printMaxImage;
-    saveAsDraft(templateUrl);
+    saveAsDraft(templateObj.templateUrl);
   } else {
     confirmLoading.value = true;
     previewImage.value = null;
