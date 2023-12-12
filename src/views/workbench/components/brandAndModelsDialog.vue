@@ -26,6 +26,9 @@
             >
               {{ item.brandName }} case
             </span>
+            <span class="single-brand" @click="caseStickerSelect">
+              Case Sticker
+            </span>
           </div>
         </div>
         <div class="model-container">
@@ -41,6 +44,7 @@
               :key="modelIndex"
               @click="modelClickHandler(model, modelIndex)"
             >
+              <!-- 手机壳贴纸测试 -->
               {{ model.phoneName }} case
             </span>
           </div>
@@ -149,6 +153,10 @@ const nextStepHandler = () => {
       height: printAdjust.extend2 || null,
     },
   });
+};
+
+const caseStickerSelect = () => {
+  emit("caseStickerNext");
 };
 
 const closeHandler = () => {

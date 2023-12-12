@@ -28,7 +28,7 @@ function drawSingle(myCanvas, image, type, width, height) {
   };
   return new Promise((resolve) => {
     let img = new Image();
-    img.setAttribute("crossOrigin",'Anonymous')
+    img.setAttribute('crossOrigin', 'Anonymous');
     img.src = image;
     img.onload = () => {
       myCanvas.globalCompositeOperation = operationMap[type];
@@ -85,44 +85,49 @@ export function uploadImageRequest(file) {
 }
 
 function uploadAndGetTemplateUrl() {
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     const finalData = document
       .getElementById('myCanvas')
       .toDataURL('image/png');
     const blob = dataURItoBlob(finalData);
+    // blob转base64
+    const templateUrlBase64 = await blobToBase64(blob);
     //组装formdata
     var fd = new FormData();
-    fd.append('file', blob); //fileData为自定义
-    fd.append('fileName', 'template111'); //fileName为自定义，名字随机生成或者写死，看需求
-    //ajax上传，ajax的形式随意，JQ的写法也没有问题
-    //需要注意的是服务端需要设定，允许跨域请求。数据接收的方式和<input type="file"/> 上传的文件没有区别
+    fd.append('file', blob);
+    fd.append('fileName', 'template111');
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open('POST', '/colgifts/upload');
-    // const currentToken = localStorage.getItem('diy-admin-token');
-    // if (currentToken) {
-    //   xmlHttp.setRequestHeader('token', currentToken); //设置请求header,按需设定，非必须
-    // }
-    // xmlHttp.setRequestHeader(
-    //   'Content-Type',
-    //   'multipart/form-data; boundary=----WebKitFormBoundaryr3jgTATix0AdBbiG'
-    // );
     xmlHttp.send(fd);
     //ajax回调
     xmlHttp.onreadystatechange = (res) => {
       //todo  your code...
       if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
         try {
-          resolve(JSON.parse(xmlHttp.responseText).data);
+          resolve({
+            templateUrl: JSON.parse(xmlHttp.responseText).data,
+            templateUrlBase64,
+          });
         } catch (error) {}
       }
     };
   });
 }
-// 导出为图片
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader();
+    fileReader.onload = (e) => {
+      resolve(e.target.result);
+    };
+    // readAsDataURL
+    fileReader.readAsDataURL(blob);
+    fileReader.onerror = () => {
+      reject(new Error('blobToBase64 error'));
+    };
+  });
+}
+// 导出预览图
 export function exportAsImage(domId, images) {
-  // const containerDom = document.getElementsByClassName('container-image')[0];
-  // const width = containerDom.naturalWidth * 0.65;
-  // const height = containerDom.naturalHeight * 0.65;
   const containerDom = document.getElementsByClassName('mask-container')[0];
   const containerWidth = getComputedStyle(containerDom, null)['width'];
   const containerHeight = getComputedStyle(containerDom, null)['height'];
@@ -138,7 +143,7 @@ export function exportAsImage(domId, images) {
       width,
       height,
       useCORS: true,
-      allowTaint: true
+      allowTaint: true,
     }).then((canvas) => {
       let imageURL = canvas.toDataURL('image/png'); //canvas转base64图片
       let img = new Image();
@@ -155,32 +160,14 @@ export function exportAsImage(domId, images) {
         if (model) {
           await drawSingle(myCanvas, model, 'model', width, height);
         }
-        const templateUrl = await uploadAndGetTemplateUrl();
-        resolve(templateUrl);
+        const templateUrlObj = await uploadAndGetTemplateUrl();
+        resolve(templateUrlObj);
       };
     });
-    // domtoimage.toPng(document.querySelector(`#${domId}`)).then((imgbase64) => {
-    //   let img = new Image();
-    //   img.src = imgbase64;
-    //   img.onload = async () => {
-    //     myCanvas.globalCompositeOperation = 'source-over';
-    //     myCanvas.drawImage(img, 0, 0);
-    //     if (mask) {
-    //       await drawSingle(myCanvas, mask, 'mask');
-    //     }
-    //     if (caseImage) {
-    //       await drawSingle(myCanvas, caseImage, 'caseImage');
-    //     }
-    //     if (model) {
-    //       await drawSingle(myCanvas, model, 'model');
-    //     }
-    //     const url = await uploadAndGetTemplateUrl();
-    //     resolve(url);
-    //   };
-    // });
   });
 }
 
+// 导出打印图
 export const exportPrintImage = (domId, maskImages, width, height) => {
   const cavasDom = document.getElementById('myCanvasMax');
   cavasDom.width = `${width}`;
@@ -191,7 +178,7 @@ export const exportPrintImage = (domId, maskImages, width, height) => {
       width,
       height,
       useCORS: true,
-      allowTaint: true
+      allowTaint: true,
     }).then((canvas) => {
       let imageURL = canvas.toDataURL('image/png'); //canvas转base64图片
       let img = new Image();
@@ -245,7 +232,7 @@ function drawSingleMax(myCanvas, image, type, width, height) {
   };
   return new Promise((resolve) => {
     let img = new Image();
-    img.setAttribute("crossOrigin",'Anonymous')
+    img.setAttribute('crossOrigin', 'Anonymous');
     img.src = image;
     img.onload = () => {
       myCanvas.globalCompositeOperation = operationMap[type];

@@ -19,7 +19,7 @@
       <var-image
         v-else
         class="preview-image"
-        :src="`https://ossdiyphone.com/${previewImage}`"
+        :src="previewImageBase64"
         :loading="$LoadingImage"
         alt=""
       />
@@ -36,6 +36,12 @@ import { ref } from "vue";
 
 const props = defineProps({
   previewImage: {
+    type: String,
+    default() {
+      return "";
+    },
+  },
+  previewImageBase64: {
     type: String,
     default() {
       return "";

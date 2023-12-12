@@ -290,6 +290,7 @@
       <BrandAndModelsDialog
         @close="brandAndModelShow = false"
         @nextStep="nextStepHandler"
+        @caseStickerNext="caseStickerNextHandler"
       />
     </var-popup>
 
@@ -334,6 +335,7 @@
         @confirm="confirmHandler"
         :confirmLoading="confirmLoading"
         :previewImage="previewImage"
+        :previewImageBase64="previewImageBase64"
         :selectPhoneName="selectPhoneName"
       />
     </var-popup>
@@ -403,6 +405,37 @@ import ResizeIcon from "@/assets/images/drag_resize_icon.png";
 import RotateIcon from "@/assets/images/drag_rotate_icon.svg";
 
 import { judgeClient, setCookie } from "@/utils";
+
+// 手机壳贴纸测试
+// stickerType: 1: 手机壳; 2: 手机壳贴纸
+const stickerType = ref(1);
+// maskImage真蒙板，caseImage边框图
+const caseStickerDatas = ref({
+  borderImage: new URL(
+    "../../assets/images/caseSticker/mask_border.png",
+    import.meta.url
+  ).href,
+  modelImage: new URL(
+    "../../assets/images/caseSticker/case_model.png",
+    import.meta.url
+  ).href,
+  caseImage: new URL(
+    "../../assets/images/caseSticker/case_case.png",
+    import.meta.url
+  ).href,
+  maskImage: new URL(
+    "../../assets/images/caseSticker/case_mask.png",
+    import.meta.url
+  ).href,
+});
+const caseStickerNextHandler = () => {
+  stickerType.value = 2;
+  selectMaskImage.value = caseStickerDatas.value.maskImage;
+  selectCaseImage.value = null;
+  selectModelImage.value = caseStickerDatas.value.borderImage;
+  brandAndModelShow.value = false;
+};
+
 // 设置colgifts_c_sid，没登录时按照该cookie存储信息
 setCookie();
 const currentClient = judgeClient();
@@ -740,6 +773,8 @@ const selectPhoneName = ref("iPhone 14");
 const selectPhoneCode = ref("IPHONE14");
 const selectCaseName = ref("Clear Impact Case - Black");
 const nextStepHandler = (datas) => {
+  // 手机壳贴纸测试
+  stickerType.value = 1;
   if (
     datas.printAdjust &&
     datas.printAdjust.width &&
@@ -795,26 +830,45 @@ const openModelDialog = () => {
 
 const printDialogShow = ref(false);
 const previewImage = ref(null);
+const previewImageBase64 = ref(null);
 const printImage = ref(null);
+// 手机壳贴纸测试
 const printHandler = async () => {
-  confirmLoading.value = true;
-  previewImage.value = null;
-  printDialogShow.value = true;
-  setItem("stickers", JSON.stringify(dragStickerList.value));
-  setGraphDomsScale(1, true);
-  const resultList = await exportImageAsync();
-  const templateUrl = resultList[0];
-  const printMaxImage = resultList[1];
-  // const templateUrl = await exportAsImage("mask-container", {
-  //   mask: selectMaskImage.value,
-  //   model: selectModelImage.value,
-  //   caseImage: selectCaseImage.value,
-  // });
-  // const printMaxImage = await dealPrintImageHandler();
-  setGraphDomsScale(defaultScale.value, false);
-  previewImage.value = templateUrl;
-  printImage.value = printMaxImage;
-  saveAsDraft(templateUrl);
+  if (stickerType === 1) {
+    confirmLoading.value = true;
+    previewImage.value = null;
+    printDialogShow.value = true;
+    setItem("stickers", JSON.stringify(dragStickerList.value));
+    setGraphDomsScale(1, true);
+    const resultList = await exportImageAsync();
+    const templateUrl = resultList[0];
+    const printMaxImage = resultList[1];
+    setGraphDomsScale(defaultScale.value, false);
+    previewImage.value = templateUrl;
+    printImage.value = printMaxImage;
+    saveAsDraft(templateUrl);
+  } else {
+    confirmLoading.value = true;
+    previewImage.value = null;
+    printDialogShow.value = true;
+    selectCaseImage.value = caseStickerDatas.value.caseImage;
+    selectModelImage.value = caseStickerDatas.value.modelImage;
+    setTimeout(async () => {
+      setGraphDomsScale(1, true);
+      const resultList = await exportImageAsync();
+      const templateObj = resultList[0];
+      const printMaxImage = resultList[1];
+      setGraphDomsScale(defaultScale.value, false);
+      previewImage.value = templateObj.templateUrl;
+      previewImageBase64.value = templateObj.templateUrlBase64;
+      printImage.value = printMaxImage;
+      confirmLoading.value = false;
+      // 还原画布
+      selectMaskImage.value = caseStickerDatas.value.maskImage;
+      selectCaseImage.value = null;
+      selectModelImage.value = caseStickerDatas.value.borderImage;
+    }, 200);
+  }
 };
 const exportImageAsync = () => {
   return new Promise((resolve) => {
@@ -876,7 +930,8 @@ watch(
 const router = useRouter();
 const confirmLoading = ref(false);
 const confirmHandler = () => {
-  if (confirmLoading.value) return;
+  // 手机壳贴纸测试
+  if (confirmLoading.value || stickerType.value === 2) return;
   confirmLoading.value = true;
   const { curPrice, oriPrice, description, extend1, extend2, extend3 } =
     selectCaseItem.value;
