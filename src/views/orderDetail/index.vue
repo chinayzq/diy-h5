@@ -73,7 +73,7 @@
         </div>
         <div>
           {{
-            `${billingJson?.stateCountry} ${billingJson?.city} ${billingJson?.streetAddress}`
+            `${billingJson?.state} ${billingJson?.city} ${billingJson?.streetAddress}`
           }}
         </div>
         <div>
