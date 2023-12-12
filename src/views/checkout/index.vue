@@ -351,6 +351,7 @@ onMounted(() => {
 const stripeClientSecret = ref(null);
 const currentOrderId = ref(null);
 const stripeElements = ref(null);
+const stripeSign = ref(null);
 const initCreditCard = async () => {
   switch (creditCardType.value) {
     case "useePay":
@@ -370,6 +371,7 @@ const initCreditCard = async () => {
       }
       stripeClientSecret.value = data.client_secret;
       currentOrderId.value = data.orderId;
+      stripeSign.value = data.id;
       const options = {
         clientSecret: data.client_secret,
         appearance: {
@@ -563,9 +565,13 @@ const payHandler = async () => {
           Snackbar.error(error.message);
           submitLoading.value = false;
         } else {
-          // stripe流程是先生成的订单号，需不需要再调payOrder需要再讨论下
           // 保存订单
-          const params = buildRequestParams(currentOrderId.value, 1, "stripe");
+          const params = buildRequestParams(
+            currentOrderId.value,
+            1,
+            "stripe",
+            stripeSign.value
+          );
           payOrder(params).then((res) => {
             if (res.code === 200) {
               Snackbar.success("Transaction successful");
@@ -664,17 +670,11 @@ const buildRequestParams = (orderId, paymentMethod, payCatelog, sign) => {
       phone,
       shipAddressJson: shipform.value,
     },
-    payExtendJson:
-      payCatelog === "usee"
-        ? {
-            sign, // 签名
-            transactionId: orderId, //订单ID
-            creditType: payCatelog, //支付渠道
-          }
-        : {
-            transactionId: orderId,
-            creditType: payCatelog,
-          },
+    payExtendJson: {
+      sign, // 签名
+      transactionId: orderId, //订单ID
+      creditType: payCatelog, //支付渠道
+    },
   };
 };
 </script>

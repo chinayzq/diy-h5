@@ -79,12 +79,34 @@ const itemClickHandler = (key) => {
   emit("naviClick", key);
 };
 
+const getImageSize = (file) => {
+  return new Promise((resolve) => {
+    let reader = new FileReader();
+    reader.readAsDataURL(file.file);
+    reader.onload = (e) => {
+      const img = e.target.result;
+      const image = new Image();
+      image.src = img;
+
+      image.onload = (_) => {
+        let width = image.width;
+        let height = image.height;
+        console.log("width, height", width, height);
+        const imageHeight = (100 / width) * height;
+        resolve(imageHeight);
+        // 然后就可以做需要的操作了
+      };
+    };
+  });
+};
+
 const uploadSuccess = async (file) => {
   console.log("file", file);
+  const imageHeight = await getImageSize(file);
   emit("loadingChange", true);
   const imageUrl = await uploadImageRequest(file.file);
   if (activeCountRef.value === 0) {
-    emit("naviClick", "image", dealImageUrl(imageUrl));
+    emit("naviClick", "image", dealImageUrl(imageUrl), imageHeight);
   } else {
     emit("naviClick", "imageReplace", dealImageUrl(imageUrl));
   }

@@ -544,7 +544,7 @@ const loadingChangeHandler = (fresh) => {
   graphLoading.value = fresh;
 };
 
-const navigationEvent = (type, file) => {
+const navigationEvent = (type, file, imageHeight) => {
   console.log("type", type);
   switch (type) {
     case "stickers":
@@ -556,7 +556,7 @@ const navigationEvent = (type, file) => {
       break;
     case "image":
       if (file) {
-        addStickerToGraph(dealImageUrlNew(file), false);
+        addStickerToGraph(dealImageUrlNew(file), false, imageHeight);
       }
       break;
     case "imageReplace":
@@ -964,12 +964,12 @@ const clearAllActive = () => {
     item.active = false;
   });
 };
-const addStickerToGraph = (url, activeFlag = false) => {
+const addStickerToGraph = (url, activeFlag = false, imageHeight = 100) => {
   clearAllActive();
   dragStickerList.value.push({
     id: uuid(),
     url,
-    height: 100,
+    height: imageHeight,
     width: 100,
     top: 280,
     left: 100,
