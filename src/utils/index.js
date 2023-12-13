@@ -27,6 +27,9 @@ export function dealImageUrlNew(id) {
   if (id.includes('https://ossdiyphone.com')) {
     return id;
   }
+  if (id.includes('colgifts/image')) {
+    return id.replace('/colgifts/image/', 'https://ossdiyphone.com/');
+  }
   return `https://ossdiyphone.com/${id}`;
 }
 export function getCookie(cname) {
