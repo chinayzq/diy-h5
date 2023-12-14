@@ -47,3 +47,6 @@ stripe:
 
   stripe.com 
   信用卡支付注册信息：注册邮箱earlchen2014@gmail.com  密码：Kuwanpay@2023 
+
+PayPal：
+  https://developer.paypal.com/docs/checkout/advanced/integrate/

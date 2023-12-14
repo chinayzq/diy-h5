@@ -151,14 +151,17 @@ const setActive = ({ id }) => {
     // top: -300px;
     padding: 10px 0;
     .single-layer {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       width: 66px;
       height: 66px;
       margin-bottom: 10px;
       border: #00000000 solid 1px;
+      background: #fff;
       .image-one {
-        height: 100%;
-        width: 100%;
+        max-height: 100%;
+        max-width: 100%;
       }
     }
     .single-layer-active {

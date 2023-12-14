@@ -100,14 +100,16 @@ const setActive = ({ id }) => {
         height: 80px;
         text-align: center;
         .single-layer {
-          display: inline-block;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           width: 70px;
           height: 70px;
           margin-bottom: 10px;
           border: #ffffff solid 2px;
           .image-one {
-            height: 100%;
-            width: 100%;
+            max-height: 100%;
+            max-width: 100%;
           }
         }
         .single-layer-active {
