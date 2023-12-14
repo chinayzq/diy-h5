@@ -24,6 +24,12 @@ export function dealImageUrl(url) {
 }
 export function dealImageUrlNew(id) {
   if (!id) return '';
+  if (id.includes('/colgifts/image/https://ossdiyphone.com/')) {
+    return id.replace(
+      '/colgifts/image/https://ossdiyphone.com/',
+      'https://ossdiyphone.com/'
+    );
+  }
   if (id.includes('https://ossdiyphone.com')) {
     return id;
   }

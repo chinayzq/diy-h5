@@ -67,7 +67,7 @@
               :key="phoneIndex"
               lazy
               :loading="$LoadingImage"
-              :src="dealImageUrl(phoneItem.url)"
+              :src="dealImageUrlNew(phoneItem.url)"
             />
           </div>
         </div>
@@ -80,7 +80,7 @@
 <script setup>
 import { getBrandAndModels, getPhoneColor } from "@/api/workbench";
 import { onBeforeMount, ref } from "vue";
-import { dealImageUrl } from "@/utils";
+import { dealImageUrlNew } from "@/utils";
 
 onBeforeMount(() => {
   initDatas();
