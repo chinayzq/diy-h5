@@ -195,7 +195,7 @@ const removeHandler = (item) => {
 const saveImageToLocal = (item) => {
   let image = new Image();
   image.setAttribute("crossOrigin", "anonymous");
-  image.src = dealImageUrl(`https://ossdiyphone.com/${item.templateUrl}`);
+  image.src = dealImageUrlNew(item.templateUrl);
   image.onload = function () {
     let canvas = document.createElement("canvas");
     canvas.width = image.width;

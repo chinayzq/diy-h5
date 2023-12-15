@@ -386,7 +386,7 @@ import LayersDialog from "./components/layersDialog.vue";
 import FlipDialog from "./components/flipDialog.vue";
 import ContinueDialog from "./components/continueDialog.vue";
 
-import { uuid, dealImageUrl, dealImageUrlNew } from "@/utils";
+import { uuid, dealImageUrlNew } from "@/utils";
 import { getTemplateDetail, saveDraft, saveProduct } from "@/api/workbench";
 import { exportAsImage, exportPrintImage } from "@/utils/domToImage";
 import { useRouter } from "vue-router";

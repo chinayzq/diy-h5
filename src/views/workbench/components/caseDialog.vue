@@ -26,7 +26,7 @@
           <var-image
             lazy
             :loading="$LoadingImage"
-            :src="dealImageUrl(item.exampleUrl)"
+            :src="dealImageUrlNew(item.exampleUrl)"
           />
         </div>
         <div class="right-part">
@@ -63,7 +63,7 @@
 </template>
 
 <script setup>
-import { dealImageUrl } from "@/utils";
+import { dealImageUrlNew } from "@/utils";
 import { ref } from "vue";
 const props = defineProps({
   dataset: {

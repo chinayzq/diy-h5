@@ -35,7 +35,7 @@
             <div class="margin-top-5">
               <img
                 class="product-image"
-                :src="dealImageUrl(item.templateUrl)"
+                :src="dealImageUrlNew(item.templateUrl)"
                 alt=""
               />
             </div>
@@ -101,7 +101,7 @@
 import { useRoute } from "vue-router";
 import { getOrderDetailById } from "@/api/workbench";
 import { computed, ref } from "vue";
-import { orderTimeRender, dealImageUrl } from "@/utils";
+import { orderTimeRender, dealImageUrlNew } from "@/utils";
 const route = useRoute();
 const pageLoading = ref(false);
 const orderDetails = ref({});

@@ -23,7 +23,7 @@
             <var-image
               lazy
               :loading="$LoadingImage"
-              :src="dealImageUrl(single.templateUrl) + '_webp'"
+              :src="dealImageUrlNew(single.templateUrl)"
             />
           </div>
         </div>
@@ -36,7 +36,7 @@
 import { useStore } from "@/stores";
 import { ref, onBeforeMount } from "vue";
 import { getTemplateTypeList, getTemplateListByCode } from "@/api/workbench";
-import { dealImageUrl } from "@/utils";
+import { dealImageUrlNew } from "@/utils";
 onBeforeMount(() => {
   initDatas();
 });
