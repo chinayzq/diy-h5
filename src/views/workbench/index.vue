@@ -70,7 +70,7 @@
         <!-- 该图只为撑起来mask容器 touchstart.prevent为了解决ios上长按能获取图片的问题-->
         <img
           class="container-image"
-          style="position: relative; z-index: -1"
+          style="position: relative; z-index: -1; opacity: 0"
           :src="selectModelImage"
           alt=""
           @touchstart.prevent="clearActiveState"
@@ -975,6 +975,7 @@ const setGraphDomsScale = (scale, hideFlag) => {
     // document.getElementsByClassName("graph-container")[0].style.left =
     //   "10000px";
     document.getElementsByClassName("graph-container")[0].style.opacity = 0;
+    document.getElementsByClassName("container-image")[0].style.opacity = 1;
   }
   document.getElementsByClassName(
     "single-graph-image"
@@ -986,7 +987,7 @@ const setGraphDomsScale = (scale, hideFlag) => {
     "mask-container"
   )[0].style.transform = `scale(${scale}, ${scale})`;
   if (!hideFlag) {
-    document.getElementsByClassName("container-image")[0].style.opacity = 1;
+    document.getElementsByClassName("container-image")[0].style.opacity = 0;
     // document.getElementsByClassName("graph-container")[0].style.left = "0";
     document.getElementsByClassName("graph-container")[0].style.opacity = 1;
   }
