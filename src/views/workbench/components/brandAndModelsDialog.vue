@@ -9,9 +9,9 @@
     />
     <div v-show="!loadingFlag" class="main-container">
       <div class="sroll-container">
-        <div style="font-size: 10px; color: #000; margin-bottom: 15px">
+        <!-- <div style="font-size: 10px; color: #000; margin-bottom: 15px">
           only sale phone cases and not original products, only adapters.
-        </div>
+        </div> -->
         <div class="brand-container">
           <div class="title-line">Brand</div>
           <div class="brand-list">

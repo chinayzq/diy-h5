@@ -186,13 +186,14 @@ export const exportPrintImage = (domId, maskImages, width, height) => {
       img.onload = async () => {
         myCanvasMax.globalCompositeOperation = 'source-over';
         myCanvasMax.drawImage(img, 0, 0, width, height);
-        if (maskImages) {
-          await drawSingleMax(myCanvasMax, maskImages, 'mask', width, height);
-        }
-        myCanvasMax.globalCompositeOperation = 'source-over';
-        myCanvasMax.strokeStyle = '#000000';
-        myCanvasMax.lineWidth = '2';
-        myCanvasMax.strokeRect(0, 0, width, height);
+        // if (maskImages) {
+        //   await drawSingleMax(myCanvasMax, maskImages, 'mask', width, height);
+        // }
+        // 设置黑边框
+        // myCanvasMax.globalCompositeOperation = 'source-over';
+        // myCanvasMax.strokeStyle = '#000000';
+        // myCanvasMax.lineWidth = '2';
+        // myCanvasMax.strokeRect(0, 0, width, height);
         const printUrl = await uploadPrintAndGetUrlMax();
         resolve(printUrl);
       };

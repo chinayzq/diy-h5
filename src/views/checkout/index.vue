@@ -306,6 +306,7 @@ import {
   createPaymentIntent,
   createPaymentIntent2,
   updateStatusToProcess,
+  getPaymentChannel,
 } from "@/api/workbench";
 import { useRouter } from "vue-router";
 import { Snackbar } from "@varlet/ui";
@@ -334,7 +335,8 @@ const specialItemValue = (country) => {
 };
 const submitLoading = ref(false);
 // useePay | stripe
-const creditCardType = ref("stripe");
+// 1：useepay 2: stripe
+const creditCardType = ref(1);
 const useepay = UseePay({
   env: "production",
   layout: "multiLine",
@@ -353,15 +355,20 @@ const currentOrderId = ref(null);
 const stripeElements = ref(null);
 const stripeSign = ref(null);
 const initCreditCard = async () => {
+  const channelResult = await getPaymentChannel();
+  if (channelResult.code !== 200) {
+    console.log("get payment channel failed！");
+  } else {
+    creditCardType.value = channelResult.data;
+  }
   switch (creditCardType.value) {
-    case "useePay":
+    case 1:
       useepay.mount(document.getElementById("cardElement"));
       useepay.on("change", (valid, code, message) => {
-        console.log("valid, code, message", valid, code, message);
         errorTips.value = message;
       });
       break;
-    case "stripe":
+    case 2:
       const { data, code } = await createPaymentIntent({
         amount: 200,
       });
@@ -498,7 +505,7 @@ const payHandler = async () => {
   } else {
     // 信用卡 - useePay
     switch (creditCardType.value) {
-      case "useePay":
+      case 1:
         useepay.validate(async (valid, code, message) => {
           if (valid) {
             submitLoading.value = true;
@@ -555,7 +562,7 @@ const payHandler = async () => {
           }
         });
         break;
-      case "stripe":
+      case 2:
         submitLoading.value = true;
         const { error } = await stripe.confirmPayment({
           elements: stripeElements.value,

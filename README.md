@@ -8,7 +8,7 @@ adrian.brooks
 t#)qDfEYp
 
 swagger:
-http://43.159.137.119:8084/colgifts/doc.html
+http://47.254.53.165:8084/colgifts/doc.html
 
 online:
 https://www.memtoys.com
