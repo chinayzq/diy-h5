@@ -336,7 +336,7 @@ const specialItemValue = (country) => {
 const submitLoading = ref(false);
 // useePay | stripe
 // 1：useepay 2: stripe
-const creditCardType = ref(1);
+const creditCardType = ref("1");
 const useepay = UseePay({
   env: "production",
   layout: "multiLine",
@@ -362,13 +362,13 @@ const initCreditCard = async () => {
     creditCardType.value = channelResult.data;
   }
   switch (creditCardType.value) {
-    case 1:
+    case "1":
       useepay.mount(document.getElementById("cardElement"));
       useepay.on("change", (valid, code, message) => {
         errorTips.value = message;
       });
       break;
-    case 2:
+    case "2":
       const { data, code } = await createPaymentIntent({
         amount: 200,
       });
@@ -505,7 +505,7 @@ const payHandler = async () => {
   } else {
     // 信用卡 - useePay
     switch (creditCardType.value) {
-      case 1:
+      case "1":
         useepay.validate(async (valid, code, message) => {
           if (valid) {
             submitLoading.value = true;
@@ -562,7 +562,7 @@ const payHandler = async () => {
           }
         });
         break;
-      case 2:
+      case "2":
         submitLoading.value = true;
         const { error } = await stripe.confirmPayment({
           elements: stripeElements.value,

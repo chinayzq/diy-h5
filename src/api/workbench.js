@@ -118,5 +118,5 @@ export function createPaymentIntent2(params) {
   return axios.post('/createpaymentintent2', params);
 }
 export function getPaymentChannel(params) {
-  return axios.post('/payment/channel', params);
+  return axios.get('/payment/channel', params);
 }
