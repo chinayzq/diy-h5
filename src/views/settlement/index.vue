@@ -68,7 +68,9 @@
       <div class="border-line"></div>
       <div class="single-line">
         <span> Estimated Total </span>
-        <span class="font-italic"> {{ Subtotal + shipping }} USD </span>
+        <span class="font-italic">
+          {{ (Number(Subtotal) + Number(shipping)).toFixed(2) }} USD
+        </span>
       </div>
       <div class="button-line">
         <span

@@ -1,6 +1,11 @@
 import { useStore } from '@/stores';
 import { getDynamicScript } from '@/api/workbench';
 import Cookies from 'js-cookie';
+
+export const countToFixed = (count) => {
+  return Number(count).toFixed(2)
+}
+
 // 获取assets静态资源
 export const getAssetsFile = (url) => {
   return new URL(`../assets/images/${url}`, import.meta.url).href;

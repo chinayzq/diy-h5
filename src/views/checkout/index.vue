@@ -231,16 +231,28 @@
           </div>
         </div>
         <div class="right-part">
-          {{ `$${item.extendJson.curPrice}` }}
+          {{ `$${countToFixed(item.extendJson.curPrice)}` }}
         </div>
       </div>
       <div class="subtotal-line">
         <span class="label"> Subtotal </span>
-        <span class="value"> ${{ subTotal }} </span>
+        <span class="value"> ${{ countToFixed(subTotal) }} </span>
       </div>
-      <div class="subtotal-line border-line" style="padding-bottom: 20px">
+      <div class="subtotal-line">
         <span class="label"> Shipping </span>
         <span class="value"> {{ shippingLabel }} </span>
+      </div>
+      <div class="subtotal-line">
+        <span class="label"> Savings </span>
+        <span class="value">
+          {{
+            discountPrice === 0 ? "$0.00" : `-$${countToFixed(discountPrice)}`
+          }}
+        </span>
+      </div>
+      <div class="subtotal-line border-line" style="padding-bottom: 20px">
+        <span class="label"> Coupon </span>
+        <span class="value"> {{ discountCode || "-" }} </span>
       </div>
       <div class="pay-methods" v-show="paidTotal > 0">
         <var-radio-group v-model="payMethod" direction="vertical">
@@ -276,7 +288,9 @@
           loading-type="wave"
           block
           type="warning"
-          ><var-icon name="lock" />Place Order ${{ paidTotal }}</var-button
+          ><var-icon name="lock" />Place Order ${{
+            countToFixed(paidTotal)
+          }}</var-button
         >
         <!-- <var-icon name="lock" />
         <span>Place Order ${{ subTotal }}</span> -->
@@ -312,6 +326,7 @@ import { useRouter } from "vue-router";
 import { Snackbar } from "@varlet/ui";
 import md5 from "md5";
 import * as CountryList from "./country.js";
+import { countToFixed } from "@/utils";
 
 const countryList = ref(CountryList.default);
 const specialItem = (country) => {
@@ -460,7 +475,7 @@ const paidTotal = ref(0);
 const resourceInfo = ref({});
 const discountCode = ref(null);
 const discountPrice = ref(0);
-const needToPay = ref(true);
+
 // get order details
 const initDatas = () => {
   checkout()
@@ -474,13 +489,13 @@ const initDatas = () => {
             return item;
           })
         : [];
-      subTotal.value = res.data.paidPrice - res.data.shippingFree;
+      subTotal.value = res.data.originalPrice - res.data.shippingFree;
       paidTotal.value = res.data.paidPrice;
       shipping.value = res.data.shippingFree;
       shippingLabel.value =
         res.data.shippingFree === 0
           ? "Free shipping"
-          : `$${res.data.shippingFree}`;
+          : `$${countToFixed(res.data.shippingFree)}`;
       discountCode.value = res.data.discountCode;
       discountPrice.value = res.data.discountPrice;
     })
@@ -499,16 +514,16 @@ const payHandler = async () => {
   if (submitLoading.value) {
     return;
   }
-  if (paidTotal.value === 0) {
-    freePayhandler();
-    return;
-  }
   // form表单必填校验
   let valid = await formIns.value.validate();
   if (!valid) return;
   if (shipDifferentAddress.value) {
     const shipFormValid = await shipFormIns.value.validate();
     if (!shipFormValid) return;
+  }
+  if (paidTotal.value === 0) {
+    freePayhandler();
+    return;
   }
   if (payMethod.value === 1) {
     // 如果是PayPal支付
@@ -610,7 +625,7 @@ const payHandler = async () => {
   }
 };
 const freePayhandler = () => {
-  const params = buildRequestParams(null, 999, null, null);
+  const params = buildRequestParams(null, 2, null, null);
   payOrder(params).then((res) => {
     if (res.code === 200) {
       Snackbar.success("Transaction successful");

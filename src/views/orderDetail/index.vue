@@ -44,27 +44,43 @@
             item.productCount
           }}</span>
           <span class="single-span flex-center-center flex-2"
-            >${{ item.extendJson.curPrice }}</span
+            >${{ countToFixed(item.extendJson.curPrice) }}</span
           >
         </div>
       </div>
       <div class="subtotal-line">
         <span class="flex-8 label">Subtotal:</span>
-        <span class="flex-2">${{ paidPrice - shippingFree }}</span>
+        <span class="flex-2"
+          >${{ countToFixed(originalPrice - shippingFree) }}</span
+        >
       </div>
       <div class="subtotal-line">
         <span class="flex-8 label">Shipping cost:</span>
-        <span class="flex-2">${{ shippingFree }}</span>
+        <span class="flex-2">${{ countToFixed(shippingFree) }}</span>
       </div>
+      <div class="subtotal-line">
+        <span class="flex-8 label">Savings:</span>
+        <span class="flex-2">{{
+          discountPrice === 0 ? "$0.00" : `$${countToFixed(discountPrice)}`
+        }}</span>
+      </div>
+      <!-- <div class="subtotal-line">
+        <span class="flex-8 label">Coupon:</span>
+        <span class="flex-2">${{ discountCode || "-" }}</span>
+      </div> -->
       <div class="subtotal-line">
         <span class="flex-8 label">Payment method:</span>
         <span class="flex-2">{{
-          paymentMethod == "1" ? "Credit card" : "Paypal"
+          paymentMethod == "1"
+            ? "Credit card"
+            : paymentMethod == "0"
+            ? "Paypal"
+            : "-"
         }}</span>
       </div>
       <div class="subtotal-line">
         <span class="flex-8 label">Total:</span>
-        <span class="flex-2">${{ paidPrice }}</span>
+        <span class="flex-2">${{ countToFixed(paidPrice) }}</span>
       </div>
       <div class="billing-address">Billing address</div>
       <div class="billing-details">
@@ -101,7 +117,8 @@
 import { useRoute } from "vue-router";
 import { getOrderDetailById } from "@/api/workbench";
 import { computed, ref } from "vue";
-import { orderTimeRender, dealImageUrlNew } from "@/utils";
+import { orderTimeRender, dealImageUrlNew, countToFixed } from "@/utils";
+
 const route = useRoute();
 const pageLoading = ref(false);
 const orderDetails = ref({});
@@ -127,6 +144,9 @@ const userName = computed(
 const orderId = computed(() => orderDetails.value?.orderId);
 const productList = computed(() => orderDetails.value?.productJson);
 const paidPrice = computed(() => orderDetails.value?.paidPrice);
+const originalPrice = computed(() => orderDetails.value?.originalPrice);
+const discountCode = computed(() => orderDetails.value?.discountCode);
+const discountPrice = computed(() => orderDetails.value?.discountPrice);
 const shippingFree = computed(() => orderDetails.value?.shippingFree);
 const paymentMethod = computed(() => orderDetails.value?.paymentMethod);
 const billingJson = computed(() => orderDetails.value?.userDTO?.billingJson);
