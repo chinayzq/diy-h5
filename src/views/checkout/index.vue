@@ -242,7 +242,7 @@
         <span class="label"> Shipping </span>
         <span class="value"> {{ shippingLabel }} </span>
       </div>
-      <div class="pay-methods">
+      <div class="pay-methods" v-show="paidTotal > 0">
         <var-radio-group v-model="payMethod" direction="vertical">
           <var-radio :checked-value="1">PayPal</var-radio>
           <img
@@ -458,6 +458,9 @@ const shippingLabel = ref(0);
 const shipping = ref(0);
 const paidTotal = ref(0);
 const resourceInfo = ref({});
+const discountCode = ref(null);
+const discountPrice = ref(0);
+const needToPay = ref(true);
 // get order details
 const initDatas = () => {
   checkout()
@@ -478,9 +481,13 @@ const initDatas = () => {
         res.data.shippingFree === 0
           ? "Free shipping"
           : `$${res.data.shippingFree}`;
+      discountCode.value = res.data.discountCode;
+      discountPrice.value = res.data.discountPrice;
     })
     .finally(() => {
-      initCreditCard();
+      if (paidTotal.value > 0) {
+        initCreditCard();
+      }
     });
 };
 initDatas();
@@ -490,6 +497,10 @@ const payHandler = async () => {
   setFormDataToLocal();
   // 支付状态校验
   if (submitLoading.value) {
+    return;
+  }
+  if (paidTotal.value === 0) {
+    freePayhandler();
     return;
   }
   // form表单必填校验
@@ -598,13 +609,32 @@ const payHandler = async () => {
     }
   }
 };
+const freePayhandler = () => {
+  const params = buildRequestParams(null, 999, null, null);
+  payOrder(params).then((res) => {
+    if (res.code === 200) {
+      Snackbar.success("Transaction successful");
+      submitLoading.value = false;
+      setTimeout(() => {
+        router.push({
+          path: "/orderDetail",
+          query: {
+            orderId: res.data,
+          },
+        });
+      }, 1000);
+    }
+  });
+};
+
 const saveOrderHandler = (orderId, payMethod) => {
   return new Promise((resolve) => {});
 };
 const buildTokenParams = () => {
   const { country, email } = formData.value;
   let payload = {};
-  payload["amount"] = paidTotal.value * 100;
+  // payload["amount"] = paidTotal.value * 100;
+  payload["amount"] = 2 * 100;
   payload["autoRedirect"] = "false";
   payload["country"] = country;
   payload["currency"] = "USD";
@@ -661,8 +691,8 @@ const buildRequestParams = (orderId, paymentMethod, payCatelog, sign) => {
   return {
     orderId,
     description: notesForOrder.value,
-    discountCode: null,
-    discountPrice: null,
+    discountCode: discountCode.value,
+    discountPrice: discountPrice.value,
     originalPrice,
     paidPrice,
     productJson: productList.value,
@@ -677,11 +707,13 @@ const buildRequestParams = (orderId, paymentMethod, payCatelog, sign) => {
       phone,
       shipAddressJson: shipform.value,
     },
-    payExtendJson: {
-      sign, // 签名
-      transactionId: orderId, //订单ID
-      creditType: payCatelog, //支付渠道
-    },
+    payExtendJson: payCatelog
+      ? {
+          sign, // 签名
+          transactionId: orderId, //订单ID
+          creditType: payCatelog, //支付渠道
+        }
+      : null,
   };
 };
 </script>

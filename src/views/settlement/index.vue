@@ -68,7 +68,7 @@
       <div class="border-line"></div>
       <div class="single-line">
         <span> Estimated Total </span>
-        <span class="font-italic"> {{ Subtotal }} USD </span>
+        <span class="font-italic"> {{ Subtotal + shipping }} USD </span>
       </div>
       <div class="button-line">
         <span
@@ -130,8 +130,6 @@ const policyUrlMap = ref({
 });
 onBeforeMount(async () => {
   listLoading.value = true;
-  const shippingValue = await getShipping();
-  shipping.value = Number(shippingValue.data).toFixed(2);
   getProductList()
     .then((res) => {
       itemList.value = res.data.map((item) => {
@@ -140,7 +138,7 @@ onBeforeMount(async () => {
         return item;
       });
     })
-    .finally(() => {
+    .finally(async () => {
       listLoading.value = false;
     });
   getPrivacy().then((res) => {
@@ -154,6 +152,14 @@ onBeforeMount(async () => {
 const policyLinkJump = (type) => {
   const url = policyUrlMap.value[type];
   window.open(url, "_self");
+};
+const freshShipping = async () => {
+  listLoading.value = true;
+  const shippingValue = await getShipping({
+    amount: Subtotal.value,
+  });
+  shipping.value = Number(shippingValue.data).toFixed(2);
+  listLoading.value = false;
 };
 
 watch(
@@ -180,6 +186,7 @@ const countCalc = () => {
   } else {
     Subtotal.value = subTotalTemp.toFixed(2);
   }
+  freshShipping();
 };
 
 const removeHandler = (item) => {
