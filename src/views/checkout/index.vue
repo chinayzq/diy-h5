@@ -256,17 +256,25 @@
       </div>
       <div class="pay-methods" v-show="paidTotal > 0">
         <var-radio-group v-model="payMethod" direction="vertical">
-          <var-radio :checked-value="1">PayPal</var-radio>
-          <img
-            style="width: 100%"
-            v-if="payMethod === 1"
-            src="@/assets/images/gateway_icon.svg"
-            alt=""
-          />
-          <div v-if="payMethod === 1" class="paypal-tips">
+          <var-radio :checked-value="1" style="font-weight: bold"
+            >PayPal</var-radio
+          >
+
+          <!-- <div v-if="payMethod === 1" class="paypal-tips">
             Secure payment via PayPal.
+          </div> -->
+          <div v-show="payMethod === 1">
+            <img
+              style="width: 100%; margin-bottom: 10px"
+              src="@/assets/images/gateway_icon.svg"
+              alt=""
+            />
+            <div id="paypal-button-container"></div>
+            <p id="result-message" style="color: #ff0000"></p>
           </div>
-          <var-radio :checked-value="2"> Credit/Debit Payment </var-radio>
+          <var-radio :checked-value="2" style="font-weight: bold">
+            Credit/Debit Payment
+          </var-radio>
           <div class="credit-container" v-show="payMethod === 2">
             <div id="cardElement"></div>
             <!-- 1.
@@ -282,7 +290,11 @@
           </div>
         </var-radio-group>
       </div>
-      <div @click="payHandler" class="button-container">
+      <div
+        @click="payHandler"
+        class="button-container"
+        v-show="payMethod === 2 || paidTotal === 0"
+      >
         <var-button
           :loading="submitLoading"
           loading-type="wave"
@@ -364,6 +376,7 @@ const stripe = Stripe(
 const errorTips = ref(null);
 onMounted(() => {
   getFormDataFromLocal();
+  initPaypal();
 });
 const stripeClientSecret = ref(null);
 const currentOrderId = ref(null);
@@ -410,7 +423,104 @@ const initCreditCard = async () => {
       break;
   }
 };
+const initPaypal = () => {
+  window.paypal
+    .Buttons({
+      async createOrder() {
+        try {
+          const response = await fetch("/api/orders", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            // use the "body" param to optionally pass additional order information
+            // like product ids and quantities
+            body: JSON.stringify({
+              cart: [
+                {
+                  id: "YOUR_PRODUCT_ID_TEST",
+                  quantity: "YOUR_PRODUCT_QUANTITY_TEST",
+                },
+              ],
+            }),
+          });
 
+          const orderData = await response.json();
+
+          if (orderData.id) {
+            return orderData.id;
+          } else {
+            const errorDetail = orderData?.details?.[0];
+            const errorMessage = errorDetail
+              ? `${errorDetail.issue} ${errorDetail.description} (${orderData.debug_id})`
+              : JSON.stringify(orderData);
+
+            throw new Error(errorMessage);
+          }
+        } catch (error) {
+          console.error(error);
+          resultMessage(
+            `Could not initiate PayPal Checkout...<br><br>${error}`
+          );
+        }
+      },
+      async onApprove(data, actions) {
+        try {
+          const response = await fetch(`/api/orders/${data.orderID}/capture`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const orderData = await response.json();
+          // Three cases to handle:
+          //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+          //   (2) Other non-recoverable errors -> Show a failure message
+          //   (3) Successful transaction -> Show confirmation or thank you message
+
+          const errorDetail = orderData?.details?.[0];
+
+          if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
+            // (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+            // recoverable state, per https://developer.paypal.com/docs/checkout/standard/customize/handle-funding-failures/
+            return actions.restart();
+          } else if (errorDetail) {
+            // (2) Other non-recoverable errors -> Show a failure message
+            throw new Error(
+              `${errorDetail.description} (${orderData.debug_id})`
+            );
+          } else if (!orderData.purchase_units) {
+            throw new Error(JSON.stringify(orderData));
+          } else {
+            // (3) Successful transaction -> Show confirmation or thank you message
+            // Or go to another URL:  actions.redirect('thank_you.html');
+            const transaction =
+              orderData?.purchase_units?.[0]?.payments?.captures?.[0] ||
+              orderData?.purchase_units?.[0]?.payments?.authorizations?.[0];
+            resultMessage(
+              `Transaction ${transaction.status}: ${transaction.id}<br><br>See console for all available details`
+            );
+            console.log(
+              "Capture result",
+              orderData,
+              JSON.stringify(orderData, null, 2)
+            );
+          }
+        } catch (error) {
+          console.error(error);
+          resultMessage(
+            `Sorry, your transaction could not be processed...<br><br>${error}`
+          );
+        }
+      },
+    })
+    .render("#paypal-button-container");
+};
+const resultMessage = (message) => {
+  const container = document.querySelector("#result-message");
+  container.innerHTML = message;
+};
 const shipDifferentAddress = ref(false);
 const notesForOrder = ref(null);
 const formIns = ref(null);
@@ -915,6 +1025,9 @@ const buildRequestParams = (orderId, paymentMethod, payCatelog, sign) => {
       background-color: transparent;
       text-decoration: none;
     }
+  }
+  :deep(.var-hover-overlay) {
+    display: none;
   }
 }
 </style>

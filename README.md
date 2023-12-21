@@ -50,3 +50,4 @@ stripe:
 
 PayPal：
   https://developer.paypal.com/docs/checkout/advanced/integrate/
+  https://developer.paypal.com/docs/checkout/standard/integrate/#link-howitworks
