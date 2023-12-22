@@ -385,7 +385,7 @@ import UndoComponent from "./components/undoComponent.vue";
 import LayersDialog from "./components/layersDialog.vue";
 import FlipDialog from "./components/flipDialog.vue";
 import ContinueDialog from "./components/continueDialog.vue";
-
+import { Snackbar } from "@varlet/ui";
 import { uuid, dealImageUrlNew } from "@/utils";
 import { getTemplateDetail, saveDraft, saveProduct } from "@/api/workbench";
 import { exportAsImage, exportPrintImage } from "@/utils/domToImage";
@@ -958,13 +958,17 @@ const confirmHandler = () => {
   saveProduct(params)
     .then((res) => {
       // 保存产品后，返回productId，进入settlement页面后，勾选到这个产品
-      setItem("selectProductId", res.data);
+      if (res.data === 200) {
+        setItem("selectProductId", res.data);
+        router.push({
+          path: "/settlement",
+        });
+      } else {
+        Snackbar.warning(res.message);
+      }
     })
     .finally(() => {
       confirmLoading.value = false;
-      router.push({
-        path: "/settlement",
-      });
     });
 };
 
