@@ -27,21 +27,23 @@ export function dealImageUrl(url) {
   }
   return returnUrl.replace('?fileId=', '/');
 }
+// const filePath = 'https://ossdiyphone.com/'
+const filePath = 'https://osscolgifts.com/'
 export function dealImageUrlNew(id) {
   if (!id) return '';
   if (id.includes('/colgifts/image/https://ossdiyphone.com/')) {
     return id.replace(
       '/colgifts/image/https://ossdiyphone.com/',
-      'https://ossdiyphone.com/'
+      filePath
     );
   }
-  if (id.includes('https://ossdiyphone.com')) {
+  if (id.includes(filePath)) {
     return id;
   }
   if (id.includes('colgifts/image')) {
-    return id.replace('/colgifts/image/', 'https://ossdiyphone.com/');
+    return id.replace('/colgifts/image/', filePath);
   }
-  return `https://ossdiyphone.com/${id}`;
+  return `${filePath}${id}`;
 }
 export function getCookie(cname) {
   let name = cname + '=';
