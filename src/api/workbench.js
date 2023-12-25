@@ -120,3 +120,9 @@ export function createPaymentIntent2(params) {
 export function getPaymentChannel(params) {
   return axios.get('/payment/channel', params);
 }
+export function createPaypalOrder(params) {
+  return axios.post('/createpaypalorder', params);
+}
+export function paypalCapture(id) {
+  return axios.post(`/orders/${id}/capture`);
+}

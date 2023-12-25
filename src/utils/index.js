@@ -1,10 +1,11 @@
 import { useStore } from '@/stores';
 import { getDynamicScript } from '@/api/workbench';
 import Cookies from 'js-cookie';
+import config from '~/config';
 
 export const countToFixed = (count) => {
-  return Number(count).toFixed(2)
-}
+  return Number(count).toFixed(2);
+};
 
 // 获取assets静态资源
 export const getAssetsFile = (url) => {
@@ -27,15 +28,14 @@ export function dealImageUrl(url) {
   }
   return returnUrl.replace('?fileId=', '/');
 }
-// const filePath = 'https://ossdiyphone.com/'
-const filePath = 'https://osscolgifts.com/'
+// const filePath = 'https://ossdiyphone.com/';
+// const filePath = 'https://osscolgifts.com/'
+// 拼接图片地址 - new
+const filePath = config[import.meta.env.MODE].filePath;
 export function dealImageUrlNew(id) {
   if (!id) return '';
   if (id.includes('/colgifts/image/https://ossdiyphone.com/')) {
-    return id.replace(
-      '/colgifts/image/https://ossdiyphone.com/',
-      filePath
-    );
+    return id.replace('/colgifts/image/https://ossdiyphone.com/', filePath);
   }
   if (id.includes(filePath)) {
     return id;

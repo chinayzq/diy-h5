@@ -63,7 +63,7 @@
         <span class="font-italic">
           {{ free ? "FREE" : `${shipping} USD` }}
         </span>
-        <span class="font-italic"> Buy 2 get free shipping </span>
+        <!-- <span class="font-italic"> Buy 2 get free shipping </span> -->
       </div>
       <div class="border-line"></div>
       <div class="single-line">
@@ -79,7 +79,7 @@
         >
           Add to card
         </span>
-        <span class="shipping-cart">
+        <span class="shipping-cart" @click="openCard">
           <img src="@/assets/images/shopping-cart.svg" alt="" />
         </span>
       </div>
@@ -240,6 +240,9 @@ const addCardHandler = () => {
     listLoading.value = false;
     cartShow.value = true;
   });
+};
+const openCard = () => {
+  cartShow.value = true;
 };
 
 const router = useRouter();

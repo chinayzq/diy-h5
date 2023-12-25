@@ -958,7 +958,7 @@ const confirmHandler = () => {
   saveProduct(params)
     .then((res) => {
       // 保存产品后，返回productId，进入settlement页面后，勾选到这个产品
-      if (res.data === 200) {
+      if (res.code === 200) {
         setItem("selectProductId", res.data);
         router.push({
           path: "/settlement",

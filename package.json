@@ -6,7 +6,9 @@
     "start": "npm run serve",
     "build:sit": "vite build --mode sit",
     "build:uat": "vite build --mode uat",
-    "build:prod": "vite build --mode prod"
+    "build:prod": "vite build --mode prod",
+    "build:memtoys": "vite build --mode memtoys",
+    "build:colgifts": "vite build --mode colgifts"
   },
   "dependencies": {
     "@varlet/ui": "^2.17.0",

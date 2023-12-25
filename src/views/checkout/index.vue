@@ -333,6 +333,8 @@ import {
   createPaymentIntent2,
   updateStatusToProcess,
   getPaymentChannel,
+  createPaypalOrder,
+  paypalCapture,
 } from "@/api/workbench";
 import { useRouter } from "vue-router";
 import { Snackbar } from "@varlet/ui";
@@ -382,6 +384,7 @@ const stripeClientSecret = ref(null);
 const currentOrderId = ref(null);
 const stripeElements = ref(null);
 const stripeSign = ref(null);
+const paypalOrderId = ref(null);
 const initCreditCard = async () => {
   const channelResult = await getPaymentChannel();
   if (channelResult.code !== 200) {
@@ -428,32 +431,20 @@ const initPaypal = () => {
     .Buttons({
       async createOrder() {
         try {
-          const response = await fetch("/api/orders", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            // use the "body" param to optionally pass additional order information
-            // like product ids and quantities
-            body: JSON.stringify({
-              cart: [
-                {
-                  id: "YOUR_PRODUCT_ID_TEST",
-                  quantity: "YOUR_PRODUCT_QUANTITY_TEST",
-                },
-              ],
-            }),
+          const createOrderResult = await createPaypalOrder({
+            billingJson: formData.value,
+            paidPrice: 200,
+            shipAddressJson: shipform.value,
           });
-
-          const orderData = await response.json();
-
-          if (orderData.id) {
-            return orderData.id;
+          console.log("createOrderResult", createOrderResult);
+          if (createOrderResult.data.id) {
+            paypalOrderId.value = createOrderResult.data.orderId;
+            return createOrderResult.data.id;
           } else {
-            const errorDetail = orderData?.details?.[0];
+            const errorDetail = createOrderResult.data?.details?.[0];
             const errorMessage = errorDetail
-              ? `${errorDetail.issue} ${errorDetail.description} (${orderData.debug_id})`
-              : JSON.stringify(orderData);
+              ? `${errorDetail.issue} ${errorDetail.description} (${createOrderResult.data.debug_id})`
+              : JSON.stringify(createOrderResult.data);
 
             throw new Error(errorMessage);
           }
@@ -465,47 +456,65 @@ const initPaypal = () => {
         }
       },
       async onApprove(data, actions) {
+        console.log("data, actions", data, actions);
         try {
-          const response = await fetch(`/api/orders/${data.orderID}/capture`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+          // const response = await fetch(`/api/orders/${data.orderID}/capture`, {
+          //   method: "POST",
+          //   headers: {
+          //     "Content-Type": "application/json",
+          //   },
+          // });
 
-          const orderData = await response.json();
-          // Three cases to handle:
-          //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
-          //   (2) Other non-recoverable errors -> Show a failure message
-          //   (3) Successful transaction -> Show confirmation or thank you message
+          // const orderData = await response.json();
+          // // Three cases to handle:
+          // //   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
+          // //   (2) Other non-recoverable errors -> Show a failure message
+          // //   (3) Successful transaction -> Show confirmation or thank you message
 
-          const errorDetail = orderData?.details?.[0];
-
-          if (errorDetail?.issue === "INSTRUMENT_DECLINED") {
+          // const errorDetail = orderData?.details?.[0];
+          const captureResult = await paypalCapture(data.orderID);
+          console.log("captureResult", captureResult);
+          if (captureResult?.data?.issue === "INSTRUMENT_DECLINED") {
             // (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
             // recoverable state, per https://developer.paypal.com/docs/checkout/standard/customize/handle-funding-failures/
             return actions.restart();
-          } else if (errorDetail) {
+          } else if (captureResult?.data?.data) {
             // (2) Other non-recoverable errors -> Show a failure message
             throw new Error(
-              `${errorDetail.description} (${orderData.debug_id})`
+              `${captureResult?.data?.data.description} (${captureResult?.data?.debug_id})`
             );
-          } else if (!orderData.purchase_units) {
-            throw new Error(JSON.stringify(orderData));
+          } else if (!captureResult?.data?.purchase_units) {
+            throw new Error(JSON.stringify(captureResult.data));
           } else {
+            const params = buildRequestParams(paypalOrderId.value, 0);
+            payOrder(params).then((res) => {
+              if (res.code === 200) {
+                Snackbar.success("Transaction successful");
+                submitLoading.value = false;
+                setTimeout(() => {
+                  router.push({
+                    path: "/orderDetail",
+                    query: {
+                      orderId: res.data,
+                    },
+                  });
+                }, 1000);
+              }
+            });
             // (3) Successful transaction -> Show confirmation or thank you message
             // Or go to another URL:  actions.redirect('thank_you.html');
-            const transaction =
-              orderData?.purchase_units?.[0]?.payments?.captures?.[0] ||
-              orderData?.purchase_units?.[0]?.payments?.authorizations?.[0];
-            resultMessage(
-              `Transaction ${transaction.status}: ${transaction.id}<br><br>See console for all available details`
-            );
-            console.log(
-              "Capture result",
-              orderData,
-              JSON.stringify(orderData, null, 2)
-            );
+            // const transaction =
+            //   captureResult?.data.purchase_units?.[0]?.payments?.captures?.[0] ||
+            //   captureResult?.data.purchase_units?.[0]?.payments?.authorizations?.[0];
+
+            // resultMessage(
+            //   `Transaction ${transaction.status}: ${transaction.id}<br><br>See console for all available details`
+            // );
+            // console.log(
+            //   "Capture result",
+            //   orderData,
+            //   JSON.stringify(orderData, null, 2)
+            // );
           }
         } catch (error) {
           console.error(error);

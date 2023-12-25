@@ -3,6 +3,7 @@ export default {
     baseUrl: '/colgifts',
     uploadUrl: '/colgifts/upload',
     buildPath: '/',
+    filePath: 'https://ossdiyphone.com/',
   },
   sit: {
     baseUrl: '/colgifts',
@@ -14,9 +15,14 @@ export default {
     uploadUrl: '/colgifts/upload',
     buildPath: '/',
   },
-  prod: {
+  memtoys: {
     baseUrl: '/colgifts',
     uploadUrl: '/colgifts/upload',
-    buildPath: '/',
+    filePath: 'https://ossdiyphone.com/',
+  },
+  colgifts: {
+    baseUrl: '/colgifts',
+    uploadUrl: '/colgifts/upload',
+    filePath: 'https://osscolgifts.com/',
   },
 };

@@ -26,6 +26,8 @@ const baseUrl = {
   sit: './',
   beta: './',
   prod: '/',
+  memtoys: './',
+  colgifts: './',
 };
 const getBaseByMode = (mode) => {
   console.log(
