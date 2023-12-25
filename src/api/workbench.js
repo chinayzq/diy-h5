@@ -123,6 +123,6 @@ export function getPaymentChannel(params) {
 export function createPaypalOrder(params) {
   return axios.post('/createpaypalorder', params);
 }
-export function paypalCapture(id) {
-  return axios.post(`/orders/${id}/capture`);
+export function paypalCapture(id, params) {
+  return axios.post(`/orders/${id}/capture`, params);
 }

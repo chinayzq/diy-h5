@@ -385,6 +385,7 @@ const currentOrderId = ref(null);
 const stripeElements = ref(null);
 const stripeSign = ref(null);
 const paypalOrderId = ref(null);
+const paypalRequestId = ref(null);
 const initCreditCard = async () => {
   const channelResult = await getPaymentChannel();
   if (channelResult.code !== 200) {
@@ -401,7 +402,7 @@ const initCreditCard = async () => {
       break;
     case "2":
       const { data, code } = await createPaymentIntent({
-        amount: 200,
+        amount: 2,
       });
       if (code !== 200) {
         Snackbar.error("Stripe Pay initialization failed");
@@ -439,6 +440,7 @@ const initPaypal = () => {
           console.log("createOrderResult", createOrderResult);
           if (createOrderResult.data.id) {
             paypalOrderId.value = createOrderResult.data.orderId;
+            paypalRequestId.value = createOrderResult.data.requestId;
             return createOrderResult.data.id;
           } else {
             const errorDetail = createOrderResult.data?.details?.[0];
@@ -472,7 +474,9 @@ const initPaypal = () => {
           // //   (3) Successful transaction -> Show confirmation or thank you message
 
           // const errorDetail = orderData?.details?.[0];
-          const captureResult = await paypalCapture(data.orderID);
+          const captureResult = await paypalCapture(data.orderID, {
+            requestId: paypalRequestId.value,
+          });
           console.log("captureResult", captureResult);
           if (captureResult?.data?.issue === "INSTRUMENT_DECLINED") {
             // (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
