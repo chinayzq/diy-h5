@@ -17,7 +17,7 @@
     <script src="https://js.stripe.com/v3/"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=ATFraEWhQPvev1foM1oxZOTguD2kJcTZPlHTyunMK-p7z4FdSOuvw1PS4Z8Nq7hudevY8mmDsZT0Ppfu&currency=USD"></script>
     <link rel="icon" href="/favicon.ico" />
-    <title>Colgifts</title>
+    <title id="projectName">Colgifts</title>
     <script>
       var coverSupport =
         'CSS' in window &&
@@ -28,7 +28,9 @@
           (coverSupport ? ', viewport-fit=cover' : '') +
           '" />'
       );
-
+      if (location.href.includes('memtoys')) {
+        document.querySelector('#projectName').innerHTML = 'memtoys';
+      }
       // 禁止双指放大
 
       // document.documentElement.addEventListener(

@@ -21,7 +21,7 @@
             height="135"
             style="display: flex; justify-content: center; align-items: center"
             :loading="$LoadingImage"
-            :src="`https://ossdiyphone.com/${item.templateUrl}`"
+            :src="dealImageUrlNew(item.templateUrl)"
             alt=""
           />
         </div>
@@ -119,6 +119,7 @@ import { onBeforeMount, ref, watch } from "vue";
 import { getStorage } from "@/utils/localStorage";
 import CartList from "./components/cartList.vue";
 import { useRouter } from "vue-router";
+import { dealImageUrlNew } from "@/utils";
 
 const currentLocal = getStorage();
 const currentProductId = ref(currentLocal.selectProductId);

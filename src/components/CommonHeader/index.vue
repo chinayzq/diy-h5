@@ -8,9 +8,17 @@
         class="menu-icon"
       />
       <img
+        v-if="currentEnv === 'colgifts'"
         @click="jumpToHome"
         class="title-logo"
         src="@/assets/images/project_logo.png"
+        alt=""
+      />
+      <img
+        v-if="currentEnv === 'memtoys'"
+        @click="jumpToHome"
+        class="title-logo"
+        src="@/assets/images/memtoys_logo.png"
         alt=""
       />
       <img
@@ -48,7 +56,10 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import Cookies from "js-cookie";
+import config from "~/config";
 
+const currentEnv = ref(config[import.meta.env.MODE].env);
+console.log("currentEnv", currentEnv);
 const props = defineProps({
   source: {
     type: String,
@@ -155,6 +166,8 @@ const jumpToPage = ({ id, type, path }) => {
     }
     .title-logo {
       cursor: pointer;
+      width: 200px;
+      height: 59px;
     }
   }
   .single-item {

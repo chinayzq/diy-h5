@@ -218,7 +218,7 @@
           <span class="image-container">
             <img
               class="order-image"
-              :src="`https://ossdiyphone.com/${item.templateUrl}`"
+              :src="dealImageUrlNew(item.templateUrl)"
               alt=""
             />
             <!-- <var-icon name="close-circle-outline" class="delete-icon" /> -->
@@ -250,9 +250,13 @@
           }}
         </span>
       </div>
-      <div class="subtotal-line border-line" style="padding-bottom: 20px">
+      <div class="subtotal-line">
         <span class="label"> Coupon </span>
         <span class="value"> {{ discountCode || "-" }} </span>
+      </div>
+      <div class="subtotal-line border-line" style="padding-bottom: 20px">
+        <span class="label"> Total </span>
+        <span class="value"> ${{ countToFixed(paidTotal) }} </span>
       </div>
       <div class="pay-methods" v-show="paidTotal > 0">
         <var-radio-group v-model="payMethod" direction="vertical">
@@ -340,7 +344,7 @@ import { useRouter } from "vue-router";
 import { Snackbar } from "@varlet/ui";
 import md5 from "md5";
 import * as CountryList from "./country.js";
-import { countToFixed } from "@/utils";
+import { countToFixed, dealImageUrlNew } from "@/utils";
 
 const countryList = ref(CountryList.default);
 const specialItem = (country) => {
@@ -402,7 +406,7 @@ const initCreditCard = async () => {
       break;
     case "2":
       const { data, code } = await createPaymentIntent({
-        amount: 2,
+        amount: paidTotal.value,
       });
       if (code !== 200) {
         Snackbar.error("Stripe Pay initialization failed");
@@ -434,7 +438,7 @@ const initPaypal = () => {
         try {
           const createOrderResult = await createPaypalOrder({
             billingJson: formData.value,
-            paidPrice: 200,
+            paidPrice: paidTotal.value,
             shipAddressJson: shipform.value,
           });
           console.log("createOrderResult", createOrderResult);
@@ -771,8 +775,7 @@ const saveOrderHandler = (orderId, payMethod) => {
 const buildTokenParams = () => {
   const { country, email } = formData.value;
   let payload = {};
-  // payload["amount"] = paidTotal.value * 100;
-  payload["amount"] = 2 * 100;
+  payload["amount"] = paidTotal.value * 100;
   payload["autoRedirect"] = "false";
   payload["country"] = country;
   payload["currency"] = "USD";

@@ -23,7 +23,7 @@
             width="50"
             height="100"
             :loading="$LoadingImage"
-            :src="`https://ossdiyphone.com/${item.templateUrl}`"
+            :src="dealImageUrlNew(item.templateUrl)"
             lazy
             alt=""
           />
@@ -117,6 +117,7 @@ import {
 } from "@/api/workbench";
 import { onBeforeMount, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import { dealImageUrlNew } from "@/utils";
 
 const props = defineProps({
   shipping: {
