@@ -37,7 +37,7 @@
             :rules="[(v) => !!v || 'Phone is required']"
             v-model="formData.phone"
           />
-          <var-select
+          <!-- <var-select
             variant="outlined"
             size="small"
             placeholder="Country *"
@@ -50,7 +50,21 @@
               :value="item.value"
               :key="item"
             />
-          </var-select>
+          </var-select> -->
+          <el-select
+            v-model="formData.country"
+            filterable
+            placeholder="Country *"
+            style="height: 40px; width: 100%"
+            class="country-selector"
+          >
+            <el-option
+              v-for="item in countryList"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
           <var-input
             variant="outlined"
             size="small"
@@ -133,7 +147,7 @@
               :rules="[(v) => !!v || 'Phone is required']"
               v-model="shipform.phone"
             />
-            <var-select
+            <!-- <var-select
               variant="outlined"
               size="small"
               placeholder="Country *"
@@ -146,7 +160,21 @@
                 :value="item.value"
                 :key="item"
               />
-            </var-select>
+            </var-select> -->
+            <el-select
+              v-model="shipform.country"
+              filterable
+              placeholder="Country *"
+              style="height: 40px; width: 100%"
+              class="country-selector"
+            >
+              <el-option
+                v-for="item in countryList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
             <var-input
               variant="outlined"
               size="small"
@@ -345,6 +373,8 @@ import { Snackbar } from "@varlet/ui";
 import md5 from "md5";
 import * as CountryList from "./country.js";
 import { countToFixed, dealImageUrlNew } from "@/utils";
+import { ElSelect, ElOption } from "element-plus";
+import "element-plus/theme-chalk/index.css"; // 引入组件样式
 
 const countryList = ref(CountryList.default);
 const specialItem = (country) => {
@@ -1044,6 +1074,13 @@ const buildRequestParams = (orderId, paymentMethod, payCatelog, sign) => {
   }
   :deep(.var-hover-overlay) {
     display: none;
+  }
+  :deep(.el-input__wrapper) {
+    box-shadow: 0 0 0 0.26667rem rgb(136, 136, 136) inset;
+    height: 40px;
+    line-height: 40px;
+    color: rgb(85, 85, 85);
+    font-size: 17px;
   }
 }
 </style>
