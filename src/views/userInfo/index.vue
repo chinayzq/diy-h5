@@ -103,7 +103,7 @@ const userInfo = ref({});
 const initDatas = () => {
   // 获取token，如果没有直接跳login
   if (!Cookies.get("token")) {
-    router.push("/login");
+    router.push("/workbench");
   }
   // 调用用户详情接口
   getUserInfo().then((res) => {
