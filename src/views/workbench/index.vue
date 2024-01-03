@@ -960,6 +960,12 @@ const confirmHandler = () => {
       phoneName: selectPhoneName.value,
       // printUrl: printImage.value,
       printUrl: null,
+      printData: {
+        graphDatas: dragStickerList.value,
+        modelImage: selectModelImage.value,
+        caseImage: selectCaseImage.value,
+        maskImage: selectMaskImage.value,
+      },
     },
     productImageList: dragStickerList.value.map((item) => {
       return item.url.split("/").slice(-1)[0];
