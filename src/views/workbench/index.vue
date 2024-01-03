@@ -1,5 +1,16 @@
 <template>
   <div class="workbench-component" @mouseup.stop="clearActiveState">
+    <!-- <div
+      id="logContainer"
+      style="
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 99999;
+        color: #fff;
+        background: #000;
+      "
+    ></div> -->
     <div
       class="header-container"
       :style="{
@@ -831,7 +842,7 @@ const openModelDialog = () => {
 const printDialogShow = ref(false);
 const previewImage = ref(null);
 const previewImageBase64 = ref(null);
-const printImage = ref(null);
+// const printImage = ref(null);
 // 手机壳贴纸测试
 const printHandler = async () => {
   if (stickerType.value === 1) {
@@ -842,11 +853,11 @@ const printHandler = async () => {
     setGraphDomsScale(1, true);
     const resultList = await exportImageAsync();
     const templateObj = resultList[0];
-    const printMaxImage = resultList[1];
+    // const printMaxImage = resultList[1];
     setGraphDomsScale(defaultScale.value, false);
     previewImage.value = templateObj.templateUrl;
     previewImageBase64.value = templateObj.templateUrlBase64;
-    printImage.value = printMaxImage;
+    // printImage.value = printMaxImage;
     saveAsDraft(templateObj.templateUrl);
   } else {
     confirmLoading.value = true;
@@ -858,11 +869,11 @@ const printHandler = async () => {
       setGraphDomsScale(1, true);
       const resultList = await exportImageAsync();
       const templateObj = resultList[0];
-      const printMaxImage = resultList[1];
+      // const printMaxImage = resultList[1];
       setGraphDomsScale(defaultScale.value, false);
       previewImage.value = templateObj.templateUrl;
       previewImageBase64.value = templateObj.templateUrlBase64;
-      printImage.value = printMaxImage;
+      // printImage.value = printMaxImage;
       confirmLoading.value = false;
       // 还原画布
       selectMaskImage.value = caseStickerDatas.value.maskImage;
@@ -879,7 +890,7 @@ const exportImageAsync = () => {
         model: selectModelImage.value,
         caseImage: selectCaseImage.value,
       }),
-      dealPrintImageHandler(),
+      // dealPrintImageHandler(),
     ]).then((result) => {
       resolve(result);
     });
@@ -947,7 +958,8 @@ const confirmHandler = () => {
       extend2,
       extend3,
       phoneName: selectPhoneName.value,
-      printUrl: printImage.value,
+      // printUrl: printImage.value,
+      printUrl: null,
     },
     productImageList: dragStickerList.value.map((item) => {
       return item.url.split("/").slice(-1)[0];

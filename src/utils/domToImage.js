@@ -167,25 +167,46 @@ export function exportAsImage(domId, images) {
   });
 }
 
+function sizeDefined(width, height) {
+  const result = {
+    width,
+    height,
+  };
+  const defaultWidth = 950;
+  if (result.width > defaultWidth) {
+    const sizeRate = result.width / defaultWidth;
+    result.width = defaultWidth;
+    result.height = result.height / sizeRate;
+  }
+  return result;
+}
 // 导出打印图
 export const exportPrintImage = (domId, maskImages, width, height) => {
   const cavasDom = document.getElementById('myCanvasMax');
-  cavasDom.width = `${width}`;
-  cavasDom.height = `${height}`;
+  const definedSize = sizeDefined(width, height);
+  console.log('definedSize', definedSize);
+  document.querySelector(
+    '#logContainer'
+  ).innerHTML += `</br>log-${definedSize.width}-${definedSize.height}`;
+  cavasDom.width = `${definedSize.width}`;
+  cavasDom.height = `${definedSize.height}`;
   let myCanvasMax = cavasDom.getContext('2d');
   return new Promise((resolve) => {
     html2Canvas(document.querySelector(`#${domId}`), {
-      width,
-      height,
+      width: definedSize.width,
+      height: definedSize.height,
       useCORS: true,
       allowTaint: true,
     }).then((canvas) => {
       let imageURL = canvas.toDataURL('image/png'); //canvas转base64图片
+      document.querySelector(
+        '#logContainer'
+      ).innerHTML += `</br>log-${imageURL}`;
       let img = new Image();
       img.src = imageURL;
       img.onload = async () => {
         myCanvasMax.globalCompositeOperation = 'source-over';
-        myCanvasMax.drawImage(img, 0, 0, width, height);
+        myCanvasMax.drawImage(img, 0, 0, definedSize.width, definedSize.height);
         // if (maskImages) {
         //   await drawSingleMax(myCanvasMax, maskImages, 'mask', width, height);
         // }
