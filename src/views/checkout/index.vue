@@ -387,11 +387,9 @@ const specialItem = (country) => {
   return false;
 };
 const specialItemValue = (country) => {
-  console.log("country", country);
   for (let i = 0; i < countryList.value.length; i++) {
     const { special, value, key } = countryList.value[i] || {};
     if (value === country && special) {
-      console.log("key", key);
       return key;
     }
   }
@@ -465,30 +463,35 @@ const initPaypal = () => {
   window.paypal
     .Buttons({
       async createOrder() {
-        try {
-          const createOrderResult = await createPaypalOrder({
-            billingJson: formData.value,
-            paidPrice: paidTotal.value,
-            shipAddressJson: shipform.value,
-          });
-          console.log("createOrderResult", createOrderResult);
-          if (createOrderResult.data.id) {
-            paypalOrderId.value = createOrderResult.data.orderId;
-            paypalRequestId.value = createOrderResult.data.requestId;
-            return createOrderResult.data.id;
-          } else {
-            const errorDetail = createOrderResult.data?.details?.[0];
-            const errorMessage = errorDetail
-              ? `${errorDetail.issue} ${errorDetail.description} (${createOrderResult.data.debug_id})`
-              : JSON.stringify(createOrderResult.data);
+        setFormDataToLocal();
+        // form表单必填校验
+        let valid = await formIns.value.validate();
+        if (!submitLoading.value && valid) {
+          try {
+            const createOrderResult = await createPaypalOrder({
+              billingJson: formData.value,
+              paidPrice: paidTotal.value,
+              shipAddressJson: shipform.value,
+            });
+            console.log("createOrderResult", createOrderResult);
+            if (createOrderResult.data.id) {
+              paypalOrderId.value = createOrderResult.data.orderId;
+              paypalRequestId.value = createOrderResult.data.requestId;
+              return createOrderResult.data.id;
+            } else {
+              const errorDetail = createOrderResult.data?.details?.[0];
+              const errorMessage = errorDetail
+                ? `${errorDetail.issue} ${errorDetail.description} (${createOrderResult.data.debug_id})`
+                : JSON.stringify(createOrderResult.data);
 
-            throw new Error(errorMessage);
+              throw new Error(errorMessage);
+            }
+          } catch (error) {
+            console.error(error);
+            resultMessage(
+              `Could not initiate PayPal Checkout...<br><br>${error}`
+            );
           }
-        } catch (error) {
-          console.error(error);
-          resultMessage(
-            `Could not initiate PayPal Checkout...<br><br>${error}`
-          );
         }
       },
       async onApprove(data, actions) {

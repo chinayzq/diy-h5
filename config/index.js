@@ -1,6 +1,6 @@
 export default {
   development: {
-    env: 'colgifts',
+    env: 'memtoys',
     baseUrl: '/colgifts',
     uploadUrl: '/colgifts/upload',
     buildPath: '/',

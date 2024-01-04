@@ -45,7 +45,7 @@ export function getCartList(params) {
   return axios.get('/listcard', { params });
 }
 export function getShipping(params) {
-  return axios.get('/shipping', { params });
+  return axios.get('/shippinginfo', { params });
 }
 export function deleteProduct(productId) {
   return axios.delete(`/deleteproduct/${productId}`);

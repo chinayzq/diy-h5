@@ -167,7 +167,7 @@ const jumpToPage = ({ id, type, path }) => {
     .title-logo {
       cursor: pointer;
       width: 200px;
-      height: 59px;
+      // height: 59px;
     }
   }
   .single-item {

@@ -14,6 +14,7 @@
       name="window-close"
       :size="30"
       @click="closeHandler"
+      v-if="rightLocalStore"
     />
     <div class="scroll-container">
       <div
@@ -78,6 +79,12 @@ const props = defineProps({
       return [];
     },
   },
+  rightLocalStore: {
+    type: Boolean,
+    default() {
+      return true;
+    },
+  },
 });
 const priceUnit = ref("USD");
 
@@ -139,7 +146,7 @@ const closeHandler = () => {
       display: flex;
       justify-content: space-between;
       .left-part {
-        width: 120px;
+        min-width: 140px;
         display: flex;
         align-items: flex-end;
         justify-content: center;

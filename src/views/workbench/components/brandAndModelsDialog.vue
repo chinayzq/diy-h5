@@ -6,6 +6,7 @@
       name="window-close"
       :size="30"
       @click="closeHandler"
+      v-if="rightLocalStore"
     />
     <div v-show="!loadingFlag" class="main-container">
       <div class="sroll-container">
@@ -81,6 +82,15 @@
 import { getBrandAndModels, getPhoneColor } from "@/api/workbench";
 import { onBeforeMount, ref } from "vue";
 import { dealImageUrlNew } from "@/utils";
+
+const props = defineProps({
+  rightLocalStore: {
+    type: Boolean,
+    default() {
+      return true;
+    },
+  },
+});
 
 onBeforeMount(() => {
   initDatas();

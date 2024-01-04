@@ -4,8 +4,16 @@
     <div class="main-container">
       <img
         @click="jumpToWorkbench"
+        v-if="currentEnv === 'memtoys'"
         class="main-logo"
         src="@/assets/images/main_icon.png"
+        alt=""
+      />
+      <img
+        @click="jumpToWorkbench"
+        v-if="currentEnv === 'colgifts'"
+        class="main-logo"
+        src="@/assets/images/main_icon_colgifts.png"
         alt=""
       />
     </div>
@@ -22,7 +30,9 @@
 import CommonHeader from "@/components/CommonHeader/index.vue";
 import CommonFooter from "@/components/CommonFooter/index.vue";
 import { useRouter } from "vue-router";
-
+import config from "~/config";
+import { ref } from "vue";
+const currentEnv = ref(config[import.meta.env.MODE].env);
 const router = useRouter();
 const jumpToWorkbench = () => {
   router.push("/workbench");

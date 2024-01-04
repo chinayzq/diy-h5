@@ -30,6 +30,11 @@
         :key="index"
         @click.stop="setActive(item)"
       >
+        <var-icon
+          name="close-circle"
+          class="delete-icon"
+          @click.stop="deleteHandler(item)"
+        />
         <span class="text-one" v-if="item.type === 'text'">
           {{ item.content }}
         </span>
@@ -105,6 +110,9 @@ const layersShow = ref(false);
 const setActive = ({ id }) => {
   emit("setActive", id);
 };
+const deleteHandler = (item) => {
+  emit("deleteItem", item);
+};
 </script>
 
 <style lang="less" scoped>
@@ -156,12 +164,20 @@ const setActive = ({ id }) => {
       justify-content: center;
       width: 66px;
       height: 66px;
-      margin-bottom: 10px;
       border: #00000000 solid 1px;
       background: #fff;
+      margin-top: 30px;
+      position: relative;
       .image-one {
         max-height: 100%;
         max-width: 100%;
+      }
+      .delete-icon {
+        cursor: pointer;
+        color: #e15aa3;
+        position: absolute;
+        right: 0;
+        top: -20px;
       }
     }
     .single-layer-active {

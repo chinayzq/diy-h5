@@ -17,6 +17,11 @@
             :key="index"
             @click.stop="setActive(item)"
           >
+            <var-icon
+              name="close-circle"
+              class="delete-icon"
+              @click.stop="deleteHandler(item)"
+            />
             <span class="text-one" v-if="item.type === 'text'">
               {{ item.content }}
             </span>
@@ -45,6 +50,9 @@ const props = defineProps({
 const emit = defineEmits();
 const setActive = ({ id }) => {
   emit("setActive", id);
+};
+const deleteHandler = (item) => {
+  emit("deleteItem", item);
 };
 </script>
 
@@ -95,6 +103,7 @@ const setActive = ({ id }) => {
       align-items: center;
       padding: 5px 0;
       overflow: auto;
+      background-color: rgba(0, 0, 0, 0.2);
       .single-image {
         width: 80px;
         height: 80px;
@@ -107,6 +116,16 @@ const setActive = ({ id }) => {
           height: 70px;
           margin-bottom: 10px;
           border: #ffffff solid 2px;
+          background: #fff;
+          margin-top: 30px;
+          position: relative;
+          .delete-icon {
+            cursor: pointer;
+            color: #e15aa3;
+            position: absolute;
+            right: 0;
+            top: -20px;
+          }
           .image-one {
             max-height: 100%;
             max-width: 100%;

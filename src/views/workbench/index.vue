@@ -224,6 +224,7 @@
         @fullScreen="graphFullScreen"
         @openDraftDialog="openDraftDialog"
         @setActive="setActiveById"
+        @deleteItem="iconDeleteHandler"
         :layers="dragStickerList"
       />
 
@@ -297,11 +298,13 @@
       overlay-class="popup-custom-border"
       position="bottom"
       v-model:show="brandAndModelShow"
+      :close-on-click-overlay="rightLocalStore"
     >
       <BrandAndModelsDialog
         @close="brandAndModelShow = false"
         @nextStep="nextStepHandler"
         @caseStickerNext="caseStickerNextHandler"
+        :rightLocalStore="rightLocalStore"
       />
     </var-popup>
 
@@ -310,6 +313,7 @@
       overlay-class="popup-custom-border"
       position="bottom"
       v-model:show="caseDialogShow"
+      :close-on-click-overlay="rightLocalStore"
     >
       <CaseDialog
         :dataset="selectCaseList"
@@ -317,6 +321,7 @@
         @close="caseDialogShow = false"
         @phoneCaseSelect="phoneCaseSelectHandler"
         @openModelDialog="openModelDialog"
+        :rightLocalStore="rightLocalStore"
       />
     </var-popup>
 
@@ -337,7 +342,7 @@
 
     <!-- Print弹窗 -->
     <var-popup
-      overlay-class="popup-custom-border"
+      overlay-class="popup-custom-border-light"
       position="bottom"
       v-model:show="printDialogShow"
     >
@@ -367,7 +372,11 @@
     <!-- PC - tempaltes -->
     <TemplateSideComponent @templateChange="templateChangeHandler" />
     <!-- PC - layers -->
-    <GraphLayers :layers="dragStickerList" @setActive="setActiveById" />
+    <GraphLayers
+      :layers="dragStickerList"
+      @setActive="setActiveById"
+      @deleteItem="iconDeleteHandler"
+    />
     <!-- continue dialog -->
     <var-overlay v-model:show="continueDialogShow">
       <ContinueDialog @clickEvent="countinueEvent" />
@@ -469,15 +478,28 @@ const freshUndoList = () => {
 const defaultScale = ref(currentClient === "PC" ? 0.8 : 0.65);
 const scale = ref(defaultScale.value);
 
+/**
+ * 初始化本地缓存处理
+ * 1. 如果存在，并且有正确的手机壳信息才让continue
+ * 2. 不存在打开品牌选择弹框，并且不让关闭
+ */
 onBeforeMount(() => {
   initLocalDatas();
 });
 const continueDialogShow = ref(false);
+/**
+ * 判断本地缓存是否正确
+ * 正确：可以关闭手机品牌弹框
+ * 错误：不可以关闭，必须选择
+ */
+const rightLocalStore = ref(false);
 const initLocalDatas = () => {
   const currentLocal = getStorage();
-  if (currentLocal && currentLocal.caseItem) {
+  if (currentLocal && currentLocal.caseItem && currentLocal.caseItem.curPrice) {
+    rightLocalStore.value = true;
     continueDialogShow.value = true;
   } else {
+    rightLocalStore.value = false;
     brandAndModelShow.value = true;
   }
 };
@@ -512,7 +534,7 @@ const countinueEvent = (event) => {
   continueDialogShow.value = false;
 };
 
-// 选择的背景图 - temp
+// 选择的背景图 - 默认
 const selectMaskImage = ref(
   new URL("../../assets/images/mask_temp.webp", import.meta.url).href
 );
@@ -822,6 +844,7 @@ const phoneCaseSelectHandler = (item) => {
   item.exampleUrl = dealImageUrlNew(item.exampleUrl);
   selectCaseItem.value = item;
   setItem("caseItem", item);
+  rightLocalStore.value = true;
   const { url, colorName } = item;
   graphLoading.value = true;
   selectCaseImage.value = dealImageUrlNew(url);
@@ -832,6 +855,11 @@ const phoneCaseSelectHandler = (item) => {
   setTimeout(() => {
     graphLoading.value = false;
   }, 1000);
+  router.replace({
+    query: {
+      phone: colorName,
+    },
+  });
 };
 
 const openModelDialog = () => {
@@ -1246,6 +1274,8 @@ const resizeObj = {
 const resizeStart = (event, item) => {
   event.preventDefault();
   currentItem = item;
+  // 记录当前照片宽高比
+  currentItem.itemRate = item.width / item.height;
   const { clientX, clientY } = eventTransfor(event);
   resizeObj.start = true;
   resizeObj.x = clientX;
@@ -1263,8 +1293,9 @@ const resizeMove = (event, item) => {
     item.fontSize += xDiff / scale.value;
   } else {
     const offsetMax = Math.max(yDiff, xDiff);
-    item.height = item.height + offsetMax / scale.value;
+    // 设置时，高的偏移量需要再除以当前图片原始宽高比，才能保证图片不变形
     item.width = item.width + offsetMax / scale.value;
+    item.height = item.height + offsetMax / scale.value / currentItem.itemRate;
   }
 };
 const resizeEnd = () => {

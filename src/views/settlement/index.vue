@@ -58,12 +58,15 @@
         <span> Subtotal </span>
         <span class="font-italic"> {{ Subtotal }} USD </span>
       </div>
-      <div class="single-line">
+      <div class="single-line" style="margin-bottom: 0">
         <span> Shipping </span>
         <span class="font-italic">
           {{ free ? "FREE" : `${shipping} USD` }}
         </span>
         <!-- <span class="font-italic"> Buy 2 get free shipping </span> -->
+      </div>
+      <div class="single-line-mini">
+        <span> {{ shippingTips }} </span>
       </div>
       <div class="border-line"></div>
       <div class="single-line">
@@ -156,12 +159,14 @@ const policyLinkJump = (type) => {
   const url = policyUrlMap.value[type];
   window.open(url, "_self");
 };
+const shippingTips = ref(null);
 const freshShipping = async () => {
   listLoading.value = true;
   const shippingValue = await getShipping({
     amount: Subtotal.value,
   });
-  shipping.value = Number(shippingValue.data).toFixed(2);
+  shipping.value = Number(shippingValue.data.shipAmount).toFixed(2);
+  shippingTips.value = shippingValue.data.content;
   listLoading.value = false;
 };
 
@@ -378,7 +383,7 @@ const jumpToWorkbench = () => {
   .bottom-container {
     box-sizing: border-box;
     padding: 20px 0;
-    height: 245px;
+    height: 265px;
     width: 100%;
     background: #000000;
     color: #ffffff;
@@ -398,6 +403,15 @@ const jumpToWorkbench = () => {
       font-size: 15px;
       font-family: "JostMedium";
       margin-bottom: 10px;
+    }
+    .single-line-mini {
+      padding: 0 20px;
+      height: 20px;
+      line-height: 20px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      font-family: "JostMedium";
     }
     .border-line {
       border-top: 2px solid #2f2e2c;
