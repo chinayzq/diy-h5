@@ -4,7 +4,7 @@ export default {
     baseUrl: '/colgifts',
     uploadUrl: '/colgifts/upload',
     buildPath: '/',
-    filePath: 'https://osscolgifts.com/',
+    filePath: 'https://ossdiyphone.com/',
   },
   sit: {
     baseUrl: '/colgifts',

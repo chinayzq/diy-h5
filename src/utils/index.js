@@ -83,8 +83,9 @@ export const orderTimeRender = (dat) => {
   if (!dat) return '--';
   dat = new Date(dat);
   const year = dat.getFullYear();
-  const mon =
-    dat.getMonth() + 1 < 10 ? '0' + (dat.getMonth() + 1) : dat.getMonth() + 1;
+  const mon = dat.getMonth() + 1;
+  // dat.getMonth() + 1 < 10 ? '0' + (dat.getMonth() + 1) : dat.getMonth() + 1;
+  console.log('mon', mon);
   const monMap = {
     1: 'January',
     2: 'February',

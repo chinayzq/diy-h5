@@ -85,7 +85,7 @@ export default ({ mode }) =>
       https: true,
       proxy: {
         '/colgifts': {
-          target: 'https://colgifts.com/',
+          target: 'https://memtoys.com/',
           changeOrigin: true,
           // rewrite: (path) => path.replace(/^\/saascloud/, 'saascloud'),
         },

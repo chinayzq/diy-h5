@@ -89,7 +89,9 @@
         </div>
         <div>
           {{
-            `${billingJson?.state} ${billingJson?.city} ${billingJson?.streetAddress} ${billingJson?.apartment}`
+            `${billingJson?.state} ${billingJson?.city} ${
+              billingJson?.streetAddress
+            } ${billingJson?.apartment || ""}`
           }}
         </div>
         <div>
@@ -104,8 +106,8 @@
       </div>
       <div class="thank-you">
         Thanks for using
-        <a class="link-span" href="https://www.memtoys.com">
-          https://www.memtoys.com
+        <a class="link-span" :href="currentDomain">
+          {{ currentDomain }}
         </a>
         !
       </div>
@@ -118,6 +120,12 @@ import { useRoute } from "vue-router";
 import { getOrderDetailById } from "@/api/workbench";
 import { computed, ref } from "vue";
 import { orderTimeRender, dealImageUrlNew, countToFixed } from "@/utils";
+
+const currentDomain = ref(
+  location.href.includes("memtoys")
+    ? "https://www.memtoys.com"
+    : "https://www.colgifts.com"
+);
 
 const route = useRoute();
 const pageLoading = ref(false);
