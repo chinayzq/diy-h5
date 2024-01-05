@@ -35,12 +35,12 @@
             <div class="case-name-line">
               {{ item.colorName }}
             </div>
-            <span class="size-camera-line">
+            <span class="size-camera-line" v-if="item.extend1">
               <span>
                 {{ item.extend1 }}
               </span>
             </span>
-            <span class="size-camera-line">
+            <span class="size-camera-line" v-if="item.extend2">
               <span>
                 {{ item.extend2 }}
               </span>
@@ -146,12 +146,12 @@ const closeHandler = () => {
       display: flex;
       justify-content: space-between;
       .left-part {
-        min-width: 140px;
+        width: 180px;
         display: flex;
         align-items: flex-end;
         justify-content: center;
         .var-image {
-          height: 95%;
+          width: 100%;
         }
       }
       .right-part {
