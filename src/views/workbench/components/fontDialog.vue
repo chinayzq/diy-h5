@@ -38,7 +38,7 @@
             height="40px"
             lazy
             :loading="$LoadingImage"
-            :src="single.extend2"
+            :src="dealImageUrlNew(single.extend2)"
           />
         </div>
       </div>
@@ -75,7 +75,8 @@
 <script setup>
 import { onBeforeMount, ref, watch } from "vue";
 import { getFontSize } from "@/api/workbench";
-import { getAssetsFile } from "@/utils";
+import { getAssetsFile, dealImageUrlNew } from "@/utils";
+
 onBeforeMount(() => {
   initDatas();
 });
@@ -206,7 +207,7 @@ const fontFamilyClick = (item) => {
   emit("fontChange", {
     type: "fontFamily",
     content: fontSizeName,
-    fontFile: extend1,
+    fontFile: dealImageUrlNew(extend1),
   });
 };
 const colorChange = (color) => {
