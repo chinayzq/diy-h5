@@ -146,7 +146,7 @@ const closeHandler = () => {
       display: flex;
       justify-content: space-between;
       .left-part {
-        width: 180px;
+        max-width: 140px;
         display: flex;
         align-items: flex-end;
         justify-content: center;

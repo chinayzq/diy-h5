@@ -70,7 +70,7 @@ const loadingFlag = ref(false);
 const initDatas = () => {
   loadingFlag.value = true;
   getStickers({
-    offset: 0,
+    offset: 1,
     pageSize: 500,
   })
     .then((res) => {

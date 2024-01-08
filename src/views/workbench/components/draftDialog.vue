@@ -51,7 +51,7 @@ onBeforeMount(() => {
 const initDraftList = () => {
   listLoading.value = true;
   getDraftList({
-    offset: 0,
+    offset: 1,
     pageSize: 50,
   })
     .then((res) => {

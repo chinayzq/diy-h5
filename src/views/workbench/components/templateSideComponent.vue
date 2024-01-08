@@ -67,7 +67,7 @@ const tabChange = (index) => {
   }
   listLoading.value = true;
   getTemplateListByCode({
-    offset: 0,
+    offset: 1,
     pageSize: 100,
     typeCode: tabs.value[index].typeCode,
   })

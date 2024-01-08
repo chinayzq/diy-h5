@@ -819,8 +819,11 @@ const nextStepHandler = (datas) => {
   }
   selectModelImage.value = dealImageUrlNew(datas.modelUrl);
   setItem("modelUrl", dealImageUrlNew(datas.modelUrl));
-  selectMaskImage.value = dealImageUrlNew(datas.maskUrl);
-  setItem("maskUrl", dealImageUrlNew(datas.maskUrl));
+  // 如果机型有设置默认蒙板，则设置
+  if (datas.maskUrl) {
+    selectMaskImage.value = dealImageUrlNew(datas.maskUrl);
+    setItem("maskUrl", dealImageUrlNew(datas.maskUrl));
+  }
   selectCaseList.value = datas.caseList;
   selectPhoneName.value = datas.phoneName;
   selectPhoneCode.value = datas.phoneCode;
@@ -842,6 +845,11 @@ const selectCaseItem = ref({
 const phoneCaseSelectHandler = (item) => {
   item.url = dealImageUrlNew(item.url);
   item.exampleUrl = dealImageUrlNew(item.exampleUrl);
+  // 如果手机壳有指定蒙板，则设置指定蒙板
+  if (item.maskImage) {
+    selectMaskImage.value = dealImageUrlNew(item.maskImage);
+    setItem("maskUrl", dealImageUrlNew(item.maskImage));
+  }
   selectCaseItem.value = item;
   setItem("caseItem", item);
   rightLocalStore.value = true;
