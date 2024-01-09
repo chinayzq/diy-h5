@@ -2,7 +2,21 @@
   <div class="checkout-page-component">
     <div class="title-line">
       <!-- <var-icon name="menu" class="menu-icon" /> -->
-      <img src="@/assets/images/project_logo.png" alt="" />
+      <!-- <img src="@/assets/images/project_logo.png" alt="" /> -->
+      <img
+        v-if="currentEnv === 'colgifts'"
+        @click="jumpToHome"
+        class="title-logo"
+        src="@/assets/images/project_logo.png"
+        alt=""
+      />
+      <img
+        v-if="currentEnv === 'memtoys'"
+        @click="jumpToHome"
+        class="title-logo"
+        src="@/assets/images/memtoys_logo.png"
+        alt=""
+      />
     </div>
     <div class="details-container">
       <div class="first-title">Delivery</div>
@@ -375,7 +389,9 @@ import * as CountryList from "./country.js";
 import { countToFixed, dealImageUrlNew } from "@/utils";
 import { ElSelect, ElOption } from "element-plus";
 import "element-plus/theme-chalk/index.css"; // 引入组件样式
+import config from "~/config";
 
+const currentEnv = ref(config[import.meta.env.MODE].env);
 const countryList = ref(CountryList.default);
 const specialItem = (country) => {
   for (let i = 0; i < countryList.value.length; i++) {
@@ -609,7 +625,7 @@ const getFormDataFromLocal = () => {
       shipform.value = JSON.parse(shippingForm);
     }
   } catch (error) {
-    console.log("init local datas failed!");
+    Snackbar.error("init local datas failed!");
   }
 };
 const shipform = ref({
@@ -911,6 +927,11 @@ const buildRequestParams = (orderId, paymentMethod, payCatelog, sign) => {
     align-items: center;
     justify-content: center;
     position: relative;
+    .title-logo {
+      cursor: pointer;
+      width: 200px;
+      // height: 59px;
+    }
     .menu-icon {
       position: absolute;
       left: 0;
