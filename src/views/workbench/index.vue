@@ -739,7 +739,7 @@ const templateChangeHandler = (templateId) => {
 };
 
 const stickersShow = ref(false);
-const stickerSelectHandler = (url) => {
+const stickerSelectHandler = async (url) => {
   console.log("url", url);
   if (replaceItem.value.id) {
     dragStickerList.value.forEach((item) => {
@@ -751,7 +751,8 @@ const stickerSelectHandler = (url) => {
     replaceItem.value = {};
     freshUndoList();
   } else {
-    addStickerToGraph(url, true);
+    const imageHeight = await getImageSize(url);
+    addStickerToGraph(url, true, imageHeight);
   }
 };
 
@@ -1006,7 +1007,7 @@ const confirmHandler = () => {
       },
     },
     productImageList: dragStickerList.value.map((item) => {
-      return item.url.split("/").slice(-1)[0];
+      return item.url ? item.url.split("/").slice(-1)[0] : "";
     }),
     phoneCode: selectPhoneCode.value,
     templateUrl: previewImage.value,
@@ -1098,6 +1099,26 @@ const addStickerToGraph = (url, activeFlag = false, imageHeight = 100) => {
     active: activeFlag,
   });
   freshUndoList();
+};
+const getImageSize = (url) => {
+  return new Promise((resolve) => {
+    // let reader = new FileReader();
+    // reader.readAsDataURL(file.file);
+    // reader.onload = (e) => {
+    // const img = e.target.result;
+    const image = new Image();
+    image.src = url;
+
+    image.onload = (_) => {
+      let width = image.width;
+      let height = image.height;
+      console.log("width, height", width, height);
+      const imageHeight = (100 / width) * height;
+      resolve(imageHeight);
+      // 然后就可以做需要的操作了
+    };
+    // };
+  });
 };
 const replaceImageUrl = (url) => {
   dragStickerList.value.forEach((item) => {
