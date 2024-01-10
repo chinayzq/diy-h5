@@ -4,7 +4,6 @@ import router from './router/index';
 import Varlet from '@varlet/ui';
 import '@varlet/ui/es/style';
 import { initGlableFilters } from './utils';
-// import 'amfe-flexible/index.js';
 import { setDomFontSize } from './utils/dom';
 import Loading from '@/components/Loading/index.vue';
 import { setLayout, setDynamicScript } from '@/utils';
