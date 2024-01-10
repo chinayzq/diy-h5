@@ -1,6 +1,6 @@
 <template>
   <div class="workbench-component" @mouseup.stop="clearActiveState">
-    <div
+    <!-- <div
       id="logContainer"
       style="
         position: absolute;
@@ -13,7 +13,7 @@
         overflow: auto;
         width: 100%;
       "
-    ></div>
+    ></div> -->
     <div
       class="header-container"
       :style="{
@@ -426,28 +426,7 @@ import DeleteIcon from "@/assets/images/drag_delete_icon.png";
 import PlusIcon from "@/assets/images/drag_plus_icon.svg";
 import ResizeIcon from "@/assets/images/drag_resize_icon.png";
 import RotateIcon from "@/assets/images/drag_rotate_icon.svg";
-import Hammer from "hammerjs";
 import { judgeClient, setCookie } from "@/utils";
-
-// 双指缩放
-const scaleIndex = 1;
-const bindScaleEvent = (id) => {
-  let _node = document.querySelector("#drag_dom_" + id);
-  let hand = new Hammer(_node);
-  console.log("hand", hand);
-  hand.get("pinch").set({ enable: true });
-  hand.on("pinchmove pinchstart pinchin pinchout", (e) => {
-    //缩放
-    if (e.type == "pinchstart") {
-      scaleIndex = this.scaleCount || 1;
-    }
-    const scaleCount = this.scaleIndex * e.scale;
-    document.querySelector(
-      "#logContainer"
-    ).innerHTML += `</br>scale - ${scaleCount}`;
-    // _node.style.transform = "scale(" + (this.scaleIndex * e.scale)+ ")"
-  });
-};
 
 // 手机壳贴纸测试
 // stickerType: 1: 手机壳; 2: 手机壳贴纸
@@ -1178,7 +1157,6 @@ const graphClearHandler = () => {
 const activeItem = (dragItem) => {
   clearActiveState();
   dragItem.active = true;
-  bindScaleEvent(dragItem.id);
 };
 // 清除所有拖拽图形active状态
 const clearActiveState = () => {
@@ -1244,19 +1222,18 @@ const draggingItem = {
   start: false,
 };
 const dragHandler = (event, item) => {
-  // const touchesCount = event.changedTouches.length;
-  // if (touchesCount === 2) {
-  //   // 双指缩放
-  //   const touch1 = event.changedTouches[0];
-  //   const touch2 = event.changedTouches[1];
-  //   const endX = Math.abs(touch1.pageX - touch2.pageX);
-  //   const scaleCalc = endX - draggingItem.startX;
-  //   item.scale += scaleCalc * 0.05;
-  //   document.querySelector(
-  //     "#logContainer"
-  //   ).innerHTML += `</br>scale - ${scaleCalc}`;
-  //   return;
-  // }
+  const touchesCount = event?.touches?.length;
+  if (touchesCount === 2) {
+    // 双指缩放
+    const touch1 = event.touches[0];
+    const touch2 = event.touches[1];
+    const currentScale =
+      getDistance(touch1, touch2) /
+      getDistance(draggingItem.startPointer[0], draggingItem.startPointer[1]);
+    item.scale = currentScale.toFixed(2);
+    event.preventDefault();
+    return;
+  }
   // 单指拖动
   const { clientX, clientY } = eventTransfor(event);
   if (clientY === 0 || clientX === 0 || !draggingItem.start) return;
@@ -1268,18 +1245,21 @@ const dragHandler = (event, item) => {
   item.left = item.left + xDiff / scale.value;
 };
 let startTimestamp = 0;
+/*
+ * 两点的距离
+ */
+const getDistance = (p1, p2) => {
+  var x = p2.pageX - p1.pageX,
+    y = p2.pageY - p1.pageY;
+  return Math.sqrt(x * x + y * y);
+};
 const dragStartHandler = (event, item) => {
-  // const touchesCount = event?.changedTouches?.length;
-  // if (touchesCount === 2) {
-  //   // 双指缩放 - 记录开始坐标
-  //   const touch1 = event.changedTouches[0];
-  //   const touch2 = event.changedTouches[1];
-  //   draggingItem.startX = Math.abs(touch1.pageX - touch2.pageX);
-  //   document.querySelector(
-  //     "#logContainer"
-  //   ).innerHTML += `</br>startX - ${draggingItem.startX}`;
-  //   return;
-  // }
+  const touchesCount = event?.touches?.length;
+  if (touchesCount === 2) {
+    // 双指缩放 - 记录开始坐标
+    draggingItem.startPointer = event.touches;
+    return;
+  }
   startTimestamp = new Date().getTime();
   activeItem(item);
   currentItem = item;
