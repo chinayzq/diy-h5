@@ -62,9 +62,6 @@ const jumpToWorkbench = () => {
     align-items: center;
     justify-content: center;
     flex: 1;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
     .main-logo {
       cursor: pointer;
       width: 200px;
@@ -76,6 +73,10 @@ const jumpToWorkbench = () => {
         rgba(255, 255, 255, 0.3)
       ),
       url("../../assets/images/home_main_background.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 80%;
   }
 }
 </style>

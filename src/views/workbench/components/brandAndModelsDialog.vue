@@ -28,13 +28,13 @@
               {{ item.brandName }} case
             </span>
           </div>
-          <!-- <span
+          <span
             class="single-brand"
             style="margin: 15px 0; display: inline-block"
             @click="caseStickerSelect"
           >
             Case Sticker
-          </span> -->
+          </span>
         </div>
         <div class="model-container">
           <div class="title-line">Model</div>
