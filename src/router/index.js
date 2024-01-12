@@ -84,4 +84,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   next();
 });
+router.afterEach((to, from, next) => {
+  document.title = to.fullPath.slice(1);
+});
 export default router;
