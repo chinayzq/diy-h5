@@ -2,7 +2,7 @@ import axios from '@/utils/axios.js';
 import qs from 'qs';
 
 export function getBrandAndModels(params) {
-  return axios.get('/list/phonemodel', params);
+  return axios.get('/list/phonemodel', { params });
 }
 // 通过手机型号获取手机壳信息
 export function getPhoneColor(params) {

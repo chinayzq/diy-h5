@@ -8,11 +8,12 @@
       @click="closeHandler"
       v-if="rightLocalStore"
     />
-    <div v-show="!loadingFlag" class="main-container">
+    <var-tabs v-model:active="active">
+      <var-tab name="phoneCase">phoneCase</var-tab>
+      <var-tab name="phoneSticker">phoneSticker</var-tab>
+    </var-tabs>
+    <div v-show="!loadingFlag && active === 'phoneCase'" class="main-container">
       <div class="sroll-container">
-        <!-- <div style="font-size: 10px; color: #000; margin-bottom: 15px">
-          only sale phone cases and not original products, only adapters.
-        </div> -->
         <div class="brand-container">
           <div class="title-line">Brand</div>
           <div class="brand-list">
@@ -28,13 +29,13 @@
               {{ item.brandName }} case
             </span>
           </div>
-          <span
+          <!-- <span
             class="single-brand"
             style="margin: 15px 0; display: inline-block"
             @click="caseStickerSelect"
           >
             Case Sticker
-          </span>
+          </span> -->
         </div>
         <div class="model-container">
           <div class="title-line">Model</div>
@@ -73,16 +74,75 @@
           </div>
         </div>
       </div>
-      <div class="next-step" @click="nextStepHandler">Next Step</div>
     </div>
+    <div
+      v-show="!loadingFlag && active === 'phoneSticker'"
+      class="main-container"
+    >
+      <div class="sroll-container">
+        <div class="brand-container">
+          <div class="title-line">Brand</div>
+          <div class="brand-list">
+            <span
+              :class="[
+                'single-brand',
+                index === stickerBrandIndex && 'single-brand-active',
+              ]"
+              v-for="(item, index) in dataList2"
+              :key="index"
+              @click="stickerBrandIndex = index"
+            >
+              {{ item.brandName }}
+            </span>
+          </div>
+          <!-- <span
+            class="single-brand"
+            style="margin: 15px 0; display: inline-block"
+            @click="caseStickerSelect"
+          >
+            Case Sticker
+          </span> -->
+        </div>
+        <div class="model-container">
+          <div class="title-line">Model</div>
+          <div class="model-list" v-if="dataList2[stickerBrandIndex]">
+            <span
+              :class="[
+                'single-model',
+                modelIndex === stickerModelIndex && 'single-model-active',
+              ]"
+              v-for="(model, modelIndex) in dataList2[stickerBrandIndex]
+                .modelList"
+              :key="modelIndex"
+              @click="modelClickHandler(model, modelIndex)"
+            >
+              <!-- 手机壳贴纸测试 -->
+              {{ model.phoneName }} sticker
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="next-step" @click="nextStepHandler">Next Step</div>
   </div>
 </template>
 
 <script setup>
 import { getBrandAndModels, getPhoneColor } from "@/api/workbench";
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref, watch } from "vue";
 import { dealImageUrlNew } from "@/utils";
 
+const active = ref("phoneCase");
+watch(
+  () => active.value,
+  (value) => {
+    if (value === "phoneCase") {
+      modelClickHandler(dataList.value[0].modelList[0], 0);
+    } else {
+      modelClickHandler(dataList2.value[0].modelList[0], 0);
+    }
+  }
+);
 const props = defineProps({
   rightLocalStore: {
     type: Boolean,
@@ -92,30 +152,39 @@ const props = defineProps({
   },
 });
 
-onBeforeMount(() => {
-  initDatas();
-});
-
+// 手机壳数据
 const dataList = ref([]);
+// 贴纸数据
+const dataList2 = ref([]);
 const loadingFlag = ref(false);
-const initDatas = () => {
+const initDatas = (type) => {
+  // phoneCase | phoneSticker
   loadingFlag.value = true;
-  getBrandAndModels()
+  getBrandAndModels({
+    source: type === "phoneCase" ? 1 : 2,
+  })
     .then((res) => {
-      console.log(res);
       if (res.code === 200) {
-        dataList.value = res.data;
-        modelClickHandler(res.data[0].modelList[0], 0);
+        if (type === "phoneCase") {
+          dataList.value = res.data;
+          modelClickHandler(res.data[0].modelList[0], 0);
+        } else if (type === "phoneSticker") {
+          dataList2.value = res.data;
+        }
       }
     })
     .finally(() => {
       loadingFlag.value = false;
     });
 };
+initDatas("phoneCase");
+initDatas("phoneSticker");
 
 const activeBrandIndex = ref(0);
 const activeModelIndex = ref(0);
 const activeCaseIndex = ref(0);
+const stickerBrandIndex = ref(0);
+const stickerModelIndex = ref(0);
 const activePhoneName = ref(null);
 const activePhoneCode = ref(null);
 const modelClickHandler = (model, index) => {
@@ -133,6 +202,7 @@ const listLoading = ref(false);
 const getCaseByPhoneCode = (phoneCode) => {
   listLoading.value = true;
   getPhoneColor({
+    source: active.value === "phoneCase" ? 1 : 2,
     phoneCode,
   })
     .then((res) => {
@@ -150,23 +220,39 @@ const getCaseByPhoneCode = (phoneCode) => {
 
 const emit = defineEmits();
 const nextStepHandler = () => {
-  const brandName = dataList.value[activeBrandIndex.value].brandName;
-  const modelUrl = phoneColorList.value[activeCaseIndex.value].url;
-  const maskUrl = maskList.value[0].url;
-  const printAdjust = printImage.value[0];
-  emit("nextStep", {
-    caseList: caseList.value, //手机壳列表&example列表
-    phoneName: activePhoneName.value, // 机型名称
-    phoneCode: activePhoneCode.value, // 机型Code
-    modelUrl, // 机型背景图
-    brandName, // 品牌名称
-    maskUrl, // 蒙版背景图
-    printAdjust: {
-      // 打印调整
-      width: printAdjust.extend1 || null,
-      height: printAdjust.extend2 || null,
-    },
-  });
+  if (active.value === "phoneCase") {
+    const brandName = dataList.value[activeBrandIndex.value].brandName;
+    const modelUrl = phoneColorList.value[activeCaseIndex.value].url;
+    const maskUrl = maskList.value[0].url;
+    const printAdjust = printImage.value[0];
+    emit("nextStep", {
+      source: active.value === "phoneCase" ? 1 : 2,
+      caseList: caseList.value, //手机壳列表&example列表
+      phoneName: activePhoneName.value, // 机型名称
+      phoneCode: activePhoneCode.value, // 机型Code
+      modelUrl, // 机型背景图
+      brandName, // 品牌名称
+      maskUrl, // 蒙版背景图
+      printAdjust: {
+        // 打印调整
+        width: printAdjust.extend1 || null,
+        height: printAdjust.extend2 || null,
+      },
+    });
+  } else {
+    const brandName = dataList2.value[activeBrandIndex.value].brandName;
+    const modelUrl = phoneColorList.value[activeCaseIndex.value].url;
+    const maskUrl = maskList.value[0].url;
+    emit("nextStep", {
+      source: active.value === "phoneCase" ? 1 : 2,
+      caseList: caseList.value, // 贴纸列表
+      phoneName: activePhoneName.value, // 机型名称
+      phoneCode: activePhoneCode.value, // 机型Code
+      modelUrl, // 机型背景图
+      brandName, // 品牌名称
+      maskUrl, // 手机壳背景图
+    });
+  }
 };
 
 const caseStickerSelect = () => {
@@ -201,7 +287,7 @@ const closeHandler = () => {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 100%;
+    height: calc(100% - 120px);
     overflow: auto;
     .sroll-container {
       flex: 1;

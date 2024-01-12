@@ -810,30 +810,46 @@ const selectPhoneCode = ref("IPHONE14");
 const selectCaseName = ref("Clear Impact Case - Black");
 const nextStepHandler = (datas) => {
   // 手机壳贴纸测试
-  stickerType.value = 1;
-  if (
-    datas.printAdjust &&
-    datas.printAdjust.width &&
-    datas.printAdjust.height
-  ) {
-    setItem("printAdjust", datas.printAdjust);
+  stickerType.value = datas.source || 1;
+  setItem("source", datas.source || 1);
+  if (datas.source === 1) {
+    if (
+      datas.printAdjust &&
+      datas.printAdjust.width &&
+      datas.printAdjust.height
+    ) {
+      setItem("printAdjust", datas.printAdjust);
+    } else {
+      removeItem("printAdjust");
+    }
+    selectModelImage.value = dealImageUrlNew(datas.modelUrl);
+    setItem("modelUrl", dealImageUrlNew(datas.modelUrl));
+    // 如果机型有设置默认蒙板，则设置
+    if (datas.maskUrl) {
+      selectMaskImage.value = dealImageUrlNew(datas.maskUrl);
+      setItem("maskUrl", dealImageUrlNew(datas.maskUrl));
+    }
+    selectCaseList.value = datas.caseList;
+    selectPhoneName.value = datas.phoneName;
+    selectPhoneCode.value = datas.phoneCode;
+    setItem("phoneName", datas.phoneName);
+    setItem("brandName", datas.brandName);
+    brandAndModelShow.value = false;
+    caseDialogShow.value = true;
   } else {
-    removeItem("printAdjust");
+    selectPhoneName.value = datas.phoneName;
+    setItem("phoneName", datas.phoneName);
+    setItem("brandName", datas.brandName);
+    selectCaseList.value = datas.caseList;
+    brandAndModelShow.value = false;
+    caseDialogShow.value = true;
+    // modelUrl - 机型背景图
+    // maskUrl - 手机壳背景图
+    // caseList - 贴纸列表（phoneCaseSelectHandler）
+    //  - url: 贴纸底图
+    //  - maskImage：贴纸蒙板
+    //  - exampleUrl：样例图
   }
-  selectModelImage.value = dealImageUrlNew(datas.modelUrl);
-  setItem("modelUrl", dealImageUrlNew(datas.modelUrl));
-  // 如果机型有设置默认蒙板，则设置
-  if (datas.maskUrl) {
-    selectMaskImage.value = dealImageUrlNew(datas.maskUrl);
-    setItem("maskUrl", dealImageUrlNew(datas.maskUrl));
-  }
-  selectCaseList.value = datas.caseList;
-  selectPhoneName.value = datas.phoneName;
-  selectPhoneCode.value = datas.phoneCode;
-  setItem("phoneName", datas.phoneName);
-  setItem("brandName", datas.brandName);
-  brandAndModelShow.value = false;
-  caseDialogShow.value = true;
 };
 const selectCaseItem = ref({
   // curPrice,
@@ -846,31 +862,47 @@ const selectCaseItem = ref({
   // colorName
 });
 const phoneCaseSelectHandler = (item) => {
-  item.url = dealImageUrlNew(item.url);
-  item.exampleUrl = dealImageUrlNew(item.exampleUrl);
-  // 如果手机壳有指定蒙板，则设置指定蒙板
-  if (item.maskImage) {
+  if (stickerType.value === 1) {
+    item.url = dealImageUrlNew(item.url);
+    item.exampleUrl = dealImageUrlNew(item.exampleUrl);
+    // 如果手机壳有指定蒙板，则设置指定蒙板
+    if (item.maskImage) {
+      selectMaskImage.value = dealImageUrlNew(item.maskImage);
+      setItem("maskUrl", dealImageUrlNew(item.maskImage));
+    }
+    selectCaseItem.value = item;
+    setItem("caseItem", item);
+    rightLocalStore.value = true;
+    const { url, colorName } = item;
+    graphLoading.value = true;
+    selectCaseImage.value = dealImageUrlNew(url);
+    setItem("caseUrl", dealImageUrlNew(url));
+    selectCaseName.value = colorName;
+    setItem("caseName", colorName);
+    caseDialogShow.value = false;
+    setTimeout(() => {
+      graphLoading.value = false;
+    }, 1000);
+    router.replace({
+      query: {
+        phone: colorName,
+      },
+    });
+  } else {
+    //  - url: 贴纸底图
+    //  - maskImage：贴纸蒙板
+    //  - exampleUrl：样例图
+    item.url = dealImageUrlNew(item.url);
+    const { url, colorName } = item;
+    selectCaseName.value = colorName;
+    setItem("caseName", colorName);
+    selectModelImage.value = dealImageUrlNew(url);
+    // selectModelImage.value = caseStickerDatas.value.borderImage; - 在nextStep设置了
+    // selectCaseImage.value = dealImageUrlNew(url); - 不需要设置
     selectMaskImage.value = dealImageUrlNew(item.maskImage);
-    setItem("maskUrl", dealImageUrlNew(item.maskImage));
+    selectCaseImage.value = null;
+    caseDialogShow.value = false;
   }
-  selectCaseItem.value = item;
-  setItem("caseItem", item);
-  rightLocalStore.value = true;
-  const { url, colorName } = item;
-  graphLoading.value = true;
-  selectCaseImage.value = dealImageUrlNew(url);
-  setItem("caseUrl", dealImageUrlNew(url));
-  selectCaseName.value = colorName;
-  setItem("caseName", colorName);
-  caseDialogShow.value = false;
-  setTimeout(() => {
-    graphLoading.value = false;
-  }, 1000);
-  router.replace({
-    query: {
-      phone: colorName,
-    },
-  });
 };
 
 const openModelDialog = () => {
