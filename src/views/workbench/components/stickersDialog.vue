@@ -58,6 +58,12 @@ const props = defineProps({
       return false;
     },
   },
+  source: {
+    type: Number,
+    default() {
+      return 1;
+    },
+  },
 });
 
 const emit = defineEmits();
@@ -70,6 +76,7 @@ const loadingFlag = ref(false);
 const initDatas = () => {
   loadingFlag.value = true;
   getStickers({
+    source: props.source,
     offset: 1,
     pageSize: 500,
   })

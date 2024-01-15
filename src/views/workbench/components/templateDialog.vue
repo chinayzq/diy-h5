@@ -57,6 +57,15 @@ import { onBeforeMount, ref } from "vue";
 import { getTemplateTypeList, getTemplateListByCode } from "@/api/workbench";
 import { dealImageUrlNew } from "@/utils";
 
+const props = defineProps({
+  source: {
+    type: Number,
+    default() {
+      return 1;
+    },
+  },
+});
+
 onBeforeMount(() => {
   initDatas();
 });
@@ -75,7 +84,9 @@ const tabs = ref([]);
 const loadingFlag = ref(false);
 const initDatas = () => {
   loadingFlag.value = true;
-  getTemplateTypeList()
+  getTemplateTypeList({
+    source: props.source,
+  })
     .then((res) => {
       if (res.code === 200) {
         tabs.value = res.data;
@@ -94,6 +105,7 @@ const tabChange = (index) => {
   }
   listLoading.value = true;
   getTemplateListByCode({
+    source: props.source,
     offset: 1,
     pageSize: 100,
     typeCode: tabs.value[index].typeCode,

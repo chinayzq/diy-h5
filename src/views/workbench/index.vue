@@ -252,6 +252,7 @@
       v-model:show="stickersShow"
     >
       <StickersDialog
+        :source="stickerType"
         :stickersShow="stickersShow"
         @close="stickersShow = false"
         @stickerSelect="stickerSelectHandler"
@@ -337,6 +338,7 @@
     >
       <TemplateDialog
         v-if="templateDialogShow"
+        :source="stickerType"
         @change="templateDialogChange"
         @templateChange="templateChangeHandler"
         @clear="graphClearHandler"
@@ -373,7 +375,10 @@
     </var-popup>
 
     <!-- PC - tempaltes -->
-    <TemplateSideComponent @templateChange="templateChangeHandler" />
+    <TemplateSideComponent
+      @templateChange="templateChangeHandler"
+      :source="stickerType"
+    />
     <!-- PC - layers -->
     <GraphLayers
       :layers="dragStickerList"
@@ -914,6 +919,11 @@ const phoneCaseSelectHandler = (item) => {
     caseStickerSelect.value.selectCaseImage = item.url;
     selectCaseImage.value = null;
     caseDialogShow.value = false;
+    router.replace({
+      query: {
+        phone: colorName,
+      },
+    });
   }
 };
 

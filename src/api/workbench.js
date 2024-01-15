@@ -18,7 +18,7 @@ export function getFontSize(params) {
   return axios.get('/list/fontsize', params);
 }
 export function getTemplateTypeList(params) {
-  return axios.get('/list/templatetype', params);
+  return axios.get('/list/templatetype', { params });
 }
 export function getTemplateListByCode(params) {
   return axios.get('/listtemplate', { params });
