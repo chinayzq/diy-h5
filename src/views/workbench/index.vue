@@ -808,6 +808,11 @@ const selectCaseList = ref([]);
 const selectPhoneName = ref("iPhone 14");
 const selectPhoneCode = ref("IPHONE14");
 const selectCaseName = ref("Clear Impact Case - Black");
+// 记录手机壳贴纸数据
+const caseStickerSelect = ref({
+  selectCaseImage: null,
+  selectModelImage: null,
+});
 const nextStepHandler = (datas) => {
   // 手机壳贴纸测试
   stickerType.value = datas.source || 1;
@@ -841,6 +846,9 @@ const nextStepHandler = (datas) => {
     setItem("phoneName", datas.phoneName);
     setItem("brandName", datas.brandName);
     selectCaseList.value = datas.caseList;
+    selectPhoneName.value = datas.phoneName;
+    selectPhoneCode.value = datas.phoneCode;
+    caseStickerSelect.value.selectModelImage = dealImageUrlNew(datas.modelUrl);
     brandAndModelShow.value = false;
     caseDialogShow.value = true;
     // modelUrl - 机型背景图
@@ -896,10 +904,14 @@ const phoneCaseSelectHandler = (item) => {
     const { url, colorName } = item;
     selectCaseName.value = colorName;
     setItem("caseName", colorName);
+    selectCaseItem.value = item;
+    setItem("caseItem", item);
     selectModelImage.value = dealImageUrlNew(url);
     // selectModelImage.value = caseStickerDatas.value.borderImage; - 在nextStep设置了
     // selectCaseImage.value = dealImageUrlNew(url); - 不需要设置
     selectMaskImage.value = dealImageUrlNew(item.maskImage);
+    // caseStickerSelect.value.selectModelImage = item.url;
+    caseStickerSelect.value.selectCaseImage = item.url;
     selectCaseImage.value = null;
     caseDialogShow.value = false;
   }
@@ -1014,13 +1026,16 @@ const router = useRouter();
 const confirmLoading = ref(false);
 const confirmHandler = () => {
   // 手机壳贴纸测试
-  if (confirmLoading.value || stickerType.value === 2) return;
+  if (confirmLoading.value) return;
   confirmLoading.value = true;
+  let params = {};
+  // if (stickerType.value === 1) {
   const { curPrice, oriPrice, description, extend1, extend2, extend3 } =
     selectCaseItem.value;
   // 保存产品后跳转
-  const params = {
+  params = {
     description: "",
+    source: stickerType.value,
     extendJson: {
       oriPrice,
       curPrice,
@@ -1033,8 +1048,14 @@ const confirmHandler = () => {
       printUrl: null,
       printData: {
         graphDatas: dragStickerList.value,
-        modelImage: selectModelImage.value,
-        caseImage: selectCaseImage.value,
+        modelImage:
+          stickerType.value === 1
+            ? selectModelImage.value
+            : caseStickerSelect.value.selectModelImage,
+        caseImage:
+          stickerType.value === 1
+            ? selectCaseImage.value
+            : caseStickerSelect.value.selectCaseImage,
         maskImage: selectMaskImage.value,
       },
     },
@@ -1044,6 +1065,9 @@ const confirmHandler = () => {
     phoneCode: selectPhoneCode.value,
     templateUrl: previewImage.value,
   };
+  // } else if (stickerType.value === 2) {
+  //   console.log("selectCaseItem.value", selectCaseItem.value);
+  // }
   saveProduct(params)
     .then((res) => {
       // 保存产品后，返回productId，进入settlement页面后，勾选到这个产品

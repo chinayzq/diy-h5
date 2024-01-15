@@ -661,7 +661,9 @@ const initDatas = () => {
       productList.value = res?.data?.productJson
         ? res?.data?.productJson.map((item) => {
             const { phoneName, caseColor, extend1, extend2 } = item.extendJson;
-            item.description = `${phoneName} - ${caseColor} ${extend1} - ${extend2}`;
+            item.description = `${phoneName} - ${caseColor} ${extend1} - ${
+              extend2 || ""
+            }`;
             return item;
           })
         : [];

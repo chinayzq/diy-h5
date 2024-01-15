@@ -3,13 +3,13 @@
     <Loading v-show="pageLoading" />
     <div class="title-line">Thank you for your order</div>
     <div class="main-container">
-      <div class="name-line">Hi {{ orderDetails?.userDTO?.lastName }},</div>
+      <div class="name-line">Hi dear,</div>
       <div class="order-id-line top-margin">
         Just to let you know - we've received your order {{ orderId }}, and it
         is now being processed:
       </div>
       <div class="order-title top-margin">
-        [Order {{ orderId }}]
+        [Order No: {{ orderId }}]
         <br />
         ({{ orderTimeRender(orderDetails.createdDate) }})
       </div>

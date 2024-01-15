@@ -28,7 +28,9 @@
         <div class="right-part">
           <div>
             <div class="item-title">
-              <span class="product-name">Phone Case</span>
+              <span class="product-name">{{
+                item.source === 1 ? "Phone Case" : "Case Sticker"
+              }}</span>
               <span class="product-price"
                 >{{ item.extendJson.curPrice }} USD</span
               >
@@ -337,7 +339,7 @@ const jumpToWorkbench = () => {
           justify-content: space-between;
           align-items: center;
           .product-name {
-            font-size: 25px;
+            font-size: 24px;
             font-family: "JostMedium";
           }
           .product-price {
