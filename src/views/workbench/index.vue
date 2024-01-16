@@ -455,13 +455,13 @@ const caseStickerDatas = ref({
     import.meta.url
   ).href,
 });
-const caseStickerNextHandler = () => {
-  stickerType.value = 2;
-  selectMaskImage.value = caseStickerDatas.value.maskImage;
-  selectCaseImage.value = null;
-  selectModelImage.value = caseStickerDatas.value.borderImage;
-  brandAndModelShow.value = false;
-};
+// const caseStickerNextHandler = () => {
+//   stickerType.value = 2;
+//   selectMaskImage.value = caseStickerDatas.value.maskImage;
+//   selectCaseImage.value = null;
+//   selectModelImage.value = caseStickerDatas.value.borderImage;
+//   brandAndModelShow.value = false;
+// };
 
 // 设置colgifts_c_sid，没登录时按照该cookie存储信息
 setCookie();
@@ -813,10 +813,12 @@ const selectCaseList = ref([]);
 const selectPhoneName = ref("iPhone 14");
 const selectPhoneCode = ref("IPHONE14");
 const selectCaseName = ref("Clear Impact Case - Black");
-// 记录手机壳贴纸数据
+// 记录预览需要的两张底图
 const caseStickerSelect = ref({
   selectCaseImage: null,
   selectModelImage: null,
+  graphBackground: null,
+  graphMask: null,
 });
 const nextStepHandler = (datas) => {
   // 手机壳贴纸测试
@@ -854,6 +856,7 @@ const nextStepHandler = (datas) => {
     selectPhoneName.value = datas.phoneName;
     selectPhoneCode.value = datas.phoneCode;
     caseStickerSelect.value.selectModelImage = dealImageUrlNew(datas.modelUrl);
+    caseStickerSelect.value.selectCaseImage = dealImageUrlNew(datas.maskUrl);
     brandAndModelShow.value = false;
     caseDialogShow.value = true;
     // modelUrl - 机型背景图
@@ -912,11 +915,9 @@ const phoneCaseSelectHandler = (item) => {
     selectCaseItem.value = item;
     setItem("caseItem", item);
     selectModelImage.value = dealImageUrlNew(url);
-    // selectModelImage.value = caseStickerDatas.value.borderImage; - 在nextStep设置了
-    // selectCaseImage.value = dealImageUrlNew(url); - 不需要设置
+    caseStickerSelect.value.graphBackground = dealImageUrlNew(url);
     selectMaskImage.value = dealImageUrlNew(item.maskImage);
-    // caseStickerSelect.value.selectModelImage = item.url;
-    caseStickerSelect.value.selectCaseImage = item.url;
+    caseStickerSelect.value.graphMask = dealImageUrlNew(item.maskImage);
     selectCaseImage.value = null;
     caseDialogShow.value = false;
     router.replace({
@@ -956,8 +957,9 @@ const printHandler = async () => {
     confirmLoading.value = true;
     previewImage.value = null;
     printDialogShow.value = true;
-    selectCaseImage.value = caseStickerDatas.value.caseImage;
-    selectModelImage.value = caseStickerDatas.value.modelImage;
+    // 设置预览需要的两张
+    selectCaseImage.value = caseStickerSelect.value.selectCaseImage;
+    selectModelImage.value = caseStickerSelect.value.selectModelImage;
     setTimeout(async () => {
       setGraphDomsScale(1, true);
       const resultList = await exportImageAsync();
@@ -969,9 +971,9 @@ const printHandler = async () => {
       // printImage.value = printMaxImage;
       confirmLoading.value = false;
       // 还原画布
-      selectMaskImage.value = caseStickerDatas.value.maskImage;
+      selectMaskImage.value = caseStickerSelect.value.graphMask;
       selectCaseImage.value = null;
-      selectModelImage.value = caseStickerDatas.value.borderImage;
+      selectModelImage.value = caseStickerSelect.value.graphBackground;
     }, 200);
   }
 };
