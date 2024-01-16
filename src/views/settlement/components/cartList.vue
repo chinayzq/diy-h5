@@ -49,10 +49,13 @@
             </div>
           </div>
           <div class="counter-line">
-            <var-icon
-              name="minus"
-              @click="item.productCount > 0 && item.productCount--"
-            />
+            <span style="width: 22px">
+              <var-icon
+                v-show="item.productCount > 1"
+                name="minus"
+                @click="item.productCount > 0 && item.productCount--"
+              />
+            </span>
             <span class="count-span">
               {{ item.productCount }}
             </span>
