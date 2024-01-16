@@ -914,11 +914,13 @@ const phoneCaseSelectHandler = (item) => {
     setItem("caseName", colorName);
     selectCaseItem.value = item;
     setItem("caseItem", item);
+    // 设置画布需要的两张图, 并且置空手机壳那张图
     selectModelImage.value = dealImageUrlNew(url);
-    caseStickerSelect.value.graphBackground = dealImageUrlNew(url);
     selectMaskImage.value = dealImageUrlNew(item.maskImage);
-    caseStickerSelect.value.graphMask = dealImageUrlNew(item.maskImage);
     selectCaseImage.value = null;
+    // 记录下，打印后还原需要
+    caseStickerSelect.value.graphBackground = dealImageUrlNew(url);
+    caseStickerSelect.value.graphMask = dealImageUrlNew(item.maskImage);
     caseDialogShow.value = false;
     router.replace({
       query: {
@@ -957,7 +959,7 @@ const printHandler = async () => {
     confirmLoading.value = true;
     previewImage.value = null;
     printDialogShow.value = true;
-    // 设置预览需要的两张
+    // 设置预览需要的两张底图
     selectCaseImage.value = caseStickerSelect.value.selectCaseImage;
     selectModelImage.value = caseStickerSelect.value.selectModelImage;
     setTimeout(async () => {
