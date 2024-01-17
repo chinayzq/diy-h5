@@ -21,7 +21,13 @@
       }"
     >
       <div class="model-case-container" @click.stop="brandAndModelShow = true">
-        {{ `${selectPhoneName} / ${selectCaseName}` }}
+        <span>
+          {{ selectPhoneName }}
+        </span>
+        /
+        <span style="padding-left: 8px">
+          {{ selectCaseName }}
+        </span>
         <var-icon name="chevron-down" />
       </div>
       <div class="print-button" @click="printHandler">PRINT</div>
@@ -960,8 +966,8 @@ const printHandler = async () => {
     previewImage.value = null;
     printDialogShow.value = true;
     // 设置预览需要的两张底图
-    selectCaseImage.value = caseStickerSelect.value.selectCaseImage;
-    selectModelImage.value = caseStickerSelect.value.selectModelImage;
+    // selectCaseImage.value = caseStickerSelect.value.selectCaseImage;
+    // selectModelImage.value = caseStickerSelect.value.selectModelImage;
     setTimeout(async () => {
       setGraphDomsScale(1, true);
       const resultList = await exportImageAsync();
@@ -973,9 +979,9 @@ const printHandler = async () => {
       // printImage.value = printMaxImage;
       confirmLoading.value = false;
       // 还原画布
-      selectMaskImage.value = caseStickerSelect.value.graphMask;
-      selectCaseImage.value = null;
-      selectModelImage.value = caseStickerSelect.value.graphBackground;
+      // selectMaskImage.value = caseStickerSelect.value.graphMask;
+      // selectCaseImage.value = null;
+      // selectModelImage.value = caseStickerSelect.value.graphBackground;
     }, 200);
   }
 };
@@ -1548,10 +1554,14 @@ const eventEndHandler = (flag) => {
       color: #333;
       border-radius: 25px;
       overflow: hidden;
-      height: 30px;
+      // height: 30px;
       line-height: 30px;
       padding: 0 10px;
       display: flex;
+      align-items: center;
+      span {
+        line-height: 20px;
+      }
     }
     .print-button {
       width: 90px;

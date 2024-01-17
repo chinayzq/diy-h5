@@ -68,11 +68,11 @@ const jumpToWorkbench = () => {
     }
   }
   .mian-container-background {
-    background: linear-gradient(
-        rgba(255, 255, 255, 0.3),
-        rgba(255, 255, 255, 0.3)
-      ),
-      url("../../assets/images/home_main_background.png");
+    // background: linear-gradient(
+    //     rgba(255, 255, 255, 0.3),
+    //     rgba(255, 255, 255, 0.3)
+    //   ),
+    //   url("../../assets/images/home_main_background.png");
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;

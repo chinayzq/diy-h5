@@ -26,10 +26,15 @@
         >
           <span class="single-span flex-6">
             <div>
-              {{ item.description }}
+              {{ descriptionRender(item) }}
             </div>
             <div class="margin-top-5">
-              model: {{ item.extendJson.phoneName }}
+              model:
+              {{
+                `${item.extendJson.phoneName} ${
+                  item.source === 2 ? "sticker" : ""
+                }`
+              }}
             </div>
             <div class="margin-top-5">Custom design</div>
             <div class="margin-top-5">
@@ -120,6 +125,27 @@ import { useRoute } from "vue-router";
 import { getOrderDetailById } from "@/api/workbench";
 import { computed, ref } from "vue";
 import { orderTimeRender, dealImageUrlNew, countToFixed } from "@/utils";
+
+const descriptionRender = (item) => {
+  const { phoneName, extend1, extend2, caseColor } = item.extendJson || {};
+  let result = "";
+  if (phoneName) {
+    result += phoneName;
+  }
+  if (item.source === 2) {
+    result += " sticker";
+  }
+  if (caseColor) {
+    result += ` - ${caseColor}`;
+  }
+  if (extend1) {
+    result += ` ${extend1}`;
+  }
+  if (extend2) {
+    result += ` ${extend2}`;
+  }
+  return result;
+};
 
 const currentDomain = ref(
   location.href.includes("memtoys")
