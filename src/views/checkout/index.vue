@@ -266,7 +266,7 @@
             <!-- <var-icon name="close-circle-outline" class="delete-icon" /> -->
           </span>
           <div class="description">
-            {{ item.description }}
+            {{ descriptionRender(item) }}
           </div>
           <div class="count">
             {{ `X ${item.productCount}` }}
@@ -390,6 +390,27 @@ import { countToFixed, dealImageUrlNew } from "@/utils";
 import { ElSelect, ElOption } from "element-plus";
 import "element-plus/theme-chalk/index.css"; // 引入组件样式
 import config from "~/config";
+
+const descriptionRender = (item) => {
+  const { phoneName, extend1, extend2, caseColor } = item.extendJson || {};
+  let result = "";
+  if (phoneName) {
+    result += phoneName;
+  }
+  if (item.source === 2) {
+    result += " sticker";
+  }
+  if (caseColor) {
+    result += ` - ${caseColor}`;
+  }
+  if (extend1) {
+    result += ` ${extend1}`;
+  }
+  if (extend2) {
+    result += ` ${extend2}`;
+  }
+  return result;
+};
 
 const currentEnv = ref(config[import.meta.env.MODE].env);
 const countryList = ref(CountryList.default);

@@ -32,9 +32,10 @@
           <div class="detail-line">
             <div class="detail-part">
               <div class="model-and-color">
-                {{ item.extendJson.phoneName }}
+                <!-- {{ item.extendJson.phoneName }}
                 -
-                {{ item.extendJson.caseColor }}
+                {{ item.extendJson.caseColor }} -->
+                {{ descriptionRender(item) }}
               </div>
               <div class="price-line">
                 <span>$</span>
@@ -121,6 +122,27 @@ import {
 import { onBeforeMount, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { dealImageUrlNew } from "@/utils";
+
+const descriptionRender = (item) => {
+  const { phoneName, extend1, extend2, caseColor } = item.extendJson || {};
+  let result = "";
+  if (phoneName) {
+    result += phoneName;
+  }
+  if (item.source === 2) {
+    result += " sticker";
+  }
+  if (caseColor) {
+    result += ` - ${caseColor}`;
+  }
+  if (extend1) {
+    result += ` - ${extend1}`;
+  }
+  if (extend2) {
+    result += ` - ${extend2}`;
+  }
+  return result;
+};
 
 const props = defineProps({
   shipping: {
@@ -281,12 +303,13 @@ const checkoutHandler = async () => {
         .detail-line {
           display: flex;
           justify-content: space-between;
-          padding: 20px 0 20px 30px;
+          padding: 20px 0 10px 30px;
           .model-and-color {
             font-size: 15px;
             line-height: 16px;
             color: rgba(26, 22, 24, 0.75);
             font-family: "JostMedium";
+            padding-bottom: 10px;
           }
           .price-line {
             font-size: 15px;
