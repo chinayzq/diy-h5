@@ -188,6 +188,7 @@ const stickerModelIndex = ref(0);
 const activePhoneName = ref(null);
 const activePhoneCode = ref(null);
 const modelClickHandler = (model, index) => {
+  stickerModelIndex.value = index;
   activeModelIndex.value = index;
   activePhoneName.value = model.phoneName;
   activePhoneCode.value = model.phoneCode;
@@ -241,8 +242,11 @@ const nextStepHandler = () => {
     });
   } else {
     const brandName = dataList2.value[activeBrandIndex.value].brandName;
-    const modelUrl = phoneColorList.value[activeCaseIndex.value].url;
-    const maskUrl = maskList.value[0].url;
+    // 暂时不需要手机壳和机型底图
+    // const modelUrl = phoneColorList.value[activeCaseIndex.value].url;
+    // const maskUrl = maskList.value[0].url;
+    const modelUrl = null;
+    const maskUrl = null;
     emit("nextStep", {
       source: active.value === "phoneCase" ? 1 : 2,
       caseList: caseList.value, // 贴纸列表
