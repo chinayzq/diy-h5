@@ -1,7 +1,19 @@
 <template>
   <div class="graph-layers-component" v-if="store.client === 'PC'">
     <div class="layer-header">
-      <img src="@/assets/images/project_logo.png" alt="" />
+      <!-- <img src="@/assets/images/project_logo.png" alt="" /> -->
+      <img
+        v-if="currentEnv === 'colgifts'"
+        class="title-logo"
+        src="@/assets/images/project_logo.png"
+        alt=""
+      />
+      <img
+        v-if="currentEnv === 'memtoys'"
+        class="title-logo"
+        src="@/assets/images/memtoys_logo.png"
+        alt=""
+      />
     </div>
     <div class="main-container">
       <div class="left-part">
@@ -36,6 +48,9 @@
 <script setup>
 import { useStore } from "@/stores";
 import { ref } from "vue";
+import config from "~/config";
+
+const currentEnv = ref(config[import.meta.env.MODE].env);
 const store = useStore();
 
 const props = defineProps({
