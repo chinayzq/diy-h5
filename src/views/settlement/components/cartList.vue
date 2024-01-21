@@ -102,7 +102,7 @@
       </div>
       <div class="button-line">
         <div class="checkout-outer">
-          <div class="checkout-inner" @click="checkoutHandler">Check out</div>
+          <div class="checkout-inner" @click="checkoutHandler">Checkout</div>
         </div>
         <div class="home-button">
           <img src="@/assets/images/home.svg" alt="" />

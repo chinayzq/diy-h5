@@ -82,7 +82,7 @@
           :class="['add-button', !policyChecked && 'add-button-disabled']"
           @click="addCardHandler"
         >
-          Add to card
+          Add to cart
         </span>
         <span class="shipping-cart" @click="openCard">
           <img src="@/assets/images/shopping-cart.svg" alt="" />

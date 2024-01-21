@@ -95,8 +95,8 @@
           <var-input
             variant="outlined"
             size="small"
-            placeholder="city *"
-            :rules="[(v) => !!v || 'city is required']"
+            placeholder="City *"
+            :rules="[(v) => !!v || 'City is required']"
             v-model="formData.city"
           />
           <var-input
@@ -205,8 +205,8 @@
             <var-input
               variant="outlined"
               size="small"
-              placeholder="city *"
-              :rules="[(v) => !!v || 'city is required']"
+              placeholder="City *"
+              :rules="[(v) => !!v || 'City is required']"
               v-model="shipform.city"
             />
             <var-input

@@ -82,9 +82,34 @@ const router = createRouter({
   ],
 });
 router.beforeEach((to, from, next) => {
+  // if (typeof gtag !== 'undefined') {
+  //   console.log('gtag',gtag)
+  //   gtag('config', 'G-0BYV4WHLQZ', {
+  //     'page_path': to.path
+  //   })
+  // }
   next();
 });
 router.afterEach((to, from, next) => {
-  document.title = to.fullPath.slice(1);
+  // console.log('to',to)
+  const currentTitle = to.fullPath.slice(1);
+  document.title = currentTitle;
+  if (window.gtag) { 
+    // console.log('window.gtag',window.gtag)
+    // window.gtag('set', 'page', currentTitle)
+    // window.gtag('send', 'pageview')
+    // window.gtag('config', 'G-0BYV4WHLQZ', {
+    //   page_title: currentTitle,
+    //   page_path: to.path,
+    //   page_location: location
+    // })
+    window.gtag('event', 'page_view', {
+      // event_category: 'eventCategory',
+      // event_label: 'eventLabel',
+      // value: 'eventValue',
+      send_to: 'G-0BYV4WHLQZ'//跟踪ID
+    })
+  }
+  // console.log(window.ga)
 });
 export default router;

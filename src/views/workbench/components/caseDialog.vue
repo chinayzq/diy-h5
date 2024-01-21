@@ -19,7 +19,7 @@
     <div class="scroll-container">
       <div
         class="single-card"
-        v-for="(item, index) in dataset"
+        v-for="(item, index) in dataset.filter((item) => item.status !== 1)"
         :key="index"
         @click="phoneCaseSelect(item)"
       >
