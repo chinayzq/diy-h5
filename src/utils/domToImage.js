@@ -184,10 +184,6 @@ function sizeDefined(width, height) {
 export const exportPrintImage = (domId, maskImages, width, height) => {
   const cavasDom = document.getElementById('myCanvasMax');
   const definedSize = sizeDefined(width, height);
-  console.log('definedSize', definedSize);
-  document.querySelector(
-    '#logContainer'
-  ).innerHTML += `</br>log-${definedSize.width}-${definedSize.height}`;
   cavasDom.width = `${definedSize.width}`;
   cavasDom.height = `${definedSize.height}`;
   let myCanvasMax = cavasDom.getContext('2d');
@@ -199,9 +195,6 @@ export const exportPrintImage = (domId, maskImages, width, height) => {
       allowTaint: true,
     }).then((canvas) => {
       let imageURL = canvas.toDataURL('image/png'); //canvas转base64图片
-      document.querySelector(
-        '#logContainer'
-      ).innerHTML += `</br>log-${imageURL}`;
       let img = new Image();
       img.src = imageURL;
       img.onload = async () => {

@@ -1068,6 +1068,7 @@ const confirmHandler = () => {
       printUrl: null,
       printData: {
         graphDatas: dragStickerList.value,
+        graphScale: scale.value,
         modelImage:
           stickerType.value === 1
             ? selectModelImage.value
