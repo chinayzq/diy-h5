@@ -21,11 +21,13 @@ export default {
     baseUrl: '/colgifts',
     uploadUrl: '/colgifts/upload',
     filePath: 'https://ossdiyphone.com/',
+    GAId: 'G-0BYV4WHLQZ',
   },
   colgifts: {
     env: 'colgifts',
     baseUrl: '/colgifts',
     uploadUrl: '/colgifts/upload',
     filePath: 'https://osscolgifts.com/',
+    GAId: 'G-T8ZYFS2SSX',
   },
 };

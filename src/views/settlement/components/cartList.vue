@@ -86,6 +86,12 @@
           <span class="saving-label"> Savings </span>
           <span class="saving-value"> -${{ savingTotal }} USD </span>
         </div>
+        <div class="saving-line">
+          <span class="saving-label"> Shipping </span>
+          <span>
+            {{ shipping == 0 ? "FREE" : `$${shipping} USD` }}
+          </span>
+        </div>
         <div class="subtotal-line">
           <span class="saving-label"> Subtotal </span>
           <span class="saving-value">
@@ -93,7 +99,7 @@
               class="through-span"
               v-if="originTotal > 0 && originTotal !== payTotal"
             >
-              ${{ originTotal }}
+              ${{ originTotal + Number(shipping) }}
             </span>
             ${{ payTotal }} USD
           </span>
@@ -118,6 +124,7 @@ import {
   deleteCart,
   couponAmount,
   savecardmount,
+  getShipping,
 } from "@/api/workbench";
 import { onBeforeMount, ref, watch } from "vue";
 import { useRouter } from "vue-router";
@@ -143,15 +150,6 @@ const descriptionRender = (item) => {
   }
   return result;
 };
-
-const props = defineProps({
-  shipping: {
-    type: Number,
-    default() {
-      return 0;
-    },
-  },
-});
 
 // 总优惠金额
 const savingTotal = ref(0);
@@ -183,11 +181,11 @@ const couponValid = () => {
   if (!coupon.value) return;
   couponAmount({
     couponCode: coupon.value,
-    originalPrice: originTotal.value,
+    originalPrice: originTotal.value + Number(shipping.value),
   }).then((res) => {
     if (res.code === 200) {
       savingTotal.value = res.data;
-      payTotal.value = originTotal.value - savingTotal.value;
+      payTotal.value = originTotal.value;
     }
   });
 };
@@ -205,7 +203,7 @@ watch(
   },
   { deep: true }
 );
-const countCalc = () => {
+const countCalc = async () => {
   let originTotalTemp = 0;
   let savingTotalTemp = 0;
   let countTemp = 0;
@@ -216,17 +214,27 @@ const countCalc = () => {
   originTotal.value = originTotalTemp;
   savingTotal.value = savingTotalTemp;
   payTotal.value = originTotalTemp - savingTotalTemp;
-  if (countTemp === 1) {
-    originTotal.value += Number(props.shipping);
-    payTotal.value += Number(props.shipping);
-  }
+  // if (countTemp === 1) {
+  //   originTotal.value += Number(shipping.value);
+  //   payTotal.value += Number(shipping.value);
+  // }
+  await freshShipping();
+};
+const shipping = ref(0);
+const freshShipping = async () => {
+  const shippingValue = await getShipping({
+    amount: originTotal.value - savingTotal.value,
+  });
+  shipping.value = Number(shippingValue.data.shipAmount).toFixed(2);
 };
 
 const router = useRouter();
 const checkoutHandler = async () => {
   await savecardmount({
     couponCode: coupon.value,
-    originalPrice: originTotal.value,
+    originalPrice:
+      // originTotal.value - savingTotal.value + Number(shipping.value),
+      originTotal.value,
   });
   // 调用saveOrder接口生成订单
   router.push({

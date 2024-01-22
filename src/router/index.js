@@ -1,5 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import Layout from '@/views/layout/index.vue';
+import config from "~/config";
+const currentGAId = config[import.meta.env.MODE].GAId;
 const router = createRouter({
   history: createWebHashHistory(), // hash模式：createWebHashHistory，history模式：createWebHistory
   // workbench
@@ -107,7 +109,7 @@ router.afterEach((to, from, next) => {
       // event_category: 'eventCategory',
       // event_label: 'eventLabel',
       // value: 'eventValue',
-      send_to: 'G-0BYV4WHLQZ'//跟踪ID
+      send_to: currentGAId//跟踪ID
     })
   }
   // console.log(window.ga)

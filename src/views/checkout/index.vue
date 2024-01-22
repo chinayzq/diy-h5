@@ -688,7 +688,8 @@ const initDatas = () => {
             return item;
           })
         : [];
-      subTotal.value = res.data.originalPrice - res.data.shippingFree;
+      // subTotal.value = res.data.originalPrice - res.data.shippingFree;
+      subTotal.value = res.data.originalPrice;
       paidTotal.value = res.data.paidPrice;
       shipping.value = res.data.shippingFree;
       shippingLabel.value =

@@ -63,7 +63,7 @@
       <div class="single-line" style="margin-bottom: 0">
         <span> Shipping </span>
         <span class="font-italic">
-          {{ free ? "FREE" : `${shipping} USD` }}
+          {{ shipping == 0 ? "FREE" : `${shipping} USD` }}
         </span>
         <!-- <span class="font-italic"> Buy 2 get free shipping </span> -->
       </div>
