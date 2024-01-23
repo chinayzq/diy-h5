@@ -8,7 +8,7 @@
       @click="closeHandler"
       v-if="rightLocalStore"
     />
-    <var-tabs v-model:active="active">
+    <var-tabs v-model:active="active" style="padding-right: 50px">
       <var-tab name="phoneCase">phoneCase</var-tab>
       <var-tab name="phoneSticker">phoneSticker</var-tab>
     </var-tabs>
@@ -277,8 +277,8 @@ const closeHandler = () => {
   position: relative;
   .close-icon {
     position: absolute;
-    right: 10px;
-    top: 10px;
+    right: 15px;
+    top: 15px;
   }
   .title-line {
     height: 25px;
