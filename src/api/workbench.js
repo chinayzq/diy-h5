@@ -126,3 +126,6 @@ export function createPaypalOrder(params) {
 export function paypalCapture(id, params) {
   return axios.post(`/orders/${id}/capture`, params);
 }
+export function updateCartCount(params) {
+  return axios.post(`/updatecardcount`, params);
+}

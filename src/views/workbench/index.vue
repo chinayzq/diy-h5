@@ -313,7 +313,6 @@
       <BrandAndModelsDialog
         @close="brandAndModelShow = false"
         @nextStep="nextStepHandler"
-        @caseStickerNext="caseStickerNextHandler"
         :rightLocalStore="rightLocalStore"
       />
     </var-popup>

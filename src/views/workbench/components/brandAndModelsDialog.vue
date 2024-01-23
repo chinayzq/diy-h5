@@ -259,9 +259,9 @@ const nextStepHandler = () => {
   }
 };
 
-const caseStickerSelect = () => {
-  emit("caseStickerNext");
-};
+// const caseStickerSelect = () => {
+//   emit("caseStickerNext");
+// };
 
 const closeHandler = () => {
   emit("close");

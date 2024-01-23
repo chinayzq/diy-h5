@@ -87,7 +87,7 @@ const props = defineProps({
   },
 });
 const priceUnit = ref("USD");
-
+console.log("ccc1");
 const emit = defineEmits();
 const changeHandler = () => {
   emit("openModelDialog");

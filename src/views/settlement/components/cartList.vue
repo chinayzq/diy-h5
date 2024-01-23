@@ -54,13 +54,13 @@
               <var-icon
                 v-show="item.productCount > 1"
                 name="minus"
-                @click="item.productCount > 0 && item.productCount--"
+                @click="productCountUpdate(item, 'minus')"
               />
             </span>
             <span class="count-span">
               {{ item.productCount }}
             </span>
-            <var-icon name="plus" @click="item.productCount++" />
+            <var-icon name="plus" @click="productCountUpdate(item, 'plus')" />
             <var-icon
               name="trash-can-outline"
               style="color: #e73295"
@@ -125,10 +125,30 @@ import {
   couponAmount,
   savecardmount,
   getShipping,
+  updateCartCount,
 } from "@/api/workbench";
 import { onBeforeMount, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { dealImageUrlNew } from "@/utils";
+
+const updateLock = ref(false);
+const productCountUpdate = (item, type) => {
+  if (updateLock.value) {
+    return;
+  }
+  updateLock.value = true;
+  if (type === "minus") {
+    item.productCount--;
+  } else {
+    item.productCount++;
+  }
+  updateCartCount({
+    cardId: item.cardId,
+    productCount: item.productCount,
+  }).finally(() => {
+    updateLock.value = false;
+  });
+};
 
 const descriptionRender = (item) => {
   const { phoneName, extend1, extend2, caseColor } = item.extendJson || {};
