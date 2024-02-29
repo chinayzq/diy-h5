@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import Layout from '@/views/layout/index.vue';
-import config from "~/config";
+import config from '~/config';
 const currentGAId = config[import.meta.env.MODE].GAId;
 const router = createRouter({
   history: createWebHashHistory(), // hash模式：createWebHashHistory，history模式：createWebHistory
@@ -96,7 +96,7 @@ router.afterEach((to, from, next) => {
   // console.log('to',to)
   const currentTitle = to.fullPath.slice(1);
   document.title = currentTitle;
-  if (window.gtag) { 
+  if (window.gtag) {
     // console.log('window.gtag',window.gtag)
     // window.gtag('set', 'page', currentTitle)
     // window.gtag('send', 'pageview')
@@ -109,8 +109,8 @@ router.afterEach((to, from, next) => {
       // event_category: 'eventCategory',
       // event_label: 'eventLabel',
       // value: 'eventValue',
-      send_to: currentGAId//跟踪ID
-    })
+      send_to: currentGAId, //跟踪ID
+    });
   }
   // console.log(window.ga)
 });

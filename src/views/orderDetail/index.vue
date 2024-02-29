@@ -55,9 +55,10 @@
       </div>
       <div class="subtotal-line">
         <span class="flex-8 label">Subtotal:</span>
-        <span class="flex-2"
+        <span class="flex-2">${{ countToFixed(originalPrice) }}</span>
+        <!-- <span class="flex-2"
           >${{ countToFixed(originalPrice - shippingFree) }}</span
-        >
+        > -->
       </div>
       <div class="subtotal-line">
         <span class="flex-8 label">Shipping cost:</span>

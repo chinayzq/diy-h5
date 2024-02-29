@@ -20,6 +20,24 @@
     <link rel="icon" id="favicon" href="/favicon2.ico" />
     <title id="projectName"></title>
     <script>
+      const idMaps = {
+        memtoys: 'G-0BYV4WHLQZ',
+        colgifts: 'G-T8ZYFS2SSX',
+      };
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+
+      gtag(
+        'config',
+        location.href.includes('memtoys')
+          ? idMaps['memtoys']
+          : idMaps['colgifts']
+      );
+    </script>
+    <script>
       var coverSupport =
         'CSS' in window &&
         typeof CSS.supports === 'function' &&
